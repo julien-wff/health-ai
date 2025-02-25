@@ -1,10 +1,28 @@
 {
-  "expo": {
-    "scheme": "acme",
-    "plugins": [
-      "expo-router"
-    ],
-    "name": "health-ai",
-    "slug": "health-ai"
-  }
+    "expo": {
+        "name": "Health AI",
+        "slug": "health-ai",
+        "scheme": "health-ai",
+        "version": "0.1.0",
+        "orientation": "portrait",
+        "userInterfaceStyle": "automatic",
+        "newArchEnabled": true,
+        "android": {
+            "package": "com.julienwff.healthai",
+            "permissions": [
+                "android.permission.health.READ_STEPS",
+                "android.permission.health.READ_SLEEP",
+                "android.permission.health.READ_EXERCISE"
+            ]
+        },
+        "web": {
+            "bundler": "metro"
+        },
+        "plugins": [
+            "expo-router"
+        ],
+        "experiments": {
+            "typedRoutes": true
+        }
+    }
 }
