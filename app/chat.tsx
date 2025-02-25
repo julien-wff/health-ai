@@ -1,3 +1,4 @@
+import ChatEmptyMessages from '@/components/chat/ChatEmptyMessages';
 import ChatMessages from '@/components/chat/ChatMessages';
 import PromptInput from '@/components/chat/PromptInput';
 import { generateAPIUrl } from '@/utils/endpoints';
@@ -13,7 +14,10 @@ export default function Chat() {
     });
 
     return <SafeAreaView className="h-full bg-slate-50 dark:bg-slate-950">
-        <ChatMessages messages={messages}/>
+        {messages.length === 0
+            ? <ChatEmptyMessages/>
+            : <ChatMessages messages={messages}/>
+        }
         <PromptInput input={input} handleInputChange={handleInputChange} handleSubmit={handleSubmit}/>
     </SafeAreaView>;
 }
