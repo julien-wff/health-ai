@@ -80,8 +80,8 @@ export default function Onboarding() {
             </View>
 
             <Text className="text-lg text-slate-800 dark:text-slate-200 mt-4">
-                If you continue, you accept that these personal records will be anonymously shared with LLM providers,
-                such as Gemini.
+                If you continue, you accept that these personal records will be anonymously shared with Google Gemini
+                via the LLM.
             </Text>
         </View>
 
