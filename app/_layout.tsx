@@ -1,5 +1,7 @@
 import '@/assets/style/global.css';
+import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
+import { hasAllRequiredPermissions, readHealthRecords } from '@/utils/health';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { Slot, useRouter } from 'expo-router';
@@ -7,7 +9,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { useColorScheme, View } from 'react-native';
-import { initialize as initializeHealth } from 'react-native-health-connect';
+import { getGrantedPermissions, initialize as initializeHealth } from 'react-native-health-connect';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -16,23 +18,41 @@ export default function Layout() {
     const colors = useColors();
     const router = useRouter();
 
-    const { getItem: getIsOnboarded } = useAsyncStorage(IS_ONBOARDED);
+    const { getItem: getIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
+    const { setIsOnboarded, setHasPermissions, setHealthRecords } = useAppState();
 
+    /**
+     * Check onboarding status, health permissions, redirect to the appropriate screen
+     */
     async function load() {
-        // Set the correct vue
-        const isOnboarded = await getIsOnboarded();
-        if (isOnboarded)
-            router.replace('/chat');
-        else
-            router.replace('/onboarding');
+        // Check onboarding status
+        const isOnboarded = await getIsOnboardedInStorage();
+        setIsOnboarded(!!isOnboarded);
 
         // Initialize health
         const healthInitialized = await initializeHealth();
         if (!healthInitialized)
             console.error('Health not initialized');
 
+        // Check for permissions
+        const grantedPermissions = await getGrantedPermissions();
+        const hasPermissions = hasAllRequiredPermissions(grantedPermissions);
+        setHasPermissions(hasPermissions);
+
+        // Redirect to the appropriate screen
+        if (isOnboarded && hasPermissions)
+            router.replace('/chat');
+        else
+            router.replace('/onboarding');
+
         // Hide the splash screen
         await SplashScreen.hideAsync();
+
+        // Read health data (after hiding the splash screen, faster and not noticeable)
+        if (hasPermissions) {
+            const records = await readHealthRecords();
+            setHealthRecords(records);
+        }
     }
 
     useEffect(() => {

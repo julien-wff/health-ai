@@ -1,14 +1,56 @@
 import HealthRecord from '@/components/onboarding/HealthRecord';
+import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
+import { hasAllRequiredPermissions, readHealthRecords, REQUIRED_PERMISSIONS } from '@/utils/health';
+import { IS_ONBOARDED } from '@/utils/storageKeys';
+import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 import { Footprints, Medal, MoonStar } from 'lucide-react-native';
-import { Image, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { useState } from 'react';
+import { Image, Text, ToastAndroid, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { requestPermission } from 'react-native-health-connect';
 
 export default function Onboarding() {
     const colorScheme = useColorScheme();
     const colors = useColors();
+    const router = useRouter();
 
-    function handleContinueClick() {
-        // TODO
+    const { setItem: setIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
+    const { hasPermissions, setHasPermissions, setIsOnboarded, setHealthRecords } = useAppState();
+    const [ isLoadingPermissions, setIsLoadingPermissions ] = useState(false);
+
+    /**
+     * Ask for permissions (if not already granted), continue to the chat screen and fetch health records
+     */
+    async function handleContinueClick() {
+        setIsLoadingPermissions(true);
+
+        if (hasPermissions) {
+            await finishOnboarding();
+            return;
+        }
+
+        ToastAndroid.show('Please allow all...', ToastAndroid.SHORT);
+        const permissions = await requestPermission(REQUIRED_PERMISSIONS);
+        if (hasAllRequiredPermissions(permissions)) {
+            setHasPermissions(true);
+            await finishOnboarding();
+        } else {
+            ToastAndroid.show('Missing permissions', ToastAndroid.SHORT);
+        }
+
+        setIsLoadingPermissions(false);
+    }
+
+    /**
+     * Set isOnboarded to true, save it in storage, redirect to the chat screen and fetch health records
+     */
+    async function finishOnboarding() {
+        setIsOnboarded(true);
+        await setIsOnboardedInStorage('1');
+        router.replace('/chat');
+        const healthRecords = await readHealthRecords();
+        setHealthRecords(healthRecords);
     }
 
     return <View className="min-h-screen flex gap-4 p-4 bg-slate-50 dark:bg-slate-950">
@@ -43,9 +85,11 @@ export default function Onboarding() {
             </Text>
         </View>
 
-        <TouchableOpacity className="bg-blue-500 dark:bg-blue-400 p-4 rounded-lg"
-                          activeOpacity={.9}
-                          onPress={handleContinueClick}>
+        <TouchableOpacity
+            className="bg-blue-500 dark:bg-blue-400 p-4 rounded-lg"
+            activeOpacity={.9}
+            disabled={isLoadingPermissions}
+            onPress={handleContinueClick}>
             <Text className="text-white font-bold text-lg text-center">
                 Continue
             </Text>
