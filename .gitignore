@@ -38,3 +38,6 @@ yarn-error.*
 # Editors
 .vscode/
 .idea/
+
+# Native build
+android/
