@@ -1,3 +1,4 @@
+import '@/utils/polyfills';
 import '@/assets/style/global.css';
 import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
