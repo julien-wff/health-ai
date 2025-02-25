@@ -1,3 +1,4 @@
+import '@/assets/style/global.css';
 import { Slot } from 'expo-router';
 import { View } from 'react-native';
 
