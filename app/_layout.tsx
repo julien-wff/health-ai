@@ -7,6 +7,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { useColorScheme, View } from 'react-native';
+import { initialize as initializeHealth } from 'react-native-health-connect';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -24,6 +25,11 @@ export default function Layout() {
             router.replace('/chat');
         else
             router.replace('/onboarding');
+
+        // Initialize health
+        const healthInitialized = await initializeHealth();
+        if (!healthInitialized)
+            console.error('Health not initialized');
 
         // Hide the splash screen
         await SplashScreen.hideAsync();

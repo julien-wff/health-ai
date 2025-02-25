@@ -25,6 +25,7 @@
         },
         "plugins": [
             "expo-router",
+            "expo-health-connect",
             [
                 "expo-splash-screen",
                 {
@@ -36,6 +37,16 @@
                         "backgroundColor": "#0f172a"
                     },
                     "imageWidth": 200
+                }
+            ],
+            [
+                "expo-build-properties",
+                {
+                    "android": {
+                        "compileSdkVersion": 35,
+                        "targetSdkVersion": 35,
+                        "minSdkVersion": 26
+                    }
                 }
             ]
         ],
