@@ -7,6 +7,7 @@ import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { Slot, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { setBackgroundColorAsync } from 'expo-system-ui';
 import { useEffect } from 'react';
 import { useColorScheme, View } from 'react-native';
 import { getGrantedPermissions, initialize as initializeHealth } from 'react-native-health-connect';
@@ -58,6 +59,10 @@ export default function Layout() {
     useEffect(() => {
         void load();
     }, []);
+
+    useEffect(() => {
+        void setBackgroundColorAsync(colors.background);
+    }, [ colors.background ]);
 
     return <View>
         <StatusBar style={colorScheme === 'light' ? 'dark' : 'light'}
