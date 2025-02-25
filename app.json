@@ -7,8 +7,13 @@
         "orientation": "portrait",
         "userInterfaceStyle": "automatic",
         "newArchEnabled": true,
+        "icon": "./assets/icons/icon.png",
         "android": {
             "package": "com.julienwff.healthai",
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/icons/adaptive-icon.png",
+                "backgroundColor": "#FFFFFF"
+            },
             "permissions": [
                 "android.permission.health.READ_STEPS",
                 "android.permission.health.READ_SLEEP",
@@ -19,7 +24,20 @@
             "bundler": "metro"
         },
         "plugins": [
-            "expo-router"
+            "expo-router",
+            [
+                "expo-splash-screen",
+                {
+                    "backgroundColor": "#f8fafc",
+                    "image": "./assets/icons/splash-icon.png",
+                    "resizeMode": "contain",
+                    "dark": {
+                        "image": "./assets/icons/splash-icon-dark.png",
+                        "backgroundColor": "#0f172a"
+                    },
+                    "imageWidth": 200
+                }
+            ]
         ],
         "experiments": {
             "typedRoutes": true
