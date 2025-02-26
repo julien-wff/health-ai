@@ -1,3 +1,4 @@
+import ProjectIcon from '@/components/content/ProjectIcon';
 import HealthRecord from '@/components/onboarding/HealthRecord';
 import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
@@ -7,7 +8,7 @@ import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { Footprints, Medal, MoonStar } from 'lucide-react-native';
 import { useState } from 'react';
-import { Image, Text, ToastAndroid, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { Text, ToastAndroid, TouchableOpacity, useColorScheme, View } from 'react-native';
 import { requestPermission } from 'react-native-health-connect';
 
 export default function Onboarding() {
@@ -56,14 +57,7 @@ export default function Onboarding() {
     return <View className="min-h-screen flex gap-4 p-4 bg-slate-50 dark:bg-slate-950">
         <View className="flex-1 flex justify-center gap-4">
             <View className="flex items-center mb-4">
-                {colorScheme === 'dark'
-                    ? <Image source={require('@/assets/icons/splash-icon-dark.png')}
-                             resizeMode="contain"
-                             className="w-24 h-24"/>
-                    : <Image source={require('@/assets/icons/splash-icon.png')}
-                             resizeMode="contain"
-                             className="w-24 h-24"/>
-                }
+                <ProjectIcon className="w-24 h-24"/>
             </View>
 
             <Text className="text-2xl font-bold text-slate-900 dark:text-slate-50">
