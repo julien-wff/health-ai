@@ -59,7 +59,7 @@ function AssistantIcon() {
                         start={[ 0, 0 ]}
                         end={[ 1, 1 ]}
                         className="absolute inset-0"
-                        style={{ borderRadius: 50 }}/>
+                        style={{ borderRadius: 20 }}/>
         <HeartPulse size={12} color={colors.blue}/>
     </View>;
 }
