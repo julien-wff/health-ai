@@ -11,10 +11,16 @@ const SYSTEM_PROMPT = [
 export async function POST(req: Request) {
     const { messages } = await req.json();
 
+    const currentDateFormatted = new Date().toLocaleString('en', {
+        day: 'numeric',
+        month: 'long',
+        weekday: 'long',
+    });
+
     const result = streamText({
         model: google('gemini-2.0-flash-001'),
         messages,
-        system: SYSTEM_PROMPT,
+        system: SYSTEM_PROMPT + ` For your information, today is ${currentDateFormatted}.`,
     });
 
     return result.toDataStreamResponse();
