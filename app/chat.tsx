@@ -11,7 +11,7 @@ import { Drawer } from 'react-native-drawer-layout';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Chat() {
-    const { messages, handleInputChange, input, handleSubmit } = useChat({
+    const { messages, handleInputChange, input, handleSubmit, setMessages, stop } = useChat({
         fetch: expoFetch as unknown as typeof globalThis.fetch,
         api: generateAPIUrl('/api/chat'),
         onError: error => console.error(error, 'ERROR'),
@@ -19,12 +19,17 @@ export default function Chat() {
 
     const [ drawerOpened, setDrawerOpened ] = useState(false);
 
+    function onNewChat() {
+        stop();
+        setMessages([]);
+    }
+
     return <SafeAreaView className="h-full bg-slate-50 dark:bg-slate-950">
         <Drawer open={drawerOpened}
                 onOpen={() => setDrawerOpened(true)}
                 onClose={() => setDrawerOpened(false)}
                 renderDrawerContent={() => <ChatDrawer/>}>
-            <ChatTopBar onOpen={() => setDrawerOpened(true)} onNew={() => ({})}/>
+            <ChatTopBar onOpen={() => setDrawerOpened(true)} onNew={onNewChat}/>
 
             {messages.length === 0
                 ? <ChatEmptyMessages/>
