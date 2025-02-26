@@ -22,6 +22,7 @@ export default function PromptInput({ input, handleInputChange, handleSubmit }: 
             ref={textInput}
             className="flex-1 p-4 rounded-xl dark:placeholder:text-slate-500 dark:text-slate-200"
             placeholder="Message the assistant"
+            returnKeyType="send"
             value={input}
             onChange={e =>
                 handleInputChange({
