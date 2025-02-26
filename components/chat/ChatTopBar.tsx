@@ -15,7 +15,9 @@ export default function ChatTopBar({ onOpen, onNew, text }: ChatTopBarProps) {
             <Menu size={30}/>
         </TouchableOpacity>
 
-        <Text className="font-bold text-lg text-center flex-1">{text || 'New Chat'}</Text>
+        <Text className="font-bold text-lg text-center flex-1" numberOfLines={1}>
+            {text || 'New Chat'}
+        </Text>
 
         <TouchableOpacity onPress={onNew}
                           className="h-16 w-16 flex items-center justify-center"
