@@ -1,4 +1,7 @@
+import { useColors } from '@/hooks/useColors';
 import { UIMessage } from 'ai';
+import { LinearGradient } from 'expo-linear-gradient';
+import { HeartPulse, User } from 'lucide-react-native';
 import { useEffect, useRef } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
@@ -21,10 +24,42 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
         <ScrollView className="flex-1 px-4" ref={scrollView} onLayout={() => updateScroll()}>
             {messages.map(m => (
                 <View key={m.id} className="my-2">
-                    <Text className="font-bold text-slate-900 dark:text-slate-100">{m.role}</Text>
+                    <View className="flex items-center flex-row gap-2 mb-1">
+                        {m.role === 'user' ? <UserIcon/> : <AssistantIcon/>}
+                        <Text className="font-bold text-slate-900 dark:text-slate-100">
+                            {m.role === 'user' ? 'You' : 'Health AI'}
+                        </Text>
+                    </View>
                     <Text className="text-slate-800 dark:text-slate-200">{m.content}</Text>
                 </View>
             ))}
         </ScrollView>
     );
+}
+
+
+function UserIcon() {
+    const colors = useColors();
+
+    return <View className="w-5 h-5 flex items-center justify-center rounded-full">
+        <LinearGradient colors={colors.greenBackground}
+                        start={[ 0, 0 ]}
+                        end={[ 1, 1 ]}
+                        className="absolute inset-0"
+                        style={{ borderRadius: 20 }}/>
+        <User size={12} color={colors.green}/>
+    </View>;
+}
+
+function AssistantIcon() {
+    const colors = useColors();
+
+    return <View className="w-6 h-6 bg-white flex items-center justify-center rounded-full">
+        <LinearGradient colors={colors.blueBackground}
+                        start={[ 0, 0 ]}
+                        end={[ 1, 1 ]}
+                        className="absolute inset-0"
+                        style={{ borderRadius: 50 }}/>
+        <HeartPulse size={12} color={colors.blue}/>
+    </View>;
 }

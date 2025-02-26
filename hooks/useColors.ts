@@ -23,6 +23,12 @@ const ROSE_100 = '#ffe4e6';
 const ROSE_950 = '#4c0519';
 const RED_500 = '#ef4444';
 
+const SKY_100 = '#e0f2fe';
+const SKY_950 = '#082f49';
+const INDIGO_100 = '#e0e7ff';
+const INDIGO_950 = '#1e1b4b';
+const BLUE_500 = '#3b82f6';
+
 type Gradient = [ string, string ];
 
 
@@ -35,8 +41,10 @@ export function useColors() {
         green: GREEN_500,
         indigo: INDIGO_500,
         red: RED_500,
+        blue: BLUE_500,
         greenBackground: (colorScheme === 'light' ? [ LIME_100, EMERALD_100 ] : [ LIME_950, EMERALD_950 ]) as Gradient,
         indigoBackground: (colorScheme === 'light' ? [ BLUE_100, VIOLET_100 ] : [ BLUE_950, VIOLET_950 ]) as Gradient,
         redBackground: (colorScheme === 'light' ? [ PINK_100, ROSE_100 ] : [ PINK_950, ROSE_950 ]) as Gradient,
+        blueBackground: (colorScheme === 'light' ? [ SKY_100, INDIGO_100 ] : [ SKY_950, INDIGO_950 ]) as Gradient,
     };
 }
