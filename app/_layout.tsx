@@ -10,7 +10,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import { useEffect } from 'react';
-import { useColorScheme, View } from 'react-native';
+import { useColorScheme } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { getGrantedPermissions, initialize as initializeHealth } from 'react-native-health-connect';
 
 void SplashScreen.preventAutoHideAsync();
@@ -65,10 +66,10 @@ export default function Layout() {
         void setBackgroundColorAsync(colors.background);
     }, [ colors.background ]);
 
-    return <View>
+    return <GestureHandlerRootView>
         <StatusBar style={colorScheme === 'light' ? 'dark' : 'light'}
                    translucent={false}
                    backgroundColor={colors.background}/>
         <Slot/>
-    </View>;
+    </GestureHandlerRootView>;
 }
