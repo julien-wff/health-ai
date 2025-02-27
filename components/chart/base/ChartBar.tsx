@@ -49,9 +49,9 @@ export default function ChartBar({ color, label, canvasHeight, canvasWidth, valu
         () => {
             const p = Skia
                 .ParagraphBuilder
-                .Make({ textAlign: TextAlign.Center })
+                .Make({ textAlign: TextAlign.Center, maxLines: 1 })
                 .pushStyle({ fontSize: 12, color: Skia.Color(colors.text) })
-                .addText(label)
+                .addText(label.trim())
                 .build();
             p.layout(barWidth);
             setLabelTextHeight(p.getHeight());

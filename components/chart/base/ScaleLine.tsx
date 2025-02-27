@@ -32,9 +32,9 @@ export default function ScaleLine({ value, lineY, canvasWidth, animationDelay }:
 
     const paragraph = useMemo(() => {
         const p = Skia.ParagraphBuilder
-            .Make({ textAlign: TextAlign.Center })
+            .Make({ textAlign: TextAlign.Center, maxLines: 1 })
             .pushStyle({ fontSize: 12, color: Skia.Color(colors.text) })
-            .addText(String(Math.round(value)))
+            .addText(String(Math.round(value)).trim())
             .build();
         p.layout(SCALE_WIDTH);
         return p;
