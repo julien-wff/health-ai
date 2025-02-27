@@ -5,6 +5,8 @@ import { useColors } from '@/hooks/useColors';
 import { hasAllRequiredPermissions, readHealthRecords } from '@/utils/health';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 import { Slot, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -14,6 +16,7 @@ import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { getGrantedPermissions, initialize as initializeHealth } from 'react-native-health-connect';
 
+dayjs.extend(duration);
 void SplashScreen.preventAutoHideAsync();
 
 export default function Layout() {
