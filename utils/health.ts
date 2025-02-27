@@ -1,4 +1,4 @@
-import { Permission, readRecords, ReadRecordsOptions, ReadRecordsResult } from 'react-native-health-connect';
+import { Permission, readRecords, ReadRecordsOptions, RecordResult } from 'react-native-health-connect';
 
 /**
  * Permissions required to read health records used by the AI
@@ -29,9 +29,9 @@ export function hasAllRequiredPermissions(grantedPermissions: Permission[]) {
 
 
 export interface ReadHealthRecords {
-    steps: ReadRecordsResult<'Steps'>;
-    sleep: ReadRecordsResult<'SleepSession'>;
-    exercise: ReadRecordsResult<'ExerciseSession'>;
+    steps: RecordResult<'Steps'>[];
+    sleep: RecordResult<'SleepSession'>[];
+    exercise: RecordResult<'ExerciseSession'>[];
 }
 
 
@@ -57,5 +57,9 @@ export async function readHealthRecords(): Promise<ReadHealthRecords> {
         readRecords('ExerciseSession', readOptions),
     ]);
 
-    return { steps, sleep, exercise };
+    return {
+        steps: steps.records,
+        sleep: sleep.records,
+        exercise: exercise.records,
+    };
 }
