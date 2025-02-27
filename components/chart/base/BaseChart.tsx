@@ -1,5 +1,6 @@
 import ChartBar from '@/components/chart/base/ChartBar';
 import DebugLines from '@/components/chart/base/DebugLines';
+import { ScaleUnit } from '@/components/chart/base/graph-values';
 import Scale from '@/components/chart/base/Scale';
 import { Canvas, LinearGradient, RoundedRect, vec } from '@shopify/react-native-skia';
 import { useMemo, useState } from 'react';
@@ -12,9 +13,10 @@ interface BaseChartProps {
     values: number[];
     labels: string[];
     debug?: boolean;
+    scaleUnit?: ScaleUnit;
 }
 
-export default function BaseChart({ barColor, backgroundColor, values, labels, debug }: BaseChartProps) {
+export default function BaseChart({ barColor, backgroundColor, values, labels, debug, scaleUnit }: BaseChartProps) {
     const [ height, setHeight ] = useState(0);
     const [ width, setWidth ] = useState(0);
 
@@ -31,7 +33,7 @@ export default function BaseChart({ barColor, backgroundColor, values, labels, d
                 <LinearGradient start={vec(0, 0)} end={vec(width, height)} colors={backgroundColor}/>
             </RoundedRect>
 
-            <Scale values={values} canvasHeight={height} canvasWidth={width}/>
+            <Scale values={values} canvasHeight={height} canvasWidth={width} scaleUnit={scaleUnit}/>
 
             {values.map((value, index) => (
                 <ChartBar key={index}

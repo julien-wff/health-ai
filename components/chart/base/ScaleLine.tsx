@@ -2,9 +2,11 @@ import {
     GRAPH_MARGIN,
     INDIVIDUAL_ANIMATIONS_DURATION,
     SCALE_WIDTH,
+    ScaleUnit,
     TOTAL_ANIMATIONS_DURATION,
 } from '@/components/chart/base/graph-values';
 import { useColors } from '@/hooks/useColors';
+import { formatScaleUnit } from '@/utils/format';
 import {
     DashPathEffect,
     Group,
@@ -25,16 +27,17 @@ interface ScaleLineProps {
     lineY: number;
     canvasWidth: number;
     animationDelay: number; // Fraction of total animations duration
+    scaleUnit?: ScaleUnit;
 }
 
-export default function ScaleLine({ value, lineY, canvasWidth, animationDelay }: ScaleLineProps) {
+export default function ScaleLine({ value, lineY, canvasWidth, animationDelay, scaleUnit }: ScaleLineProps) {
     const colors = useColors();
 
     const paragraph = useMemo(() => {
         const p = Skia.ParagraphBuilder
             .Make({ textAlign: TextAlign.Center, maxLines: 1 })
             .pushStyle({ fontSize: 12, color: Skia.Color(colors.text) })
-            .addText(String(Math.round(value)).trim())
+            .addText(formatScaleUnit(value, scaleUnit))
             .build();
         p.layout(SCALE_WIDTH);
         return p;
