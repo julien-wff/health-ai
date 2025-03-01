@@ -23,11 +23,15 @@ export default function Chat() {
         maxSteps: 5,
         onError: error => console.error(error, 'ERROR'),
         onToolCall({ toolCall }) {
-            const toolName = toolCall.toolName as keyof typeof tools;
-            if (toolName === 'get-daily-steps')
-                return formatRecordsForAI(filterRecordsForAI(healthRecords!.steps, toolCall.args as DateRangeParams));
-            if (toolName === 'get-daily-exercise')
-                return formatRecordsForAI(filterRecordsForAI(healthRecords!.exercise, toolCall.args as DateRangeParams));
+            switch (toolCall.toolName as keyof typeof tools) {
+                case 'get-daily-steps':
+                    return formatRecordsForAI(filterRecordsForAI(healthRecords!.steps, toolCall.args as DateRangeParams));
+                case 'get-daily-exercise':
+                    return formatRecordsForAI(filterRecordsForAI(healthRecords!.exercise, toolCall.args as DateRangeParams));
+                case 'display-exercise':
+                case 'display-steps':
+                    return 'ok';
+            }
         },
     });
 

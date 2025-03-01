@@ -31,13 +31,27 @@ export const tools = {
         parameters: z.object({
             startDate: z.string().optional().describe('Start date of the range to query, of the format yyyy-mm-dd'),
             endDate: z.string().optional().describe('End date of the range to query, of the format yyyy-mm-dd'),
-        }),
+        }).describe('Returns the steps count for each day in the range.'),
     },
     'get-daily-exercise': {
-        description: 'Get day-by-day exercise / active minutes from the user.',
+        description: 'Get day-by-day exercise / active moments from the user. They are classified by type (bike, run, sports and so on).',
         parameters: z.object({
             startDate: z.string().optional().describe('Start date of the range to query, of the format yyyy-mm-dd'),
             endDate: z.string().optional().describe('End date of the range to query, of the format yyyy-mm-dd'),
+        }).describe('Returns each exercise that happened in the range, with its nature and duration.'),
+    },
+    'display-steps': {
+        description: 'Display a graph with the day-to-day steps of the user.',
+        parameters: z.object({
+            startDate: z.string().optional().describe('Start date of the range to display, of the format yyyy-mm-dd'),
+            endDate: z.string().optional().describe('End date of the range to display, of the format yyyy-mm-dd'),
+        }),
+    },
+    'display-exercise': {
+        description: 'Display a graph with the day-to-day exercise of the user. All activities (bike, run, sports and so on) are mixed together.',
+        parameters: z.object({
+            startDate: z.string().optional().describe('Start date of the range to display, of the format yyyy-mm-dd'),
+            endDate: z.string().optional().describe('End date of the range to display, of the format yyyy-mm-dd'),
         }),
     },
 } satisfies ToolSet;

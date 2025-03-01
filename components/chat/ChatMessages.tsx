@@ -1,3 +1,4 @@
+import ChatToolWidget from '@/components/chat/ChatToolWidget';
 import { useColors } from '@/hooks/useColors';
 import { UIMessage } from 'ai';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -30,7 +31,19 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
                             {m.role === 'user' ? 'You' : 'Health AI'}
                         </Text>
                     </View>
-                    <Text className="text-slate-800 dark:text-slate-200">{m.content}</Text>
+                    {m.parts
+                        .map((part, i) => {
+                            switch (part.type) {
+                                case 'text':
+                                    return <Text key={i}
+                                                 className="text-slate-800 dark:text-slate-200">
+                                        {part.text}
+                                    </Text>;
+                                case 'tool-invocation':
+                                    return <ChatToolWidget invocation={part.toolInvocation}
+                                                           key={part.toolInvocation.toolCallId}/>;
+                            }
+                        })}
                 </View>
             ))}
         </ScrollView>
