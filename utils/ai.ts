@@ -10,9 +10,12 @@ export async function generateConversationTitle(messages: UIMessage[]) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            messages: messages.map(({ role, content }) => ({ role, content })),
+            messages: messages.map(({ role, content, parts }) => ({ role, content, parts })),
         }),
     });
+
+    if (!response.ok)
+        throw new Error('Failed to generate conversation title');
 
     return response.text();
 }

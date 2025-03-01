@@ -1,5 +1,6 @@
 import { google } from '@ai-sdk/google';
-import { CoreMessage, generateText } from 'ai';
+import { TextUIPart } from '@ai-sdk/ui-utils';
+import { CoreMessage, generateText, GenerateTextResult, ToolSet } from 'ai';
 
 const SYSTEM_PROMPT = [
     'You are a personalized health assistant.',
@@ -13,18 +14,25 @@ const SYSTEM_PROMPT = [
 
 
 export async function POST(req: Request) {
-    const { messages } = await req.json() as { messages: CoreMessage[] };
+    const { messages } = await req.json() as { messages: (CoreMessage & { parts: TextUIPart[] })[] };
     messages.push({
         role: 'user',
         content: 'Now generate the title',
+        parts: [ { type: 'text', text: 'Now generate the title' } ],
     });
 
-    const result = await generateText({
-        model: google('gemini-2.0-flash-001'),
-        messages,
-        system: SYSTEM_PROMPT,
-        maxTokens: 12,
-    });
+    let result: GenerateTextResult<ToolSet, never>;
+    try {
+        result = await generateText({
+            model: google('gemini-2.0-flash-001'),
+            messages,
+            system: SYSTEM_PROMPT,
+            maxTokens: 12,
+        });
+    } catch (e) {
+        console.error(e);
+        return new Response('Failed to generate title', { status: 500 });
+    }
 
     return new Response(result.text);
 }
