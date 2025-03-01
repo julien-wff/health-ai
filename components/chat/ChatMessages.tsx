@@ -24,7 +24,7 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
     return (
         <ScrollView className="flex-1 px-4" ref={scrollView} onLayout={() => updateScroll()}>
             {messages.map(m => (
-                <View key={m.id} className="my-2">
+                <View key={m.id} className="mt-2 mb-6">
                     <View className="flex items-center flex-row gap-2 mb-1">
                         {m.role === 'user' ? <UserIcon/> : <AssistantIcon/>}
                         <Text className="font-bold text-slate-900 dark:text-slate-100">
@@ -35,8 +35,7 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
                         .map((part, i) => {
                             switch (part.type) {
                                 case 'text':
-                                    return <Text key={i}
-                                                 className="text-slate-800 dark:text-slate-200">
+                                    return <Text key={i} className="text-slate-800 dark:text-slate-200">
                                         {part.text}
                                     </Text>;
                                 case 'tool-invocation':
