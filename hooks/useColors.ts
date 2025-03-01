@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 
 const SLATE_50 = '#f8fafc';
@@ -35,7 +36,7 @@ type Gradient = [ string, string ];
 export function useColors() {
     const colorScheme = useColorScheme();
 
-    return {
+    return useMemo(() => ({
         background: colorScheme === 'light' ? SLATE_50 : SLATE_950,
         text: colorScheme === 'light' ? SLATE_800 : SLATE_200,
         green: GREEN_500,
@@ -46,5 +47,5 @@ export function useColors() {
         indigoBackground: (colorScheme === 'light' ? [ BLUE_100, VIOLET_100 ] : [ BLUE_950, VIOLET_950 ]) as Gradient,
         redBackground: (colorScheme === 'light' ? [ PINK_100, ROSE_100 ] : [ PINK_950, ROSE_950 ]) as Gradient,
         blueBackground: (colorScheme === 'light' ? [ SKY_100, INDIGO_100 ] : [ SKY_950, INDIGO_950 ]) as Gradient,
-    };
+    }), [ colorScheme ]);
 }

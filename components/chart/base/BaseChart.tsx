@@ -3,7 +3,7 @@ import DebugLines from '@/components/chart/base/DebugLines';
 import { ScaleUnit } from '@/components/chart/base/graph-values';
 import Scale from '@/components/chart/base/Scale';
 import { Canvas, LinearGradient, RoundedRect, vec } from '@shopify/react-native-skia';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { LayoutChangeEvent, View } from 'react-native';
 
 
@@ -16,7 +16,14 @@ interface BaseChartProps {
     scaleUnit?: ScaleUnit;
 }
 
-export default function BaseChart({ barColor, backgroundColor, values, labels, debug, scaleUnit }: BaseChartProps) {
+export default React.memo(function BaseChart({
+                                                 barColor,
+                                                 backgroundColor,
+                                                 values,
+                                                 labels,
+                                                 debug,
+                                                 scaleUnit,
+                                             }: BaseChartProps) {
     const [ height, setHeight ] = useState(0);
     const [ width, setWidth ] = useState(0);
 
@@ -49,4 +56,4 @@ export default function BaseChart({ barColor, backgroundColor, values, labels, d
             {debug && <DebugLines canvasHeight={height} canvasWidth={width}/>}
         </Canvas>
     </View>;
-}
+});
