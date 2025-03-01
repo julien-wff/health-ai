@@ -38,14 +38,14 @@ export default function PromptInput({ input, handleInputChange, handleSubmit }: 
                 e.preventDefault();
             }}
         />
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => {
+            if (input.trim().length > 0)
+                handleSubmit();
+            else
+                looseFocus();
+        }}>
             <View className="bg-blue-500 dark:bg-blue-400 p-4 rounded-xl">
-                <Send size={20} color="white" onPress={() => {
-                    if (input.trim().length > 0)
-                        handleSubmit();
-                    else
-                        looseFocus();
-                }}/>
+                <Send size={20} color="white"/>
             </View>
         </TouchableOpacity>
     </View>;
