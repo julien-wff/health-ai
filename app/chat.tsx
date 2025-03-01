@@ -65,7 +65,10 @@ export default function Chat() {
                 : <ChatMessages messages={messages}/>
             }
 
-            <PromptInput input={input} setInput={setInput} handleSubmit={handleSubmit}/>
+            <PromptInput input={input}
+                         setInput={setInput}
+                         handleSubmit={handleSubmit}
+                         isLoading={status === 'streaming' || status === 'submitted'}/>
         </Drawer>
     </SafeAreaView>;
 }

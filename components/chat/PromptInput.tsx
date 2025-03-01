@@ -1,3 +1,4 @@
+import AnimatedLoadingIcon from '@/components/chat/AnimatedLoadingIcon';
 import { Send } from 'lucide-react-native';
 import { FormEvent, useRef } from 'react';
 import { TextInput, TouchableOpacity, View } from 'react-native';
@@ -6,9 +7,10 @@ interface PromptInputProps {
     input: string;
     setInput: (value: string) => void;
     handleSubmit: (e?: FormEvent) => void;
+    isLoading?: boolean;
 }
 
-export default function PromptInput({ input, setInput, handleSubmit }: PromptInputProps) {
+export default function PromptInput({ input, setInput, handleSubmit, isLoading }: PromptInputProps) {
 
     const textInput = useRef<TextInput>(null);
 
@@ -30,15 +32,18 @@ export default function PromptInput({ input, setInput, handleSubmit }: PromptInp
                 e.preventDefault();
             }}
         />
-        <TouchableOpacity onPress={() => {
-            if (input.trim().length > 0)
-                handleSubmit();
-            else
-                looseFocus();
-        }}>
-            <View className="bg-blue-500 dark:bg-blue-400 p-4 rounded-xl">
+        <TouchableOpacity className="bg-blue-500 dark:bg-blue-400 p-4 rounded-xl disabled:opacity-75 h-14 w-14"
+                          disabled={isLoading}
+                          onPress={() => {
+                              looseFocus();
+                              if (input.trim().length > 0)
+                                  handleSubmit();
+                          }}>
+            {isLoading ?
+                <AnimatedLoadingIcon size={20} color="white"/>
+                :
                 <Send size={20} color="white"/>
-            </View>
+            }
         </TouchableOpacity>
     </View>;
 }
