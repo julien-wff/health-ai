@@ -12,4 +12,3 @@ export function formatScaleUnit(value: number, scaleUnit: ScaleUnit = 'none') {
             return String(Math.round(value / roundMultiplier) * roundMultiplier).trim();
     }
 }
-

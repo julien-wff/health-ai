@@ -1,3 +1,6 @@
+import { DateRangeParams } from '@/utils/ai';
+import { numberToExerciseType } from '@/utils/exerciseType';
+import dayjs from 'dayjs';
 import { Permission, readRecords, ReadRecordsOptions, RecordResult } from 'react-native-health-connect';
 
 /**
@@ -62,4 +65,39 @@ export async function readHealthRecords(): Promise<ReadHealthRecords> {
         sleep: sleep.records,
         exercise: exercise.records,
     };
+}
+
+export function filterRecordsForAI(
+    records: RecordResult<'Steps' | 'SleepSession' | 'ExerciseSession'>[],
+    range: DateRangeParams,
+) {
+    return records.filter(record =>
+        dayjs(record.startTime).isBetween(
+            range.startDate || dayjs().subtract(1, 'month'),
+            range.endDate || dayjs(),
+            'day',
+            '[]',
+        ),
+    );
+}
+
+export function formatRecordsForAI(records: RecordResult<'Steps' | 'SleepSession' | 'ExerciseSession'>[]) {
+    if ('count' in records[0])
+        return JSON.stringify(
+            records.map(record => ({
+                count: (record as RecordResult<'Steps'>).count,
+                date: dayjs(record.startTime).format('YYYY-MM-DD'),
+            })),
+        );
+
+    if ('exerciseType' in records[0])
+        return JSON.stringify(
+            records.map(record => ({
+                durationMinutes: dayjs(record.endTime).diff(record.startTime, 'minute'),
+                type: numberToExerciseType((record as RecordResult<'ExerciseSession'>).exerciseType),
+                date: dayjs(record.startTime).format('YYYY-MM-DD'),
+            })),
+        );
+
+    return '[]';
 }

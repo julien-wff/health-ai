@@ -3,8 +3,10 @@ import ChatEmptyMessages from '@/components/chat/ChatEmptyMessages';
 import ChatMessages from '@/components/chat/ChatMessages';
 import ChatTopBar from '@/components/chat/ChatTopBar';
 import PromptInput from '@/components/chat/PromptInput';
-import { generateConversationTitle } from '@/utils/ai';
+import { useAppState } from '@/hooks/useAppState';
+import { DateRangeParams, generateConversationTitle, tools } from '@/utils/ai';
 import { generateAPIUrl } from '@/utils/endpoints';
+import { filterRecordsForAI, formatRecordsForAI } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
 import { fetch as expoFetch } from 'expo/fetch';
 import { useEffect, useState } from 'react';
@@ -12,10 +14,20 @@ import { Drawer } from 'react-native-drawer-layout';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Chat() {
+    const { healthRecords } = useAppState();
+
     const { messages, handleInputChange, input, handleSubmit, setMessages, stop, status } = useChat({
         fetch: expoFetch as unknown as typeof globalThis.fetch,
         api: generateAPIUrl('/api/chat'),
+        maxSteps: 5,
         onError: error => console.error(error, 'ERROR'),
+        onToolCall({ toolCall }) {
+            const toolName = toolCall.toolName as keyof typeof tools;
+            if (toolName === 'get-daily-steps')
+                return formatRecordsForAI(filterRecordsForAI(healthRecords!.steps, toolCall.args as DateRangeParams));
+            if (toolName === 'get-daily-exercise')
+                return formatRecordsForAI(filterRecordsForAI(healthRecords!.exercise, toolCall.args as DateRangeParams));
+        },
     });
 
     useEffect(() => {

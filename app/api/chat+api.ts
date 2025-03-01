@@ -1,3 +1,4 @@
+import { tools } from '@/utils/ai';
 import { google } from '@ai-sdk/google';
 import { streamText } from 'ai';
 
@@ -15,12 +16,14 @@ export async function POST(req: Request) {
         day: 'numeric',
         month: 'long',
         weekday: 'long',
+        year: 'numeric',
     });
 
     const result = streamText({
         model: google('gemini-2.0-flash-001'),
         messages,
         system: SYSTEM_PROMPT + ` For your information, today is ${currentDateFormatted}.`,
+        tools,
     });
 
     return result.toDataStreamResponse();
