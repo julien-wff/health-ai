@@ -10,13 +10,14 @@ import { filterRecordsForAI, formatRecordsForAI } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
 import { fetch as expoFetch } from 'expo/fetch';
 import { useEffect, useState } from 'react';
+import { InteractionManager } from 'react-native';
 import { Drawer } from 'react-native-drawer-layout';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Chat() {
     const { healthRecords } = useAppState();
 
-    const { messages, handleInputChange, input, handleSubmit, setMessages, stop, status } = useChat({
+    const { messages, setInput, input, handleSubmit, setMessages, stop, status } = useChat({
         fetch: expoFetch as unknown as typeof globalThis.fetch,
         api: generateAPIUrl('/api/chat'),
         maxSteps: 5,
@@ -34,7 +35,9 @@ export default function Chat() {
         if (messages.length !== 2 || status !== 'ready' || title !== null)
             return;
 
-        generateConversationTitle(messages).then(setTitle);
+        InteractionManager.runAfterInteractions(() => {
+            generateConversationTitle(messages).then(setTitle);
+        });
     }, [ messages.length, status ]);
 
     const [ drawerOpened, setDrawerOpened ] = useState(false);
@@ -58,7 +61,7 @@ export default function Chat() {
                 : <ChatMessages messages={messages}/>
             }
 
-            <PromptInput input={input} handleInputChange={handleInputChange} handleSubmit={handleSubmit}/>
+            <PromptInput input={input} setInput={setInput} handleSubmit={handleSubmit}/>
         </Drawer>
     </SafeAreaView>;
 }

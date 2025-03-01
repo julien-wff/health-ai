@@ -1,14 +1,14 @@
 import { Send } from 'lucide-react-native';
-import { ChangeEvent, FormEvent, useRef } from 'react';
+import { FormEvent, useRef } from 'react';
 import { TextInput, TouchableOpacity, View } from 'react-native';
 
 interface PromptInputProps {
     input: string;
-    handleInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    setInput: (value: string) => void;
     handleSubmit: (e?: FormEvent) => void;
 }
 
-export default function PromptInput({ input, handleInputChange, handleSubmit }: PromptInputProps) {
+export default function PromptInput({ input, setInput, handleSubmit }: PromptInputProps) {
 
     const textInput = useRef<TextInput>(null);
 
@@ -24,15 +24,7 @@ export default function PromptInput({ input, handleInputChange, handleSubmit }: 
             placeholder="Message the assistant"
             returnKeyType="send"
             value={input}
-            onChange={e =>
-                handleInputChange({
-                    ...e,
-                    target: {
-                        ...e.target,
-                        value: e.nativeEvent.text,
-                    },
-                } as unknown as ChangeEvent<HTMLInputElement>)
-            }
+            onChangeText={setInput}
             onSubmitEditing={e => {
                 handleSubmit(e as unknown as FormEvent);
                 e.preventDefault();
