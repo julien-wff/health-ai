@@ -2,6 +2,7 @@ import '@/utils/polyfills';
 import '@/assets/style/global.css';
 import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
+import { getStoredChats } from '@/utils/chat';
 import { hasAllRequiredPermissions, readHealthRecords } from '@/utils/health';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
@@ -27,7 +28,7 @@ export default function Layout() {
     const router = useRouter();
 
     const { getItem: getIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
-    const { setIsOnboarded, setHasPermissions, setHealthRecords } = useAppState();
+    const { setIsOnboarded, setHasPermissions, setHealthRecords, setChats } = useAppState();
 
     /**
      * Check onboarding status, health permissions, redirect to the appropriate screen
@@ -55,6 +56,10 @@ export default function Layout() {
 
         // Hide the splash screen
         await SplashScreen.hideAsync();
+
+        // Load the chats
+        const chats = await getStoredChats();
+        setChats(chats);
 
         // Read health data (after hiding the splash screen, faster and not noticeable)
         if (hasPermissions) {
