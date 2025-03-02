@@ -34,7 +34,7 @@ export default React.memo(function BaseChart({
         setWidth(ev.nativeEvent.layout.width);
     }
 
-    return <View className="w-full h-48 mb-2" onLayout={onLayout}>
+    return <View className="w-full h-48 my-2" onLayout={onLayout}>
         <Canvas style={{ width, height }}>
             <RoundedRect width={width} height={height} r={12}>
                 <LinearGradient start={vec(0, 0)} end={vec(width, height)} colors={backgroundColor}/>
