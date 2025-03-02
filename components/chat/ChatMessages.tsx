@@ -22,9 +22,12 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
     }
 
     return (
-        <ScrollView className="flex-1 px-4" ref={scrollView} onLayout={() => updateScroll()}>
+        <ScrollView className="flex-1 px-4"
+                    ref={scrollView}
+                    onLayout={() => updateScroll()}
+                    contentContainerClassName="pb-4">
             {messages.map(m => (
-                <View key={m.id} className="mt-2 mb-6">
+                <View key={m.id} className="my-2">
                     <View className="flex items-center flex-row gap-2 mb-1">
                         {m.role === 'user' ? <UserIcon/> : <AssistantIcon/>}
                         <Text className="font-bold text-slate-900 dark:text-slate-100">
@@ -36,7 +39,7 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
                             switch (part.type) {
                                 case 'text':
                                     return <Text key={i} className="text-slate-800 dark:text-slate-200">
-                                        {part.text}
+                                        {part.text.trim()}
                                     </Text>;
                                 case 'tool-invocation':
                                     return <ChatToolWidget invocation={part.toolInvocation}
