@@ -17,7 +17,7 @@ export async function generateConversationTitle(messages: UIMessage[]) {
     if (!response.ok)
         throw new Error('Failed to generate conversation title');
 
-    return response.text();
+    return response.text().then(r => r.trim());
 }
 
 export interface DateRangeParams {
