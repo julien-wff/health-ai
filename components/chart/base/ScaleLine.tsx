@@ -41,7 +41,7 @@ export default function ScaleLine({ value, lineY, canvasWidth, animationDelay, s
             .build();
         p.layout(SCALE_WIDTH);
         return p;
-    }, [ value, colors.text ]);
+    }, [ value, colors.text, scaleUnit ]);
 
     const paragraphX = canvasWidth - GRAPH_MARGIN - SCALE_WIDTH;
     const lineX2 = canvasWidth - GRAPH_MARGIN - SCALE_WIDTH;

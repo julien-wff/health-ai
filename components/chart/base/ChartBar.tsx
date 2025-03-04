@@ -15,23 +15,40 @@ interface ChartBarProps {
     canvasHeight: number;
     canvasWidth: number;
     value: number; // 0-100
+    offset: number; // 0-100
     index: number;
     label: string;
     barsCount: number;
     color: string;
+    reverse?: boolean;
 }
 
-export default function ChartBar({ color, label, canvasHeight, canvasWidth, value, index, barsCount }: ChartBarProps) {
+export default function ChartBar({
+                                     color,
+                                     label,
+                                     canvasHeight,
+                                     canvasWidth,
+                                     value,
+                                     offset,
+                                     index,
+                                     barsCount,
+                                     reverse,
+                                 }: ChartBarProps) {
     const colors = useColors();
     const [ labelTextHeight, setLabelTextHeight ] = useState(0);
 
     const barWidth = (canvasWidth - SCALE_WIDTH - GRAPH_MARGIN * 2) / barsCount * BAR_SPACE_RATIO;
     const finalBarHeight = (canvasHeight - GRAPH_MARGIN * 2 - LABELS_HEIGHT) * value / 100;
     const barX = GRAPH_MARGIN + index * barWidth / BAR_SPACE_RATIO; // TODO: remove last bar spacing
-    const finalBarY = canvasHeight - GRAPH_MARGIN - finalBarHeight - LABELS_HEIGHT;
+    const finalBarY = reverse ? GRAPH_MARGIN : canvasHeight - GRAPH_MARGIN - finalBarHeight - LABELS_HEIGHT;
+    const barOffset = (canvasHeight - GRAPH_MARGIN * 2 - LABELS_HEIGHT) * offset / 100;
 
     const barHeight = useSharedValue(0);
-    const barY = useDerivedValue(() => finalBarY + (finalBarHeight - barHeight.value));
+    const barY = useDerivedValue(
+        () => finalBarY
+            + Number(!reverse) * (finalBarHeight - barHeight.value) // If reverse, don't animate barY
+            + barOffset * (Number(!!reverse) * 2 - 1), // If reverse, barOffset is negative
+    );
     const labelOpacity = useSharedValue(0);
     useEffect(() => {
         const animationDelay = (TOTAL_ANIMATIONS_DURATION - INDIVIDUAL_ANIMATIONS_DURATION) / barsCount * index;
