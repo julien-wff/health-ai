@@ -82,6 +82,9 @@ export function filterRecordsForAI(
 }
 
 export function formatRecordsForAI(records: RecordResult<'Steps' | 'SleepSession' | 'ExerciseSession'>[]) {
+    if (records.length === 0)
+        return '[]';
+
     if ('count' in records[0])
         return JSON.stringify(
             records.map(record => ({
@@ -96,6 +99,15 @@ export function formatRecordsForAI(records: RecordResult<'Steps' | 'SleepSession
                 durationMinutes: dayjs(record.endTime).diff(record.startTime, 'minute'),
                 type: numberToExerciseType((record as RecordResult<'ExerciseSession'>).exerciseType),
                 date: dayjs(record.startTime).format('YYYY-MM-DD'),
+            })),
+        );
+
+    if ('stages' in records[0])
+        return JSON.stringify(
+            records.map(record => ({
+                durationMinutes: dayjs(record.endTime).diff(record.startTime, 'minute'),
+                startTime: dayjs(record.startTime).format('YYYY-MM-DD HH:mm'),
+                endTime: dayjs(record.endTime).format('YYYY-MM-DD HH:mm'),
             })),
         );
 

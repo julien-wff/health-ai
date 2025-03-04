@@ -40,6 +40,13 @@ export const tools = {
             endDate: z.string().optional().describe('End date of the range to query, of the format yyyy-mm-dd'),
         }).describe('Returns each exercise that happened in the range, with its nature and duration.'),
     },
+    'get-daily-sleep': {
+        description: 'Get day-by-day sleep time from the user.',
+        parameters: z.object({
+            startDate: z.string().optional().describe('Start date of the range to query, of the format yyyy-mm-dd'),
+            endDate: z.string().optional().describe('End date of the range to query, of the format yyyy-mm-dd'),
+        }).describe('Returns the sleep time for each day in the range.'),
+    },
     'display-steps': {
         description: 'Display a graph with the day-to-day steps of the user.',
         parameters: z.object({
@@ -49,6 +56,13 @@ export const tools = {
     },
     'display-exercise': {
         description: 'Display a graph with the day-to-day exercise of the user. All activities (bike, run, sports and so on) are mixed together.',
+        parameters: z.object({
+            startDate: z.string().optional().describe('Start date of the range to display, of the format yyyy-mm-dd'),
+            endDate: z.string().optional().describe('End date of the range to display, of the format yyyy-mm-dd'),
+        }),
+    },
+    'display-sleep': {
+        description: 'Display a graph with the day-to-day sleep of the user.',
         parameters: z.object({
             startDate: z.string().optional().describe('Start date of the range to display, of the format yyyy-mm-dd'),
             endDate: z.string().optional().describe('End date of the range to display, of the format yyyy-mm-dd'),

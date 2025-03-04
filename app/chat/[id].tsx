@@ -36,8 +36,11 @@ export default function Chat() {
                     return formatRecordsForAI(filterRecordsForAI(healthRecords!.steps, toolCall.args as DateRangeParams));
                 case 'get-daily-exercise':
                     return formatRecordsForAI(filterRecordsForAI(healthRecords!.exercise, toolCall.args as DateRangeParams));
+                case 'get-daily-sleep':
+                    return formatRecordsForAI(filterRecordsForAI(healthRecords!.sleep, toolCall.args as DateRangeParams));
                 case 'display-exercise':
                 case 'display-steps':
+                case 'display-sleep':
                     return 'ok';
             }
         },
