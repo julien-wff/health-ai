@@ -1,7 +1,14 @@
 import AnimatedLoadingIcon from '@/components/chat/AnimatedLoadingIcon';
 import { Send } from 'lucide-react-native';
 import { FormEvent, useRef } from 'react';
-import { TextInput, TouchableOpacity, View } from 'react-native';
+import {
+    NativeSyntheticEvent,
+    TextInput,
+    TextInputSubmitEditingEventData,
+    TouchableOpacity,
+    Vibration,
+    View,
+} from 'react-native';
 
 interface PromptInputProps {
     input: string;
@@ -14,9 +21,15 @@ export default function PromptInput({ input, setInput, handleSubmit, isLoading }
 
     const textInput = useRef<TextInput>(null);
 
-    const looseFocus = () => {
-        textInput.current?.blur();
-    };
+    function sendPrompt(e?: NativeSyntheticEvent<TextInputSubmitEditingEventData>) {
+        if (input.trim().length > 0)
+            handleSubmit(e as unknown as FormEvent);
+
+        if (!e) {
+            textInput.current?.blur();
+            Vibration.vibrate(50);
+        }
+    }
 
     return <View
         className="p-4 shadow-xl shadow-black bg-slate-50 dark:bg-slate-900 rounded-t-[20px] flex flex-row items-center gap-4">
@@ -27,18 +40,11 @@ export default function PromptInput({ input, setInput, handleSubmit, isLoading }
             returnKeyType="send"
             value={input}
             onChangeText={setInput}
-            onSubmitEditing={e => {
-                handleSubmit(e as unknown as FormEvent);
-                e.preventDefault();
-            }}
+            onSubmitEditing={sendPrompt}
         />
         <TouchableOpacity className="bg-blue-500 dark:bg-blue-400 p-4 rounded-xl disabled:opacity-75 h-14 w-14"
                           disabled={isLoading}
-                          onPress={() => {
-                              looseFocus();
-                              if (input.trim().length > 0)
-                                  handleSubmit();
-                          }}>
+                          onPress={() => sendPrompt()}>
             {isLoading ?
                 <AnimatedLoadingIcon size={20} color="white"/>
                 :

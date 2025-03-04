@@ -9,6 +9,7 @@ import { getStorageChat, saveStorageChat } from '@/utils/chat';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterRecordsForAI, formatRecordsForAI } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
+import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { fetch as expoFetch } from 'expo/fetch';
 import { useEffect, useState } from 'react';
@@ -79,6 +80,14 @@ export default function Chat() {
             generateConversationTitle(messages).then(setTitle);
         });
     }, [ messages.length, status, title, responseStreamed ]);
+
+    // Slight vibration each time a part of a message is received
+    useEffect(() => {
+        if (!responseStreamed || messages.length % 2 === 1)
+            return;
+
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    }, [ messages ]);
 
     /**
      * Stop current message streaming (if any) and navigate to new chat screen
