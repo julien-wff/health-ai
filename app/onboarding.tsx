@@ -8,11 +8,10 @@ import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { Footprints, Medal, MoonStar } from 'lucide-react-native';
 import { useState } from 'react';
-import { Text, ToastAndroid, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
 import { requestPermission } from 'react-native-health-connect';
 
 export default function Onboarding() {
-    const colorScheme = useColorScheme();
     const colors = useColors();
     const router = useRouter();
 
