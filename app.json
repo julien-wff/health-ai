@@ -49,6 +49,14 @@
                         "minSdkVersion": 26
                     }
                 }
+            ],
+            [
+                "@sentry/react-native/expo",
+                {
+                    "url": "https://sentry.io/",
+                    "project": "health-ai",
+                    "organization": "julien-wff"
+                }
             ]
         ],
         "experiments": {

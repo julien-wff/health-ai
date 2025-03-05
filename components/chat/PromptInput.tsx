@@ -1,4 +1,5 @@
 import AnimatedLoadingIcon from '@/components/chat/AnimatedLoadingIcon';
+import * as Sentry from '@sentry/react-native';
 import { Send } from 'lucide-react-native';
 import { FormEvent, useRef } from 'react';
 import {
@@ -22,8 +23,10 @@ export default function PromptInput({ input, setInput, handleSubmit, isLoading }
     const textInput = useRef<TextInput>(null);
 
     function sendPrompt(e?: NativeSyntheticEvent<TextInputSubmitEditingEventData>) {
-        if (input.trim().length > 0)
+        if (input.trim().length > 0) {
             handleSubmit(e as unknown as FormEvent);
+            Sentry.captureEvent({ event_id: 'send-prompt' });
+        }
 
         if (!e) {
             textInput.current?.blur();

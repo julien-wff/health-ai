@@ -6,10 +6,12 @@ import { getStoredChats } from '@/utils/chat';
 import { hasAllRequiredPermissions, readHealthRecords } from '@/utils/health';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import * as Sentry from '@sentry/react-native';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import isBetween from 'dayjs/plugin/isBetween';
-import { Slot, useRouter } from 'expo-router';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
+import { Slot, useNavigationContainerRef, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { setBackgroundColorAsync } from 'expo-system-ui';
@@ -18,14 +20,46 @@ import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { getGrantedPermissions, initialize as initializeHealth } from 'react-native-health-connect';
 
+const navigationIntegration = Sentry.reactNavigationIntegration({
+    // Only in native builds, not in Expo Go.
+    enableTimeToInitialDisplay: Constants.executionEnvironment === ExecutionEnvironment.StoreClient,
+});
+
+Sentry.init({
+    dsn: 'https://c8b3098796768b3d7e8e11f08b34535a@o796186.ingest.us.sentry.io/4508925967073280',
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
+    tracesSampleRate: 1.0,
+    enableNativeFramesTracking: Constants.executionEnvironment === ExecutionEnvironment.StoreClient,
+    integrations: [
+        Sentry.mobileReplayIntegration({
+            maskAllImages: false,
+            maskAllText: false,
+            maskAllVectors: false,
+        }),
+        navigationIntegration,
+    ],
+});
+
 dayjs.extend(duration);
 dayjs.extend(isBetween);
 void SplashScreen.preventAutoHideAsync();
 
-export default function Layout() {
+
+export default Sentry.wrap(Layout);
+
+function Layout() {
     const colorScheme = useColorScheme();
     const colors = useColors();
     const router = useRouter();
+
+    const ref = useNavigationContainerRef();
+
+    useEffect(() => {
+        if (ref) {
+            navigationIntegration.registerNavigationContainer(ref);
+        }
+    }, [ ref ]);
 
     const { getItem: getIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
     const { setIsOnboarded, setHasPermissions, setHealthRecords, setChats } = useAppState();
@@ -40,8 +74,10 @@ export default function Layout() {
 
         // Initialize health
         const healthInitialized = await initializeHealth();
-        if (!healthInitialized)
+        if (!healthInitialized) {
+            Sentry.captureException(new Error('Health not initialized'));
             console.error('Health not initialized');
+        }
 
         // Check for permissions
         const grantedPermissions = await getGrantedPermissions();

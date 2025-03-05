@@ -9,6 +9,7 @@ import { getStorageChat, saveStorageChat } from '@/utils/chat';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterRecordsForAI, formatRecordsForAI } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
+import * as Sentry from '@sentry/react-native';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { fetch as expoFetch } from 'expo/fetch';
@@ -29,19 +30,24 @@ export default function Chat() {
         fetch: expoFetch as unknown as typeof globalThis.fetch,
         api: generateAPIUrl('/api/chat'),
         maxSteps: 5,
-        onError: error => console.error(error, 'ERROR'),
+        onError: error => {
+            Sentry.captureException(error);
+            console.error(error, 'ERROR');
+        },
         onToolCall({ toolCall }) {
             switch (toolCall.toolName as keyof typeof tools) {
                 case 'get-daily-steps':
+                case 'display-steps':
+                    Sentry.captureEvent({ event_id: 'get-daily-steps' });
                     return formatRecordsForAI(filterRecordsForAI(healthRecords!.steps, toolCall.args as DateRangeParams));
                 case 'get-daily-exercise':
+                case 'display-exercise':
+                    Sentry.captureEvent({ event_id: 'get-daily-exercise' });
                     return formatRecordsForAI(filterRecordsForAI(healthRecords!.exercise, toolCall.args as DateRangeParams));
                 case 'get-daily-sleep':
-                    return formatRecordsForAI(filterRecordsForAI(healthRecords!.sleep, toolCall.args as DateRangeParams));
-                case 'display-exercise':
-                case 'display-steps':
                 case 'display-sleep':
-                    return 'ok';
+                    Sentry.captureEvent({ event_id: 'get-daily-sleep' });
+                    return formatRecordsForAI(filterRecordsForAI(healthRecords!.sleep, toolCall.args as DateRangeParams));
             }
         },
         onResponse() {
