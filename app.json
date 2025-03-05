@@ -3,7 +3,7 @@
         "name": "Health AI",
         "slug": "health-ai",
         "scheme": "health-ai",
-        "version": "0.1.0",
+        "version": "1.0.0",
         "orientation": "portrait",
         "userInterfaceStyle": "automatic",
         "newArchEnabled": true,
