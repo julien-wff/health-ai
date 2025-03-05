@@ -7,7 +7,8 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "prebuild": "expo prebuild --clean"
+    "prebuild": "expo prebuild --clean",
+    "build:web": "expo export --platform web"
   },
   "dependencies": {
     "@ai-sdk/google": "^1.1.17",
