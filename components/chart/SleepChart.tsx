@@ -1,6 +1,7 @@
 import BaseChart from '@/components/chart/base/BaseChart';
 import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
+import { filterRecordsForAI } from '@/utils/health';
 import dayjs, { Dayjs } from 'dayjs';
 import { useMemo } from 'react';
 
@@ -14,9 +15,7 @@ export default function SleepChart({ startDate, endDate }: SleepChartProps) {
     const { healthRecords } = useAppState();
 
     const [ sleep, offset, labels, earliestHoursMinutes ] = useMemo(() => {
-        // Default: last 7 days
-        const start = startDate ? dayjs(startDate) : dayjs().subtract(7, 'day');
-        const end = dayjs(endDate);
+        const filteredRecords = filterRecordsForAI(healthRecords?.sleep ?? [], { startDate, endDate });
 
         const sleep: number[] = [];
         const offset: number[] = [];
@@ -24,12 +23,9 @@ export default function SleepChart({ startDate, endDate }: SleepChartProps) {
         const labels: string[] = [];
         let earliestHoursMinutes = 2 * 60 * 24;
 
-        for (const record of healthRecords?.sleep ?? []) {
+        for (const record of filteredRecords) {
             const startTime = dayjs(record.startTime);
             const endTime = dayjs(record.endTime);
-
-            if (startTime.isBefore(start) || endTime.isAfter(end))
-                continue;
 
             const sameDay = startTime.isSame(endTime, 'day');
             const startHourMinutes = startTime.hour() * 60 + startTime.minute() + (sameDay ? 24 * 60 : 0);

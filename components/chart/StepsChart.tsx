@@ -1,6 +1,8 @@
 import BaseChart from '@/components/chart/base/BaseChart';
 import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
+import { filterRecordsForAI } from '@/utils/health';
+import dayjs from 'dayjs';
 import { useMemo } from 'react';
 
 interface StepsChartProps {
@@ -13,19 +15,13 @@ export default function StepsChart({ startDate, endDate }: StepsChartProps) {
     const { healthRecords } = useAppState();
 
     const [ stepCount, weekLabel ] = useMemo((() => {
-        // Default: last 7 days
-        const start = startDate ? new Date(startDate) : new Date(new Date().setDate(new Date().getDate() - 7));
-        const end = endDate ? new Date(endDate) : new Date();
-
+        const filteredRecords = filterRecordsForAI(healthRecords?.steps ?? [], { startDate, endDate });
         const steps: number[] = [];
         const labels: string[] = [];
 
-        for (const record of healthRecords?.steps ?? []) {
-            if (new Date(record.startTime) < start || new Date(record.startTime) > end)
-                continue;
-
+        for (const record of filteredRecords) {
             steps.push(record.count);
-            labels.push(new Date(record.startTime).toLocaleDateString('en', { weekday: 'short' }));
+            labels.push(dayjs(record.startTime).format('ddd'));
         }
 
         return [ steps, labels ];

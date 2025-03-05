@@ -67,18 +67,22 @@ export async function readHealthRecords(): Promise<ReadHealthRecords> {
     };
 }
 
-export function filterRecordsForAI(
-    records: RecordResult<'Steps' | 'SleepSession' | 'ExerciseSession'>[],
+export const dateRangeToDayJs = (range: DateRangeParams) => [
+    range.startDate ? dayjs(range.startDate) : dayjs().subtract(7, 'day'),
+    dayjs(range.endDate),
+] as const;
+
+export function filterRecordsForAI<T extends RecordResult<'Steps' | 'SleepSession' | 'ExerciseSession'>[]>(
+    records: T,
     range: DateRangeParams,
-) {
+): T {
     return records.filter(record =>
         dayjs(record.startTime).isBetween(
-            range.startDate || dayjs().subtract(1, 'month'),
-            range.endDate || dayjs(),
+            ...dateRangeToDayJs(range),
             'day',
-            '[]',
+            '(]',
         ),
-    );
+    ) as T;
 }
 
 export function formatRecordsForAI(records: RecordResult<'Steps' | 'SleepSession' | 'ExerciseSession'>[]) {

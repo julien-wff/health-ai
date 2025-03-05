@@ -1,6 +1,7 @@
 import BaseChart from '@/components/chart/base/BaseChart';
 import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
+import { dateRangeToDayJs, filterRecordsForAI } from '@/utils/health';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
 
@@ -15,21 +16,18 @@ export default function ExerciseChart({ startDate, endDate }: ExerciseChartProps
 
     const [ stepCount, weekLabel ] = useMemo((() => {
         // Default: last 7 days
-        const start = startDate ? dayjs(startDate) : dayjs().subtract(6, 'day');
-        const end = endDate ? dayjs(endDate) : dayjs();
+        const [ start, end ] = dateRangeToDayJs({ startDate, endDate });
+        const filteredRecords = filterRecordsForAI(healthRecords?.exercise ?? [], { startDate, endDate });
 
         const aggregatedData = new Map<string, number>();
 
         // Populate map with 0
-        for (let i = start; i <= end; i = i.add(1, 'day')) {
+        for (let i = start.add(1, 'day'); i <= end; i = i.add(1, 'day')) {
             aggregatedData.set(i.format('YYYY-MM-DD'), 0);
         }
 
         // Aggregate exercise data
-        for (const record of healthRecords?.exercise ?? []) {
-            if (dayjs(record.startTime) < start || dayjs(record.startTime) > end)
-                continue;
-
+        for (const record of filteredRecords) {
             const duration = dayjs(record.endTime).diff(record.startTime, 'minute');
             const date = dayjs(record.startTime).format('YYYY-MM-DD');
             aggregatedData.set(date, (aggregatedData.get(date) ?? 0) + duration);
