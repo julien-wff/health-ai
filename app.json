@@ -53,6 +53,15 @@
         ],
         "experiments": {
             "typedRoutes": true
-        }
+        },
+        "extra": {
+            "router": {
+                "origin": false
+            },
+            "eas": {
+                "projectId": "ee4962d3-730a-49a4-9980-9d6a698c390a"
+            }
+        },
+        "owner": "julien-wff-org"
     }
 }
