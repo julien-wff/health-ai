@@ -130,7 +130,7 @@ function Layout() {
 
     if (process.env.EXPO_PUBLIC_POSTHOG_AUTH_TOKEN)
         return <PostHogProvider apiKey={process.env.EXPO_PUBLIC_POSTHOG_AUTH_TOKEN}
-                                options={{ host: 'https://eu.posthog.com' }}>
+                                options={{ host: 'https://eu.i.posthog.com' }}>
             {result}
         </PostHogProvider>;
     return result;
