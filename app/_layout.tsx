@@ -38,6 +38,7 @@ Sentry.init({
             maskAllVectors: false,
         }),
         navigationIntegration,
+        Sentry.reactNativeTracingIntegration(),
     ],
 });
 
