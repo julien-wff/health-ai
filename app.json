@@ -65,7 +65,8 @@
                         "com.google.android.apps.healthdata"
                     ]
                 }
-            ]
+            ],
+            "expo-localization"
         ],
         "experiments": {
             "typedRoutes": true
