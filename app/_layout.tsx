@@ -3,7 +3,7 @@ import '@/assets/style/global.css';
 import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
 import { getStoredChats } from '@/utils/chat';
-import { hasAllRequiredPermissions, readHealthRecords } from '@/utils/health';
+import { hasAllRequiredPermissions, isHealthConnectInstalled, readHealthRecords } from '@/utils/health';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import * as Sentry from '@sentry/react-native';
@@ -71,6 +71,13 @@ function Layout() {
         // Check onboarding status
         const isOnboarded = await getIsOnboardedInStorage();
         setIsOnboarded(!!isOnboarded);
+
+        // Check if health connect is initialized
+        if (!await isHealthConnectInstalled()) {
+            router.replace('/install-health-connect');
+            await SplashScreen.hideAsync();
+            return;
+        }
 
         // Initialize health
         const healthInitialized = await initializeHealth();

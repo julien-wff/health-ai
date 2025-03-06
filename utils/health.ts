@@ -1,6 +1,7 @@
 import { DateRangeParams } from '@/utils/ai';
 import { numberToExerciseType } from '@/utils/exerciseType';
 import dayjs from 'dayjs';
+import { checkInstalledApps } from 'expo-check-installed-apps';
 import { Permission, readRecords, ReadRecordsOptions, RecordResult } from 'react-native-health-connect';
 
 /**
@@ -28,6 +29,13 @@ export function hasAllRequiredPermissions(grantedPermissions: Permission[]) {
     );
 
     return filteredGrantedPermissions.length === REQUIRED_PERMISSIONS.length;
+}
+
+
+export async function isHealthConnectInstalled() {
+    const HEALTH_CONNECT_PACKAGE_NAME = 'com.google.android.apps.healthdata';
+    const installed = await checkInstalledApps([ HEALTH_CONNECT_PACKAGE_NAME ]);
+    return installed[HEALTH_CONNECT_PACKAGE_NAME];
 }
 
 

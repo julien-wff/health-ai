@@ -57,6 +57,14 @@
                     "project": "health-ai",
                     "organization": "julien-wff"
                 }
+            ],
+            [
+                "expo-check-installed-apps",
+                {
+                    "android": [
+                        "com.google.android.apps.healthdata"
+                    ]
+                }
             ]
         ],
         "experiments": {
