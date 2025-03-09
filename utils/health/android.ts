@@ -1,8 +1,8 @@
-import { DateRangeParams } from '@/utils/ai';
-import { numberToExerciseType } from '@/utils/exerciseType';
-import dayjs from 'dayjs';
+import { numberToExerciseType } from '@/utils/health/androidExerciseType';
+import { ExerciseData, HealthRecords, SleepData, StepsData } from '@/utils/health/index';
+import dayjs, { Dayjs } from 'dayjs';
 import { checkInstalledApps } from 'expo-check-installed-apps';
-import { Permission, readRecords, ReadRecordsOptions, RecordResult } from 'react-native-health-connect';
+import { Permission, readRecords, ReadRecordsOptions } from 'react-native-health-connect';
 
 /**
  * Permissions required to read health records used by the AI
@@ -32,17 +32,14 @@ export function hasAllRequiredPermissions(grantedPermissions: Permission[]) {
 }
 
 
+/**
+ * Check if Health Connect is installed on the device
+ * @returns True if Health Connect is installed
+ */
 export async function isHealthConnectInstalled() {
     const HEALTH_CONNECT_PACKAGE_NAME = 'com.google.android.apps.healthdata';
     const installed = await checkInstalledApps([ HEALTH_CONNECT_PACKAGE_NAME ]);
     return installed[HEALTH_CONNECT_PACKAGE_NAME];
-}
-
-
-export interface ReadHealthRecords {
-    steps: RecordResult<'Steps'>[];
-    sleep: RecordResult<'SleepSession'>[];
-    exercise: RecordResult<'ExerciseSession'>[];
 }
 
 
@@ -51,13 +48,10 @@ export interface ReadHealthRecords {
  * Records are read in parallel for performance, but this method still takes a few hundred milliseconds.
  * @returns Health records for the last month
  */
-export async function readHealthRecords(): Promise<ReadHealthRecords> {
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
+export async function readAndroidHealthRecords(): Promise<HealthRecords> {
     const readOptions = {
         timeRangeFilter: {
-            startTime: oneMonthAgo.toISOString(),
+            startTime: dayjs().subtract(7, 'day').toISOString(),
             operator: 'after',
         },
     } satisfies ReadRecordsOptions;
@@ -69,59 +63,26 @@ export async function readHealthRecords(): Promise<ReadHealthRecords> {
     ]);
 
     return {
-        steps: steps.records,
-        sleep: sleep.records,
-        exercise: exercise.records,
+        steps: new Map<Dayjs, StepsData>(steps.records.map(r => [
+            dayjs(r.startTime),
+            {
+                steps: r.count,
+            },
+        ])),
+        sleep: new Map<Dayjs, SleepData>(sleep.records.map(r => [
+            dayjs(r.startTime),
+            {
+                endTime: dayjs(r.endTime),
+                duration: dayjs.duration(dayjs(r.endTime).diff(dayjs(r.startTime))),
+            },
+        ])),
+        exercise: new Map<Dayjs, ExerciseData>(exercise.records.map(r => [
+            dayjs(r.startTime),
+            {
+                endTime: dayjs(r.endTime),
+                duration: dayjs.duration(dayjs(r.endTime).diff(dayjs(r.startTime))),
+                type: numberToExerciseType(r.exerciseType),
+            },
+        ])),
     };
-}
-
-export const dateRangeToDayJs = (range: DateRangeParams) => [
-    range.startDate ? dayjs(range.startDate) : dayjs().subtract(7, 'day'),
-    dayjs(range.endDate),
-] as const;
-
-export function filterRecordsForAI<T extends RecordResult<'Steps' | 'SleepSession' | 'ExerciseSession'>[]>(
-    records: T,
-    range: DateRangeParams,
-): T {
-    return records.filter(record =>
-        dayjs(record.startTime).isBetween(
-            ...dateRangeToDayJs(range),
-            'day',
-            '(]',
-        ),
-    ) as T;
-}
-
-export function formatRecordsForAI(records: RecordResult<'Steps' | 'SleepSession' | 'ExerciseSession'>[]) {
-    if (records.length === 0)
-        return '[]';
-
-    if ('count' in records[0])
-        return JSON.stringify(
-            records.map(record => ({
-                count: (record as RecordResult<'Steps'>).count,
-                date: dayjs(record.startTime).format('YYYY-MM-DD'),
-            })),
-        );
-
-    if ('exerciseType' in records[0])
-        return JSON.stringify(
-            records.map(record => ({
-                durationMinutes: dayjs(record.endTime).diff(record.startTime, 'minute'),
-                type: numberToExerciseType((record as RecordResult<'ExerciseSession'>).exerciseType),
-                date: dayjs(record.startTime).format('YYYY-MM-DD'),
-            })),
-        );
-
-    if ('stages' in records[0])
-        return JSON.stringify(
-            records.map(record => ({
-                durationMinutes: dayjs(record.endTime).diff(record.startTime, 'minute'),
-                startTime: dayjs(record.startTime).format('YYYY-MM-DD HH:mm'),
-                endTime: dayjs(record.endTime).format('YYYY-MM-DD HH:mm'),
-            })),
-        );
-
-    return '[]';
 }

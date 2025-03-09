@@ -1,15 +1,15 @@
 import { useAppState } from '@/hooks/useAppState';
-import { hasAllRequiredPermissions, isHealthConnectInstalled, readHealthRecords } from '@/utils/health/android';
+import { hasAllRequiredPermissions, isHealthConnectInstalled } from '@/utils/health/android';
 import * as Sentry from '@sentry/react-native';
 import { SplashScreen, useRouter } from 'expo-router';
 import { getGrantedPermissions, initialize as initializeHealth } from 'react-native-health-connect';
 
 /**
- * Hook to initialize react-native-health-connect (permissions, data fetching)
+ * Hook to initialize react-native-health-connect and manage permissions
  * @returns Functions to run pre-checks, initialize health, and load health records
  */
 export function useAndroidHealthInit() {
-    const { setHasPermissions, setHealthRecords } = useAppState();
+    const { setHasPermissions } = useAppState();
     const router = useRouter();
 
     const runPreChecks = async () => {
@@ -37,29 +37,11 @@ export function useAndroidHealthInit() {
         const hasPermissions = hasAllRequiredPermissions(grantedPermissions);
         setHasPermissions(hasPermissions);
 
-        // Redirect to the appropriate screen
-        if (useAppState.getState().isOnboarded && hasPermissions)
-            router.replace('/chat');
-        else
-            router.replace('/onboarding');
-
-        // Hide the splash screen
-        await SplashScreen.hideAsync();
-
         return true;
-    };
-
-    const loadHealthRecords = async () => {
-        // Read health data (after hiding the splash screen, faster and not noticeable)
-        if (useAppState.getState().hasPermissions) {
-            const records = await readHealthRecords();
-            setHealthRecords(records);
-        }
     };
 
     return {
         runPreChecks,
         initAndroidHealth,
-        loadHealthRecords,
     };
 }
