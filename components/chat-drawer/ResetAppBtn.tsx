@@ -3,6 +3,7 @@ import { useColors } from '@/hooks/useColors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { Trash } from 'lucide-react-native';
+import { usePostHog } from 'posthog-react-native';
 import { Alert, Pressable, Text, useColorScheme } from 'react-native';
 
 export default function ResetAppBtn() {
@@ -10,8 +11,10 @@ export default function ResetAppBtn() {
     const colorScheme = useColorScheme();
     const colors = useColors();
     const { setChats } = useAppState();
+    const posthog = usePostHog();
 
     function showResetAlert() {
+        posthog.capture('reset_app_prompt');
         Alert.alert(
             'Reset application',
             'All stored data, chats and settings will be removed. This action cannot be undone.',
@@ -34,6 +37,7 @@ export default function ResetAppBtn() {
     }
 
     async function resetApp() {
+        posthog.capture('reset_app');
         const keys = await AsyncStorage.getAllKeys();
         await AsyncStorage.multiRemove(keys);
         console.log(`Removed ${keys.length} keys`);
