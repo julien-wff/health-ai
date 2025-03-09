@@ -7,7 +7,7 @@ import { useAppState } from '@/hooks/useAppState';
 import { DateRangeParams, generateConversationTitle, tools } from '@/utils/ai';
 import { getStorageChat, saveStorageChat } from '@/utils/chat';
 import { generateAPIUrl } from '@/utils/endpoints';
-import { filterRecordsForAI, formatRecordsForAI } from '@/utils/health';
+import { filterRecordsForAI, formatRecordsForAI } from '@/utils/health/android';
 import { useChat } from '@ai-sdk/react';
 import * as Sentry from '@sentry/react-native';
 import * as Haptics from 'expo-haptics';

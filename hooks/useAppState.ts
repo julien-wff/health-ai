@@ -1,5 +1,5 @@
 import { StorageChat } from '@/utils/chat';
-import { ReadHealthRecords } from '@/utils/health';
+import { ReadHealthRecords } from '@/utils/health/android';
 import { UIMessage } from 'ai';
 import { create } from 'zustand';
 

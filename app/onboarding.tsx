@@ -2,7 +2,7 @@ import ProjectIcon from '@/components/content/ProjectIcon';
 import HealthRecord from '@/components/onboarding/HealthRecord';
 import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
-import { hasAllRequiredPermissions, readHealthRecords, REQUIRED_PERMISSIONS } from '@/utils/health';
+import { hasAllRequiredPermissions, readHealthRecords, REQUIRED_PERMISSIONS } from '@/utils/health/android';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';

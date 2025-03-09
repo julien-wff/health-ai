@@ -1,6 +1,6 @@
 import { useAppInit } from '@/hooks/useAppInit';
 import { useColors } from '@/hooks/useColors';
-import { isHealthConnectInstalled } from '@/utils/health';
+import { isHealthConnectInstalled } from '@/utils/health/android';
 import { TriangleAlert } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
 import { useEffect, useState } from 'react';

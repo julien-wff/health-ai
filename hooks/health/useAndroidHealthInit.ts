@@ -1,5 +1,5 @@
 import { useAppState } from '@/hooks/useAppState';
-import { hasAllRequiredPermissions, isHealthConnectInstalled, readHealthRecords } from '@/utils/health';
+import { hasAllRequiredPermissions, isHealthConnectInstalled, readHealthRecords } from '@/utils/health/android';
 import * as Sentry from '@sentry/react-native';
 import { SplashScreen, useRouter } from 'expo-router';
 import { getGrantedPermissions, initialize as initializeHealth } from 'react-native-health-connect';

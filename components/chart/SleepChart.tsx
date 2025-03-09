@@ -1,7 +1,7 @@
 import BaseChart from '@/components/chart/base/BaseChart';
 import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
-import { filterRecordsForAI } from '@/utils/health';
+import { filterRecordsForAI } from '@/utils/health/android';
 import dayjs, { Dayjs } from 'dayjs';
 import { useMemo } from 'react';
 
