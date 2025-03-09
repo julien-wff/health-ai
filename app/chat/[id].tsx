@@ -13,6 +13,7 @@ import * as Sentry from '@sentry/react-native';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { fetch as expoFetch } from 'expo/fetch';
+import { usePostHog } from 'posthog-react-native';
 import { useEffect, useState } from 'react';
 import { InteractionManager } from 'react-native';
 import { Drawer } from 'react-native-drawer-layout';
@@ -22,6 +23,7 @@ export default function Chat() {
     const { healthRecords, addOrUpdateChat } = useAppState();
     const router = useRouter();
     const { id: chatId } = useLocalSearchParams<{ id: string }>();
+    const posthog = usePostHog();
 
     const [ responseStreamed, setResponseStreamed ] = useState(false);
 
@@ -38,19 +40,20 @@ export default function Chat() {
             switch (toolCall.toolName as keyof typeof tools) {
                 case 'get-daily-steps':
                 case 'display-steps':
-                    Sentry.captureEvent({ event_id: 'get-daily-steps' });
+                    posthog.capture('chat_get_daily_steps', { display: toolCall.toolName.startsWith('display') });
                     return formatRecordsForAI(filterRecordsForAI(healthRecords!.steps, toolCall.args as DateRangeParams));
                 case 'get-daily-exercise':
                 case 'display-exercise':
-                    Sentry.captureEvent({ event_id: 'get-daily-exercise' });
+                    posthog.capture('chat_get_daily_exercise', { display: toolCall.toolName.startsWith('display') });
                     return formatRecordsForAI(filterRecordsForAI(healthRecords!.exercise, toolCall.args as DateRangeParams));
                 case 'get-daily-sleep':
                 case 'display-sleep':
-                    Sentry.captureEvent({ event_id: 'get-daily-sleep' });
+                    posthog.capture('chat_get_daily_sleep', { display: toolCall.toolName.startsWith('display') });
                     return formatRecordsForAI(filterRecordsForAI(healthRecords!.sleep, toolCall.args as DateRangeParams));
             }
         },
         onResponse() {
+            posthog.capture('chat_response');
             setResponseStreamed(true);
         },
     });
@@ -81,6 +84,10 @@ export default function Chat() {
             void saveStorageChat(chatId, messages, title);
         });
 
+        // Register new message to PostHog
+        if (title)
+            posthog.capture('chat_message', { messageCount: messages.length });
+
         if (messages.length !== 2 || title !== null)
             return;
 
@@ -102,6 +109,7 @@ export default function Chat() {
      * Stop current message streaming (if any) and navigate to new chat screen
      */
     function onNewChat() {
+        posthog.capture('chat_new_click');
         stop();
         router.replace('/chat');
     }

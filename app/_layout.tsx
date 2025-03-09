@@ -15,7 +15,7 @@ import { Slot, useNavigationContainerRef, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { setBackgroundColorAsync } from 'expo-system-ui';
-import { PostHogProvider } from 'posthog-react-native';
+import { PostHog, PostHogProvider } from 'posthog-react-native';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -43,6 +43,13 @@ Sentry.init({
     ],
 });
 
+let posthogClient: PostHog | null = null;
+if (process.env.EXPO_PUBLIC_POSTHOG_AUTH_TOKEN) {
+    posthogClient = new PostHog(process.env.EXPO_PUBLIC_POSTHOG_AUTH_TOKEN, {
+        host: 'https://eu.i.posthog.com',
+    });
+}
+
 dayjs.extend(duration);
 dayjs.extend(isBetween);
 void SplashScreen.preventAutoHideAsync();
@@ -62,6 +69,13 @@ function Layout() {
             navigationIntegration.registerNavigationContainer(ref);
         }
     }, [ ref ]);
+
+    useEffect(() => {
+        if (posthogClient)
+            void posthogClient.register({
+                $dev: process.env.NODE_ENV === 'development',
+            });
+    }, []);
 
     const { getItem: getIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
     const { setIsOnboarded, setHasPermissions, setHealthRecords, setChats } = useAppState();
@@ -128,9 +142,13 @@ function Layout() {
         <Slot/>
     </GestureHandlerRootView>;
 
-    if (process.env.EXPO_PUBLIC_POSTHOG_AUTH_TOKEN)
-        return <PostHogProvider apiKey={process.env.EXPO_PUBLIC_POSTHOG_AUTH_TOKEN}
-                                options={{ host: 'https://eu.i.posthog.com' }}>
+    if (posthogClient)
+        return <PostHogProvider client={posthogClient}
+                                autocapture={{
+                                    captureScreens: true,
+                                    captureLifecycleEvents: true,
+                                    captureTouches: true,
+                                }}>
             {result}
         </PostHogProvider>;
     return result;
