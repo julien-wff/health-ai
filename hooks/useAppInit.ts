@@ -1,4 +1,4 @@
-import { useAndroidHealthInit } from '@/hooks/health/useAndroidHealthInit';
+import { useAndroidHealthInit } from '@/hooks/helpers/useAndroidHealthInit';
 import { useAppState } from '@/hooks/useAppState';
 import { getStoredChats } from '@/utils/chat';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
