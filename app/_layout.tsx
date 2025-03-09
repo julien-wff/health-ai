@@ -1,17 +1,13 @@
 import '@/utils/polyfills';
 import '@/assets/style/global.css';
-import { useAppState } from '@/hooks/useAppState';
+import { useAppInit } from '@/hooks/useAppInit';
 import { useColors } from '@/hooks/useColors';
-import { getStoredChats } from '@/utils/chat';
-import { hasAllRequiredPermissions, isHealthConnectInstalled, readHealthRecords } from '@/utils/health';
-import { IS_ONBOARDED } from '@/utils/storageKeys';
-import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import * as Sentry from '@sentry/react-native';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import isBetween from 'dayjs/plugin/isBetween';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
-import { Slot, useNavigationContainerRef, useRouter } from 'expo-router';
+import { Slot, useNavigationContainerRef } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { setBackgroundColorAsync } from 'expo-system-ui';
@@ -19,7 +15,6 @@ import { PostHog, PostHogProvider } from 'posthog-react-native';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { getGrantedPermissions, initialize as initializeHealth } from 'react-native-health-connect';
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
     // Only in native builds, not in Expo Go.
@@ -60,7 +55,7 @@ export default Sentry.wrap(Layout);
 function Layout() {
     const colorScheme = useColorScheme();
     const colors = useColors();
-    const router = useRouter();
+    const { loadStateFromStorage, initHealthAndAsyncLoadState } = useAppInit();
 
     const ref = useNavigationContainerRef();
 
@@ -75,60 +70,12 @@ function Layout() {
             void posthogClient.register({
                 $dev: process.env.NODE_ENV === 'development',
             });
-    }, []);
 
-    const { getItem: getIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
-    const { setIsOnboarded, setHasPermissions, setHealthRecords, setChats } = useAppState();
-
-    /**
-     * Check onboarding status, health permissions, redirect to the appropriate screen
-     */
-    async function load() {
-        // Check onboarding status
-        const isOnboarded = await getIsOnboardedInStorage();
-        setIsOnboarded(!!isOnboarded);
-
-        // Check if health connect is initialized
-        if (!await isHealthConnectInstalled()) {
-            router.replace('/install-health-connect');
-            await SplashScreen.hideAsync();
-            return;
-        }
-
-        // Initialize health
-        const healthInitialized = await initializeHealth();
-        if (!healthInitialized) {
-            Sentry.captureException(new Error('Health not initialized'));
-            console.error('Health not initialized');
-        }
-
-        // Check for permissions
-        const grantedPermissions = await getGrantedPermissions();
-        const hasPermissions = hasAllRequiredPermissions(grantedPermissions);
-        setHasPermissions(hasPermissions);
-
-        // Redirect to the appropriate screen
-        if (isOnboarded && hasPermissions)
-            router.replace('/chat');
-        else
-            router.replace('/onboarding');
-
-        // Hide the splash screen
-        await SplashScreen.hideAsync();
-
-        // Load the chats
-        const chats = await getStoredChats();
-        setChats(chats);
-
-        // Read health data (after hiding the splash screen, faster and not noticeable)
-        if (hasPermissions) {
-            const records = await readHealthRecords();
-            setHealthRecords(records);
-        }
-    }
-
-    useEffect(() => {
-        void load();
+        // Load application data and switch views
+        (async () => {
+            await loadStateFromStorage();
+            await initHealthAndAsyncLoadState();
+        })();
     }, []);
 
     useEffect(() => {
