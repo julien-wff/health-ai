@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import isBetween from 'dayjs/plugin/isBetween';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
-import { Slot, useNavigationContainerRef } from 'expo-router';
+import { Stack, useNavigationContainerRef } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { setBackgroundColorAsync } from 'expo-system-ui';
@@ -86,7 +86,9 @@ function Layout() {
         <StatusBar style={colorScheme === 'light' ? 'dark' : 'light'}
                    translucent={false}
                    backgroundColor={colors.background}/>
-        <Slot/>
+        <Stack screenOptions={{ headerShown: false, animation: 'none' }}>
+            <Stack.Screen name="profile" options={{ animation: 'default' }}/>
+        </Stack>
     </GestureHandlerRootView>;
 
     if (posthogClient)
