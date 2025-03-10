@@ -6,6 +6,13 @@ import { usePostHog } from 'posthog-react-native';
 import { useEffect, useState } from 'react';
 import { AppState, Linking, Text, TouchableOpacity, View } from 'react-native';
 
+/**
+ * Renders the Health Connect installation and configuration screen.
+ *
+ * The component displays a prompt to install Health Connect via the Play Store if it is not yet installed.
+ * Once Health Connect is installed, it shows a button that initializes health data and updates the app state.
+ * It listens for app state changes to refresh the installation status and logs user interactions with analytics.
+ */
 export default function InstallHealthConnect() {
     const colors = useColors();
     const { initHealthAndAsyncLoadState } = useAppInit();

@@ -15,9 +15,13 @@ export const REQUIRED_PERMISSIONS = [
 
 
 /**
- * Check if all required permissions are granted
- * @param grantedPermissions Permissions currently granted
- * @returns True if all required permissions are granted
+ * Verifies that all health record permissions required by the app are granted.
+ *
+ * This function checks whether the provided list includes each of the permissions defined in REQUIRED_PERMISSIONS
+ * by comparing both the record type and access type. It returns true only if every required permission is present.
+ *
+ * @param grantedPermissions - The list of permissions that have been granted.
+ * @returns True if all required permissions are granted; otherwise, false.
  */
 export function hasAllRequiredPermissions(grantedPermissions: Permission[]) {
     const filteredGrantedPermissions = grantedPermissions.filter(
@@ -33,8 +37,13 @@ export function hasAllRequiredPermissions(grantedPermissions: Permission[]) {
 
 
 /**
- * Check if Health Connect is installed on the device
- * @returns True if Health Connect is installed
+ * Checks if the Health Connect app is installed on the device.
+ *
+ * This asynchronous function queries the system for the Health Connect package 
+ * by checking for the package name 'com.google.android.apps.healthdata'. 
+ * It returns a promise that resolves to true if the app is installed, false otherwise.
+ *
+ * @returns A promise that resolves to true if Health Connect is installed, otherwise false.
  */
 export async function isHealthConnectInstalled() {
     const HEALTH_CONNECT_PACKAGE_NAME = 'com.google.android.apps.healthdata';
@@ -44,9 +53,16 @@ export async function isHealthConnectInstalled() {
 
 
 /**
- * Read health records for the last month.
- * Records are read in parallel for performance, but this method still takes a few hundred milliseconds.
- * @returns Health records for the last month
+ * Retrieves health records for the last 7 days.
+ *
+ * This asynchronous function concurrently reads health records for steps, sleep sessions, and exercise sessions
+ * using a common time range filter. Each record set is transformed into a Map with the record's start time as the key:
+ * - Steps records: Each entry includes the step count.
+ * - Sleep records: Each entry contains the session's end time and computed duration.
+ * - Exercise records: Each entry contains the session's end time, computed duration, and an exercise type converted
+ *   from a numeric representation.
+ *
+ * @returns An object containing maps of steps, sleep, and exercise records keyed by their start time.
  */
 export async function readAndroidHealthRecords(): Promise<HealthRecords> {
     const readOptions = {

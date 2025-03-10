@@ -10,6 +10,14 @@ interface StepsChartProps {
     endDate: Dayjs,
 }
 
+/**
+ * Renders a chart displaying daily step counts within a specified date range.
+ *
+ * The component filters step records to include only those between the provided start and end dates, extracts the daily step counts and corresponding weekday labels, and displays them in a bar chart using a predefined color scheme.
+ *
+ * @param startDate The inclusive start date for filtering step records.
+ * @param endDate The inclusive end date for filtering step records.
+ */
 export default function StepsChart({ startDate, endDate }: StepsChartProps) {
     const colors = useColors();
     const { steps: stepsRecords } = useHealthData();

@@ -52,6 +52,17 @@ void SplashScreen.preventAutoHideAsync();
 
 export default Sentry.wrap(Layout);
 
+/**
+ * Root layout component that initializes app state, error tracking, and analytics integration.
+ *
+ * This component registers the navigation container for error tracking, asynchronously loads
+ * the application state and health configuration, and updates the app’s background color based
+ * on the current color scheme. It renders the main gesture handler view with a status bar and
+ * navigation slot, and conditionally wraps the content in an analytics provider if the PostHog
+ * client is available.
+ *
+ * @returns The JSX element representing the application's root layout.
+ */
 function Layout() {
     const colorScheme = useColorScheme();
     const colors = useColors();

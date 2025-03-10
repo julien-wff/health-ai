@@ -11,6 +11,17 @@ interface ExerciseChartProps {
     endDate: Dayjs,
 }
 
+/**
+ * Renders a chart displaying aggregated daily exercise durations.
+ *
+ * The component filters and aggregates exercise records within the given date range,
+ * converting the total duration for each day (starting from the day after the start date)
+ * into active minutes. These active minutes and their corresponding day-of-week labels
+ * are then passed to a base chart component for visualization.
+ *
+ * @param startDate - The beginning of the date range for which exercise data is aggregated. Aggregation starts from the day after this date.
+ * @param endDate - The end of the date range for exercise data aggregation.
+ */
 export default function ExerciseChart({ startDate, endDate }: ExerciseChartProps) {
     const colors = useColors();
     const { exercise: exerciseRecords } = useHealthData();

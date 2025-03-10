@@ -20,6 +20,11 @@ import { InteractionManager } from 'react-native';
 import { Drawer } from 'react-native-drawer-layout';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+/**
+ * Renders the chat interface, managing chat state, messaging, and health data integration.
+ *
+ * This component initializes chat messages and title from stored data and sets up message handling with a custom chat hook. It processes health data tool calls for steps, exercise, and sleep, logs errors via Sentry, and tracks interactions with PostHog. The chat session is persisted automatically when conditions are met, and haptic feedback is triggered upon receiving new message parts.
+ */
 export default function Chat() {
     const { addOrUpdateChat } = useAppState();
     const { steps, exercise, sleep } = useHealthData();

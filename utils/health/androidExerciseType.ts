@@ -63,6 +63,12 @@ export const androidExerciseType = {
 } as const;
 
 
+/**
+ * Returns the exercise type key associated with the given numeric identifier.
+ *
+ * @param n - The numeric value representing an Android exercise type.
+ * @returns The corresponding exercise type key if a match is found; otherwise, undefined.
+ */
 export function numberToExerciseType(n: number): keyof typeof androidExerciseType {
     return Object
         .entries(androidExerciseType)

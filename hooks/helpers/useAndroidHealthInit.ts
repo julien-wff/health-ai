@@ -5,8 +5,13 @@ import { SplashScreen, useRouter } from 'expo-router';
 import { getGrantedPermissions, initialize as initializeHealth } from 'react-native-health-connect';
 
 /**
- * Hook to initialize react-native-health-connect and manage permissions
- * @returns Functions to run pre-checks, initialize health, and load health records
+ * Custom React hook that initializes the react-native-health-connect library on Android and manages health permissions.
+ *
+ * This hook provides two asynchronous functions:
+ * - runPreChecks: Checks whether Health Connect is installed. If not, it navigates to the installation page and hides the splash screen.
+ * - initAndroidHealth: Attempts to initialize Health Connect, updates the application's permission state based on granted permissions, and logs any initialization failure.
+ *
+ * @returns An object containing the runPreChecks and initAndroidHealth functions.
  */
 export function useAndroidHealthInit() {
     const { setHasPermissions } = useAppState();

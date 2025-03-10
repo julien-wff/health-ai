@@ -14,6 +14,21 @@ import { useState } from 'react';
 import { Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
 import { requestPermission } from 'react-native-health-connect';
 
+/**
+ * Initiates the onboarding process by handling permission requests when the user chooses to continue.
+ *
+ * Captures an analytics event to mark the start of onboarding and sets a loading indicator. If the required
+ * permissions are already granted, it immediately finalizes onboarding. Otherwise, it requests the necessary
+ * permissions and, upon successful grant, updates the permission state and finalizes onboarding. If permissions
+ * are denied, it displays a toast notification indicating the missing permissions.
+ */
+
+/**
+ * Finalizes the onboarding process.
+ *
+ * Updates the onboarding state in both the application and persistent storage, navigates the user to the chat screen,
+ * and retrieves the device's health records to update the corresponding application state.
+ */
 export default function Onboarding() {
     const colors = useColors();
     const router = useRouter();

@@ -10,6 +10,15 @@ interface SleepChartProps {
     endDate: Dayjs,
 }
 
+/**
+ * Renders a sleep chart that visualizes sleep duration and time offsets.
+ *
+ * This component filters sleep records within the specified date range, computes each record’s sleep duration (in minutes), calculates offsets relative to the earliest sleep event (accounting for overnight spans), and generates labels based on the record end times. The derived data is passed to a BaseChart component for visualization.
+ *
+ * @param startDate - The start date defining the lower bound for filtering sleep records.
+ * @param endDate - The end date defining the upper bound for filtering sleep records.
+ * @returns A JSX element rendering the sleep chart.
+ */
 export default function SleepChart({ startDate, endDate }: SleepChartProps) {
     const colors = useColors();
     const { sleep: sleepRecords } = useHealthData();

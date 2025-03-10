@@ -9,8 +9,13 @@ import { SplashScreen, useRouter } from 'expo-router';
 import { Platform } from 'react-native';
 
 /**
- * Platform-agnostic hook to initialize the app
- * @returns Functions to load state from storage, run health pre-checks, initialize health, and post-initialization
+ * Custom React hook to initialize application state and manage health data in a platform-agnostic way.
+ *
+ * This hook provides two asynchronous functions:
+ * - loadStateFromStorage: Retrieves the onboarding status from persistent storage and updates the global application state.
+ * - initHealthAndAsyncLoadState: Executes platform-specific health pre-checks and initializes health services. It then navigates the user to the appropriate screen based on onboarding status and permissions, hides the splash screen, loads stored chat data, and, if permissions are granted, updates the state with health records.
+ *
+ * @returns An object containing the loadStateFromStorage and initHealthAndAsyncLoadState functions.
  */
 export function useAppInit() {
     const { getItem: getIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
