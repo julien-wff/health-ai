@@ -51,7 +51,7 @@ export async function isHealthConnectInstalled() {
 export async function readAndroidHealthRecords(): Promise<HealthRecords> {
     const readOptions = {
         timeRangeFilter: {
-            startTime: dayjs().subtract(7, 'day').toISOString(),
+            startTime: dayjs().subtract(1, 'month').toISOString(),
             operator: 'after',
         },
     } satisfies ReadRecordsOptions;
