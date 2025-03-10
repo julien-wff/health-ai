@@ -4,10 +4,11 @@ import ChatMessages from '@/components/chat/ChatMessages';
 import ChatTopBar from '@/components/chat/ChatTopBar';
 import PromptInput from '@/components/chat/PromptInput';
 import { useAppState } from '@/hooks/useAppState';
+import { useHealthData } from '@/hooks/useHealthData';
 import { DateRangeParams, generateConversationTitle, tools } from '@/utils/ai';
 import { getStorageChat, saveStorageChat } from '@/utils/chat';
 import { generateAPIUrl } from '@/utils/endpoints';
-import { filterRecordsForAI, formatRecordsForAI } from '@/utils/health';
+import { filterCollectionRange, formatCollection } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
 import * as Sentry from '@sentry/react-native';
 import * as Haptics from 'expo-haptics';
@@ -20,7 +21,8 @@ import { Drawer } from 'react-native-drawer-layout';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Chat() {
-    const { healthRecords, addOrUpdateChat } = useAppState();
+    const { addOrUpdateChat } = useAppState();
+    const { steps, exercise, sleep } = useHealthData();
     const router = useRouter();
     const { id: chatId } = useLocalSearchParams<{ id: string }>();
     const posthog = usePostHog();
@@ -37,19 +39,21 @@ export default function Chat() {
             console.error(error, 'ERROR');
         },
         onToolCall({ toolCall }) {
+            const { startDate, endDate } = toolCall.args as DateRangeParams;
+
             switch (toolCall.toolName as keyof typeof tools) {
                 case 'get-daily-steps':
                 case 'display-steps':
                     posthog.capture('chat_get_daily_steps', { display: toolCall.toolName.startsWith('display') });
-                    return formatRecordsForAI(filterRecordsForAI(healthRecords!.steps, toolCall.args as DateRangeParams));
+                    return formatCollection(filterCollectionRange(steps, startDate, endDate), 'steps');
                 case 'get-daily-exercise':
                 case 'display-exercise':
                     posthog.capture('chat_get_daily_exercise', { display: toolCall.toolName.startsWith('display') });
-                    return formatRecordsForAI(filterRecordsForAI(healthRecords!.exercise, toolCall.args as DateRangeParams));
+                    return formatCollection(filterCollectionRange(exercise, startDate, endDate), 'exercise');
                 case 'get-daily-sleep':
                 case 'display-sleep':
                     posthog.capture('chat_get_daily_sleep', { display: toolCall.toolName.startsWith('display') });
-                    return formatRecordsForAI(filterRecordsForAI(healthRecords!.sleep, toolCall.args as DateRangeParams));
+                    return formatCollection(filterCollectionRange(sleep, startDate, endDate), 'sleep');
             }
         },
         onResponse() {

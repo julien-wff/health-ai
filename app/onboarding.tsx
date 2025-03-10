@@ -2,7 +2,9 @@ import ProjectIcon from '@/components/content/ProjectIcon';
 import HealthRecord from '@/components/onboarding/HealthRecord';
 import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
-import { hasAllRequiredPermissions, readHealthRecords, REQUIRED_PERMISSIONS } from '@/utils/health';
+import { useHealthData } from '@/hooks/useHealthData';
+import { readHealthRecords } from '@/utils/health';
+import { hasAllRequiredPermissions, REQUIRED_PERMISSIONS } from '@/utils/health/android';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
@@ -18,7 +20,8 @@ export default function Onboarding() {
     const posthog = usePostHog();
 
     const { setItem: setIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
-    const { hasPermissions, setHasPermissions, setIsOnboarded, setHealthRecords } = useAppState();
+    const { hasPermissions, setHasPermissions, setIsOnboarded } = useAppState();
+    const { setHealthRecords } = useHealthData();
     const [ isLoadingPermissions, setIsLoadingPermissions ] = useState(false);
 
     /**

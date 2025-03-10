@@ -1,19 +1,14 @@
-import { useAppState } from '@/hooks/useAppState';
+import { useAppInit } from '@/hooks/useAppInit';
 import { useColors } from '@/hooks/useColors';
-import { getStoredChats } from '@/utils/chat';
-import { hasAllRequiredPermissions, isHealthConnectInstalled, readHealthRecords } from '@/utils/health';
-import * as Sentry from '@sentry/react-native';
-import { useRouter } from 'expo-router';
+import { isHealthConnectInstalled } from '@/utils/health/android';
 import { TriangleAlert } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
 import { useEffect, useState } from 'react';
 import { AppState, Linking, Text, TouchableOpacity, View } from 'react-native';
-import { getGrantedPermissions, initialize as initializeHealth } from 'react-native-health-connect';
 
 export default function InstallHealthConnect() {
     const colors = useColors();
-    const { setHasPermissions, isOnboarded, setChats, setHealthRecords } = useAppState();
-    const router = useRouter();
+    const { initHealthAndAsyncLoadState } = useAppInit();
     const [ isAppInstalled, setIsAppInstalled ] = useState(false);
     const posthog = usePostHog();
 
@@ -24,34 +19,7 @@ export default function InstallHealthConnect() {
 
     async function handleHealthConnectSetup() {
         posthog.capture('health_connect_setup_done');
-
-        // Initialize health
-        const healthInitialized = await initializeHealth();
-        if (!healthInitialized) {
-            Sentry.captureException(new Error('Health not initialized'));
-            console.error('Health not initialized');
-        }
-
-        // Check for permissions
-        const grantedPermissions = await getGrantedPermissions();
-        const hasPermissions = hasAllRequiredPermissions(grantedPermissions);
-        setHasPermissions(hasPermissions);
-
-        // Redirect to the appropriate screen
-        if (isOnboarded && hasPermissions)
-            router.replace('/chat');
-        else
-            router.replace('/onboarding');
-
-        // Load the chats
-        const chats = await getStoredChats();
-        setChats(chats);
-
-        // Read health data (after hiding the splash screen, faster and not noticeable)
-        if (hasPermissions) {
-            const records = await readHealthRecords();
-            setHealthRecords(records);
-        }
+        await initHealthAndAsyncLoadState();
     }
 
     useEffect(() => {

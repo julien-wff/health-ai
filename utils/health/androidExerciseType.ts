@@ -1,4 +1,4 @@
-export const exerciseType = {
+export const androidExerciseType = {
     EXERCISE_TYPE_BADMINTON: 2,
     EXERCISE_TYPE_BASEBALL: 4,
     EXERCISE_TYPE_BASKETBALL: 5,
@@ -63,8 +63,8 @@ export const exerciseType = {
 } as const;
 
 
-export function numberToExerciseType(n: number): keyof typeof exerciseType {
+export function numberToExerciseType(n: number): keyof typeof androidExerciseType {
     return Object
-        .entries(exerciseType)
-        .find(([ , value ]) => value === n)?.[0] as keyof typeof exerciseType;
+        .entries(androidExerciseType)
+        .find(([ , value ]) => value === n)?.[0] as keyof typeof androidExerciseType;
 }
