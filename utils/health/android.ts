@@ -2,7 +2,17 @@ import { numberToExerciseType } from '@/utils/health/androidExerciseType';
 import { ExerciseData, HealthRecords, SleepData, StepsData } from '@/utils/health/index';
 import dayjs, { Dayjs } from 'dayjs';
 import { checkInstalledApps } from 'expo-check-installed-apps';
-import { Permission, readRecords, ReadRecordsOptions } from 'react-native-health-connect';
+import type { Permission, ReadRecordsOptions, ReadRecordsResult } from 'react-native-health-connect';
+import { Platform } from 'react-native';
+
+
+/**
+ * Return the react-native-health-connect module if the platform is Android
+ * because if imported on iOS, it will make a build error.
+ */
+export const healthConnect = Platform.OS === 'android'
+    ? require('react-native-health-connect')
+    : null;
 
 /**
  * Permissions required to read health records used by the AI
@@ -57,10 +67,10 @@ export async function readAndroidHealthRecords(): Promise<HealthRecords> {
     } satisfies ReadRecordsOptions;
 
     const [ steps, sleep, exercise ] = await Promise.all([
-        readRecords('Steps', readOptions),
-        readRecords('SleepSession', readOptions),
-        readRecords('ExerciseSession', readOptions),
-    ]);
+        healthConnect!.readRecords('Steps', readOptions),
+        healthConnect!.readRecords('SleepSession', readOptions),
+        healthConnect!.readRecords('ExerciseSession', readOptions),
+    ]) as [ ReadRecordsResult<'Steps'>, ReadRecordsResult<'SleepSession'>, ReadRecordsResult<'ExerciseSession'> ];
 
     return {
         steps: new Map<Dayjs, StepsData>(steps.records.map(r => [

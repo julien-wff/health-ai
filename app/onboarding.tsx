@@ -4,7 +4,7 @@ import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
 import { useHealthData } from '@/hooks/useHealthData';
 import { readHealthRecords } from '@/utils/health';
-import { hasAllRequiredPermissions, REQUIRED_PERMISSIONS } from '@/utils/health/android';
+import { hasAllRequiredPermissions, healthConnect, REQUIRED_PERMISSIONS } from '@/utils/health/android';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
@@ -12,7 +12,6 @@ import { Footprints, Medal, MoonStar } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
 import { useState } from 'react';
 import { Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
-import { requestPermission } from 'react-native-health-connect';
 
 export default function Onboarding() {
     const colors = useColors();
@@ -38,7 +37,7 @@ export default function Onboarding() {
         }
 
         ToastAndroid.show('Please allow all...', ToastAndroid.SHORT);
-        const permissions = await requestPermission(REQUIRED_PERMISSIONS);
+        const permissions = await healthConnect!.requestPermission(REQUIRED_PERMISSIONS);
         if (hasAllRequiredPermissions(permissions)) {
             posthog.capture('onboarding_granted');
             setHasPermissions(true);
