@@ -41,3 +41,4 @@ yarn-error.*
 
 # Native build
 android/
+ios/

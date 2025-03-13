@@ -4,15 +4,16 @@ import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
 import { useHealthData } from '@/hooks/useHealthData';
 import { readHealthRecords } from '@/utils/health';
-import { hasAllRequiredPermissions, REQUIRED_PERMISSIONS } from '@/utils/health/android';
+import { hasAllRequiredPermissions, healthConnect, REQUIRED_PERMISSIONS } from '@/utils/health/android';
+import { initHealthKit } from '@/utils/health/ios';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { Footprints, Medal, MoonStar } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
 import { useState } from 'react';
-import { Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
-import { requestPermission } from 'react-native-health-connect';
+import { Platform, Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Onboarding() {
     const colors = useColors();
@@ -37,15 +38,23 @@ export default function Onboarding() {
             return;
         }
 
-        ToastAndroid.show('Please allow all...', ToastAndroid.SHORT);
-        const permissions = await requestPermission(REQUIRED_PERMISSIONS);
-        if (hasAllRequiredPermissions(permissions)) {
-            posthog.capture('onboarding_granted');
+        if (Platform.OS === 'ios') {
+            await initHealthKit();
             setHasPermissions(true);
             await finishOnboarding();
-        } else {
-            posthog.capture('onboarding_denied');
-            ToastAndroid.show('Missing permissions', ToastAndroid.SHORT);
+        }
+
+        if (Platform.OS === 'android') {
+            ToastAndroid.show('Please allow all...', ToastAndroid.SHORT);
+            const permissions = await healthConnect!.requestPermission(REQUIRED_PERMISSIONS);
+            if (hasAllRequiredPermissions(permissions)) {
+                posthog.capture('onboarding_granted');
+                setHasPermissions(true);
+                await finishOnboarding();
+            } else {
+                posthog.capture('onboarding_denied');
+                ToastAndroid.show('Missing permissions', ToastAndroid.SHORT);
+            }
         }
 
         setIsLoadingPermissions(false);
@@ -63,7 +72,7 @@ export default function Onboarding() {
         setHealthRecords(healthRecords);
     }
 
-    return <View className="min-h-screen flex gap-4 p-4 bg-slate-50 dark:bg-slate-950">
+    return <SafeAreaView className="h-full flex gap-4 p-4">
         <View className="flex-1 flex justify-center gap-4">
             <View className="flex items-center mb-4">
                 <ProjectIcon className="w-24 h-24"/>
@@ -97,5 +106,5 @@ export default function Onboarding() {
                 Continue
             </Text>
         </TouchableOpacity>
-    </View>;
+    </SafeAreaView>;
 }

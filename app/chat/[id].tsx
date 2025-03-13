@@ -16,9 +16,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { fetch as expoFetch } from 'expo/fetch';
 import { usePostHog } from 'posthog-react-native';
 import { useEffect, useState } from 'react';
-import { InteractionManager } from 'react-native';
+import { InteractionManager, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { Drawer } from 'react-native-drawer-layout';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function Chat() {
     const { addOrUpdateChat } = useAppState();
@@ -26,6 +26,7 @@ export default function Chat() {
     const router = useRouter();
     const { id: chatId } = useLocalSearchParams<{ id: string }>();
     const posthog = usePostHog();
+    const insets = useSafeAreaInsets();
 
     const [ responseStreamed, setResponseStreamed ] = useState(false);
 
@@ -118,22 +119,31 @@ export default function Chat() {
         router.replace('/chat');
     }
 
-    return <SafeAreaView className="h-full bg-slate-50 dark:bg-slate-950">
-        <Drawer open={drawerOpened}
-                onOpen={() => setDrawerOpened(true)}
-                onClose={() => setDrawerOpened(false)}
-                renderDrawerContent={() => <ChatDrawer/>}>
-            <ChatTopBar onOpen={() => setDrawerOpened(true)} onNew={onNewChat} text={title}/>
+    return <View className="h-full relative">
+        <SafeAreaView className="h-full">
+            <Drawer open={drawerOpened}
+                    onOpen={() => setDrawerOpened(true)}
+                    onClose={() => setDrawerOpened(false)}
+                    renderDrawerContent={() => <ChatDrawer/>}>
+                <KeyboardAvoidingView className="flex flex-1"
+                                      keyboardVerticalOffset={insets.top}
+                                      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+                    <ChatTopBar onOpen={() => setDrawerOpened(true)} onNew={onNewChat} text={title}/>
 
-            {messages.length === 0
-                ? <ChatEmptyMessages/>
-                : <ChatMessages messages={messages}/>
-            }
+                    {messages.length === 0
+                        ? <ChatEmptyMessages/>
+                        : <ChatMessages messages={messages}/>
+                    }
 
-            <PromptInput input={input}
-                         setInput={setInput}
-                         handleSubmit={handleSubmit}
-                         isLoading={status === 'streaming' || status === 'submitted'}/>
-        </Drawer>
-    </SafeAreaView>;
+                    <PromptInput input={input}
+                                 setInput={setInput}
+                                 handleSubmit={handleSubmit}
+                                 isLoading={status === 'streaming' || status === 'submitted'}/>
+                </KeyboardAvoidingView>
+            </Drawer>
+        </SafeAreaView>
+
+        <View className="w-full absolute bottom-0 bg-slate-50 dark:bg-slate-900"
+              style={{ height: insets.bottom }}/>
+    </View>;
 }

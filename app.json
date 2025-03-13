@@ -20,6 +20,9 @@
                 "android.permission.health.READ_EXERCISE"
             ]
         },
+        "ios": {
+            "bundleIdentifier": "com.julienwff.healthai"
+        },
         "web": {
             "bundler": "metro",
             "output": "server"
@@ -66,7 +69,8 @@
                     ]
                 }
             ],
-            "expo-localization"
+            "expo-localization",
+            "react-native-health"
         ],
         "experiments": {
             "typedRoutes": true
