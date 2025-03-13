@@ -5,13 +5,14 @@ import { useColors } from '@/hooks/useColors';
 import { useHealthData } from '@/hooks/useHealthData';
 import { readHealthRecords } from '@/utils/health';
 import { hasAllRequiredPermissions, healthConnect, REQUIRED_PERMISSIONS } from '@/utils/health/android';
+import { initHealthKit } from '@/utils/health/ios';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { Footprints, Medal, MoonStar } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
 import { useState } from 'react';
-import { Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
+import { Platform, Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
 
 export default function Onboarding() {
     const colors = useColors();
@@ -36,15 +37,23 @@ export default function Onboarding() {
             return;
         }
 
-        ToastAndroid.show('Please allow all...', ToastAndroid.SHORT);
-        const permissions = await healthConnect!.requestPermission(REQUIRED_PERMISSIONS);
-        if (hasAllRequiredPermissions(permissions)) {
-            posthog.capture('onboarding_granted');
+        if (Platform.OS === 'ios') {
+            await initHealthKit();
             setHasPermissions(true);
             await finishOnboarding();
-        } else {
-            posthog.capture('onboarding_denied');
-            ToastAndroid.show('Missing permissions', ToastAndroid.SHORT);
+        }
+
+        if (Platform.OS === 'android') {
+            ToastAndroid.show('Please allow all...', ToastAndroid.SHORT);
+            const permissions = await healthConnect!.requestPermission(REQUIRED_PERMISSIONS);
+            if (hasAllRequiredPermissions(permissions)) {
+                posthog.capture('onboarding_granted');
+                setHasPermissions(true);
+                await finishOnboarding();
+            } else {
+                posthog.capture('onboarding_denied');
+                ToastAndroid.show('Missing permissions', ToastAndroid.SHORT);
+            }
         }
 
         setIsLoadingPermissions(false);

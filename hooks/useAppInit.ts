@@ -3,6 +3,7 @@ import { useAppState } from '@/hooks/useAppState';
 import { useHealthData } from '@/hooks/useHealthData';
 import { getStoredChats } from '@/utils/chat';
 import { readHealthRecords } from '@/utils/health';
+import { isHealthKitAvailable } from '@/utils/health/ios';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { SplashScreen, useRouter } from 'expo-router';
@@ -40,7 +41,7 @@ export function useAppInit() {
                 preCheckSuccess = await androidHealth.runPreChecks();
                 break;
             default:
-                preCheckSuccess = true;
+                preCheckSuccess = await isHealthKitAvailable();
                 break;
         }
 
@@ -53,8 +54,12 @@ export function useAppInit() {
             case 'android':
                 healthInitSuccess = await androidHealth.initAndroidHealth();
                 break;
+            case 'ios':
+                // Only necessary during onboarding
+                healthInitSuccess = true;
+                break;
             default:
-                console.warn(`Health not supported on ${Platform.OS}`);
+                console.warn(`Health init not supported on ${Platform.OS}`);
                 setHasPermissions(true);
                 healthInitSuccess = true;
                 break;
