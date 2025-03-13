@@ -19,14 +19,16 @@ import { useEffect, useState } from 'react';
 import { InteractionManager, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { Drawer } from 'react-native-drawer-layout';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import EmptyHealthNotification from '@/components/empty-health/EmptyHealthNotification';
 
 export default function Chat() {
     const { addOrUpdateChat } = useAppState();
-    const { steps, exercise, sleep } = useHealthData();
+    const { steps, exercise, sleep, loaded: healthLoaded, empty: healthEmpty } = useHealthData();
     const router = useRouter();
     const { id: chatId } = useLocalSearchParams<{ id: string }>();
     const posthog = usePostHog();
     const insets = useSafeAreaInsets();
+    const [ healthWarningDismissed, setHealthWarningDismissed ] = useState(false);
 
     const [ responseStreamed, setResponseStreamed ] = useState(false);
 
@@ -140,6 +142,10 @@ export default function Chat() {
                                  handleSubmit={handleSubmit}
                                  isLoading={status === 'streaming' || status === 'submitted'}/>
                 </KeyboardAvoidingView>
+
+                {healthLoaded && healthEmpty && !healthWarningDismissed &&
+                    <EmptyHealthNotification onDismiss={() => setHealthWarningDismissed(true)}/>
+                }
             </Drawer>
         </SafeAreaView>
 

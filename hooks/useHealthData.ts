@@ -4,6 +4,7 @@ import { create } from 'zustand';
 
 export interface HealthDataState {
     loaded: boolean;
+    empty: boolean;
     steps: StepsCollection;
     exercise: ExerciseCollection;
     sleep: SleepCollection;
@@ -12,11 +13,13 @@ export interface HealthDataState {
 
 export const useHealthData = create<HealthDataState>(set => ({
     loaded: false,
+    empty: true,
     steps: new Map(),
     exercise: new Map(),
     sleep: new Map(),
     setHealthRecords: (records: HealthRecords) => set({
         loaded: true,
+        empty: records.steps.size === 0 && records.exercise.size === 0 && records.sleep.size === 0,
         steps: records.steps,
         exercise: records.exercise,
         sleep: records.sleep,
