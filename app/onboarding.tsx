@@ -13,6 +13,7 @@ import { Footprints, Medal, MoonStar } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
 import { useState } from 'react';
 import { Platform, Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Onboarding() {
     const colors = useColors();
@@ -71,7 +72,7 @@ export default function Onboarding() {
         setHealthRecords(healthRecords);
     }
 
-    return <View className="min-h-screen flex gap-4 p-4 bg-slate-50 dark:bg-slate-950">
+    return <SafeAreaView className="h-full flex gap-4 p-4">
         <View className="flex-1 flex justify-center gap-4">
             <View className="flex items-center mb-4">
                 <ProjectIcon className="w-24 h-24"/>
@@ -105,5 +106,5 @@ export default function Onboarding() {
                 Continue
             </Text>
         </TouchableOpacity>
-    </View>;
+    </SafeAreaView>;
 }
