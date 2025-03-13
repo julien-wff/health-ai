@@ -1,18 +1,23 @@
 import { ExerciseCollection, HealthRecords, SleepCollection, StepsCollection } from '@/utils/health/index';
 import dayjs from 'dayjs';
 import BrokenHealthKit, { type HealthInputOptions, type HealthValue } from 'react-native-health';
+import { Platform } from 'react-native';
 
 // React-native-health is not yet compatible with React Native 0.76
 // See https://github.com/agencyenterprise/react-native-health/issues/399#issuecomment-2612353058
-const AppleHealthKit = require('react-native').NativeModules.AppleHealthKit as typeof BrokenHealthKit;
-AppleHealthKit.Constants = BrokenHealthKit.Constants;
+const AppleHealthKit = Platform.OS === 'ios'
+    ? require('react-native').NativeModules.AppleHealthKit as typeof BrokenHealthKit
+    : null;
+
+if (AppleHealthKit)
+    AppleHealthKit.Constants = BrokenHealthKit.Constants;
 
 export { AppleHealthKit };
 
 export const REQUIRED_PERMISSIONS = [
-    AppleHealthKit.Constants.Permissions.StepCount,
-    AppleHealthKit.Constants.Permissions.Workout,
-    AppleHealthKit.Constants.Permissions.SleepAnalysis,
+    AppleHealthKit?.Constants.Permissions.StepCount!,
+    AppleHealthKit?.Constants.Permissions.Workout!,
+    AppleHealthKit?.Constants.Permissions.SleepAnalysis!,
 ];
 
 
@@ -21,7 +26,7 @@ export const REQUIRED_PERMISSIONS = [
  * @returns True if HealthKit is available
  */
 export const isHealthKitAvailable = () => new Promise<boolean>((resolve, reject) => {
-    AppleHealthKit.isAvailable((err, available) => {
+    AppleHealthKit!.isAvailable((err, available) => {
         if (err) {
             reject(err);
             return;
@@ -36,7 +41,7 @@ export const isHealthKitAvailable = () => new Promise<boolean>((resolve, reject)
  * Note that we cannot see which permissions were granted or denied.
  */
 export const initHealthKit = () => new Promise<HealthValue>((resolve, reject) => {
-    AppleHealthKit.initHealthKit({
+    AppleHealthKit!.initHealthKit({
         permissions: {
             read: REQUIRED_PERMISSIONS,
             write: [],
@@ -77,7 +82,7 @@ export async function readIosHealthRecords(): Promise<HealthRecords> {
  * @returns Daily step counts for the last month
  */
 const readStepsCount = (options: HealthInputOptions) => new Promise<StepsCollection>((resolve, reject) => {
-    AppleHealthKit.getDailyStepCountSamples(options, (err, steps) => {
+    AppleHealthKit!.getDailyStepCountSamples(options, (err, steps) => {
         if (err) {
             reject(err);
             return;
@@ -111,9 +116,9 @@ const readStepsCount = (options: HealthInputOptions) => new Promise<StepsCollect
  * @returns Workout sessions for the last month
  */
 const readWorkouts = (options: HealthInputOptions) => new Promise<ExerciseCollection>((resolve, reject) => {
-    AppleHealthKit.getSamples({
+    AppleHealthKit!.getSamples({
         ...options,
-        type: AppleHealthKit.Constants.Observers.Workout,
+        type: AppleHealthKit!.Constants.Observers.Workout,
     }, (err, workouts) => {
         if (err) {
             reject(err);
@@ -141,7 +146,7 @@ const readWorkouts = (options: HealthInputOptions) => new Promise<ExerciseCollec
  * @returns Sleep sessions for the last month
  */
 const readSleep = (options: HealthInputOptions) => new Promise<SleepCollection>((resolve, reject) => {
-    AppleHealthKit.getSleepSamples(options, (err, sessions) => {
+    AppleHealthKit!.getSleepSamples(options, (err, sessions) => {
         if (err) {
             reject(err);
             return;
