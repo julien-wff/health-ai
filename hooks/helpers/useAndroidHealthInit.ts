@@ -1,8 +1,7 @@
 import { useAppState } from '@/hooks/useAppState';
-import { hasAllRequiredPermissions, isHealthConnectInstalled } from '@/utils/health/android';
+import { hasAllRequiredPermissions, healthConnect, isHealthConnectInstalled } from '@/utils/health/android';
 import * as Sentry from '@sentry/react-native';
 import { SplashScreen, useRouter } from 'expo-router';
-import { getGrantedPermissions, initialize as initializeHealth } from 'react-native-health-connect';
 
 /**
  * Hook to initialize react-native-health-connect and manage permissions
@@ -25,7 +24,7 @@ export function useAndroidHealthInit() {
 
     const initAndroidHealth = async () => {
         // Initialize health connect
-        const healthInitialized = await initializeHealth();
+        const healthInitialized = await healthConnect!.initialize();
         if (!healthInitialized) {
             console.error('Health not initialized');
             Sentry.captureException(new Error('Health not initialized'));
@@ -33,7 +32,7 @@ export function useAndroidHealthInit() {
         }
 
         // Check for permissions
-        const grantedPermissions = await getGrantedPermissions();
+        const grantedPermissions = await healthConnect!.getGrantedPermissions();
         const hasPermissions = hasAllRequiredPermissions(grantedPermissions);
         setHasPermissions(hasPermissions);
 

@@ -1,4 +1,5 @@
 import { readAndroidHealthRecords } from '@/utils/health/android';
+import { readIosHealthRecords } from '@/utils/health/ios';
 import dayjs, { Dayjs } from 'dayjs';
 import { Duration } from 'dayjs/plugin/duration';
 import { Platform } from 'react-native';
@@ -38,8 +39,10 @@ export async function readHealthRecords(): Promise<HealthRecords> {
     switch (Platform.OS) {
         case 'android':
             return readAndroidHealthRecords();
+        case 'ios':
+            return readIosHealthRecords();
         default:
-            throw new Error('Unsupported platform');
+            throw new Error(`Unsupported platform ${Platform.OS} for health records reading`);
     }
 }
 

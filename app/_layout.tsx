@@ -13,7 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import { PostHog, PostHogProvider } from 'posthog-react-native';
 import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
@@ -86,7 +86,10 @@ function Layout() {
         <StatusBar style={colorScheme === 'light' ? 'dark' : 'light'}
                    translucent={false}
                    backgroundColor={colors.background}/>
-        <Stack screenOptions={{ headerShown: false, animation: 'none' }}>
+        <Stack screenOptions={{ headerShown: false, animation: 'none' }}
+               screenLayout={({ children }) =>
+                   <View className="h-full bg-slate-50 dark:bg-slate-950">{children}</View>
+               }>
             <Stack.Screen name="profile" options={{ animation: 'default' }}/>
         </Stack>
     </GestureHandlerRootView>;
