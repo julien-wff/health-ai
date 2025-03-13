@@ -13,8 +13,11 @@ import { StatusBar } from 'expo-status-bar';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import { PostHog, PostHogProvider } from 'posthog-react-native';
 import { useEffect } from 'react';
-import { useColorScheme, View } from 'react-native';
+import { AppState, NativeEventSubscription, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useAppState } from '@/hooks/useAppState';
+import { useHealthData } from '@/hooks/useHealthData';
+import { readHealthRecords } from '@/utils/health';
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
     // Only in native builds, not in Expo Go.
@@ -56,6 +59,8 @@ function Layout() {
     const colorScheme = useColorScheme();
     const colors = useColors();
     const { loadStateFromStorage, initHealthAndAsyncLoadState } = useAppInit();
+    const { hasPermissions } = useAppState();
+    const { setHealthRecords } = useHealthData();
 
     const ref = useNavigationContainerRef();
 
@@ -72,10 +77,21 @@ function Layout() {
             });
 
         // Load application data and switch views
+        let subscription: NativeEventSubscription;
         (async () => {
             await loadStateFromStorage();
             await initHealthAndAsyncLoadState();
+
+            // Reload health data when the app comes back from background
+            subscription = AppState.addEventListener('focus', () => {
+                if (!hasPermissions)
+                    return;
+
+                readHealthRecords().then(setHealthRecords);
+            });
         })();
+
+        return () => subscription?.remove();
     }, []);
 
     useEffect(() => {
