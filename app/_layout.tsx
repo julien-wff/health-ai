@@ -30,7 +30,7 @@ Sentry.init({
     integrations: [
         Sentry.mobileReplayIntegration({
             maskAllImages: false,
-            maskAllText: false,
+            maskAllText: true,
             maskAllVectors: false,
         }),
         navigationIntegration,
