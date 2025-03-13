@@ -26,6 +26,7 @@ Sentry.init({
     replaysSessionSampleRate: 0.1,
     replaysOnErrorSampleRate: 1.0,
     tracesSampleRate: 1.0,
+    enabled: process.env.NODE_ENV !== 'development',
     enableNativeFramesTracking: Constants.executionEnvironment === ExecutionEnvironment.StoreClient,
     integrations: [
         Sentry.mobileReplayIntegration({
