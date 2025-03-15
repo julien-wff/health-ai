@@ -1,7 +1,10 @@
 import '@/utils/polyfills';
 import '@/assets/style/global.css';
 import { useAppInit } from '@/hooks/useAppInit';
+import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
+import { useHealthData } from '@/hooks/useHealthData';
+import { readHealthRecords } from '@/utils/health';
 import * as Sentry from '@sentry/react-native';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
@@ -15,9 +18,6 @@ import { PostHog, PostHogProvider } from 'posthog-react-native';
 import { useEffect } from 'react';
 import { AppState, NativeEventSubscription, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useAppState } from '@/hooks/useAppState';
-import { useHealthData } from '@/hooks/useHealthData';
-import { readHealthRecords } from '@/utils/health';
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
     // Only in native builds, not in Expo Go.
@@ -83,8 +83,8 @@ function Layout() {
             await initHealthAndAsyncLoadState();
 
             // Reload health data when the app comes back from background
-            subscription = AppState.addEventListener('focus', () => {
-                if (!hasPermissions)
+            subscription = AppState.addEventListener('change', () => {
+                if (!hasPermissions || AppState.currentState !== 'active')
                     return;
 
                 readHealthRecords().then(setHealthRecords);
