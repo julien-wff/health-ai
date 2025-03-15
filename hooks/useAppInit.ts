@@ -56,7 +56,7 @@ export function useAppInit() {
                 break;
             case 'ios':
                 // Only necessary during onboarding
-                setHasPermissions(true);
+                setHasPermissions(useAppState.getState().isOnboarded);
                 healthInitSuccess = true;
                 break;
             default:
