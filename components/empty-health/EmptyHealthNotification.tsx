@@ -1,4 +1,4 @@
-import { Platform, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { TriangleAlert } from 'lucide-react-native';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
 import { useEffect } from 'react';
@@ -42,11 +42,7 @@ export default function EmptyHealthNotification({ onDismiss }: EmptyHealthNotifi
 
     return <GestureDetector gesture={pan}>
         <Animated.View className="w-full px-8 absolute top-12" style={animatedStyles}>
-            <Link href={Platform.select({
-                android: '/troubleshoot/android',
-                ios: '/troubleshoot/ios',
-                default: '/chat',
-            })}>
+            <Link href="/troubleshoot">
                 <View className={`flex flex-row gap-4 items-center p-4 rounded-lg border
                               bg-orange-100 border-orange-500 dark:bg-orange-900 dark:border-orange-400`}>
                     <TriangleAlert color={colors.orange} size={36}/>

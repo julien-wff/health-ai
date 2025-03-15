@@ -107,8 +107,7 @@ function Layout() {
                    <View className="h-full bg-slate-50 dark:bg-slate-950">{children}</View>
                }>
             {/* Following screens have in and out animations, while all the others don't */}
-            <Stack.Screen name="troubleshoot/android" options={{ animation: 'default' }}/>
-            <Stack.Screen name="troubleshoot/ios" options={{ animation: 'default' }}/>
+            <Stack.Screen name="troubleshoot/index" options={{ animation: 'default' }}/>
         </Stack>
     </GestureHandlerRootView>;
 
