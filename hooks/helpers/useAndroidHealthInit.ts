@@ -15,7 +15,7 @@ export function useAndroidHealthInit() {
         // Check if health connect is installed
         const healthConnectInstalled = await isHealthConnectInstalled();
         if (!healthConnectInstalled) {
-            router.replace('/install-health-connect');
+            router.replace('/troubleshoot/install-health-connect');
             await SplashScreen.hideAsync();
             return false;
         }
