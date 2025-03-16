@@ -3,7 +3,8 @@ import { ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useColors } from '@/hooks/useColors';
 import InputField from '@/components/profile/InputField';
-import ResetAppBtn from '@/components/chat-drawer/ResetAppBtn';
+import ResetAppBtn from '@/components/profile/ResetAppBtn';
+import DebugInfoBtn from '@/components/profile/DebugInfoBtn';
 
 export default function Profile() {
     const router = useRouter();
@@ -27,7 +28,10 @@ export default function Profile() {
 
         <Text className="text-slate-800 dark:text-slate-200 ml-4 mt-4">Application settings</Text>
         <View className="bg-white dark:bg-slate-900 rounded-lg">
-            <ResetAppBtn/>
+            <View className="border-b border-slate-300 dark:border-slate-700">
+                <ResetAppBtn/>
+            </View>
+            <DebugInfoBtn/>
         </View>
     </View>;
 }
