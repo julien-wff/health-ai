@@ -5,13 +5,12 @@ import { useEffect } from 'react';
 import { useColors } from '@/hooks/useColors';
 import { Link } from 'expo-router';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { useHealthData } from '@/hooks/useHealthData';
 
-interface EmptyHealthNotificationProps {
-    onDismiss?: () => void;
-}
 
-export default function EmptyHealthNotification({ onDismiss }: EmptyHealthNotificationProps) {
+export default function EmptyHealthNotification() {
     const colors = useColors();
+    const { warningNotificationStatus, setWarningNotificationStatus } = useHealthData();
 
     const showProgress = useSharedValue(0);
 
@@ -23,12 +22,24 @@ export default function EmptyHealthNotification({ onDismiss }: EmptyHealthNotifi
             // Movement downwards or progress > 40% will show the notification back
             const envValue = ev.velocityY >= -20 && showProgress.value > .4 ? 1 : 0;
             showProgress.value = withTiming(envValue, { duration: 300 });
-            if (envValue === 0 && onDismiss)
-                runOnJS(onDismiss)();
+            if (envValue === 0)
+                runOnJS(setWarningNotificationStatus)('dismissed');
         });
 
     useEffect(() => {
-        showProgress.value = withDelay(1000, withTiming(1, { duration: 500 }));
+        switch (warningNotificationStatus) {
+            case 'shown':
+                showProgress.value = 1;
+                return;
+            case 'show':
+                showProgress.value = withDelay(1000, withTiming(1, { duration: 500 }));
+                const t = setTimeout(() => {
+                    setWarningNotificationStatus('shown');
+                }, 1500);
+                return () => clearTimeout(t);
+            default:
+                return;
+        }
     }, []);
 
     const animatedStyles = useAnimatedStyle(() => ({
@@ -39,6 +50,9 @@ export default function EmptyHealthNotification({ onDismiss }: EmptyHealthNotifi
             },
         ],
     }));
+
+    if (warningNotificationStatus === 'dismissed')
+        return <></>;
 
     return <GestureDetector gesture={pan}>
         <Animated.View className="w-full px-8 absolute top-12" style={animatedStyles}>

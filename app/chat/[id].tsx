@@ -23,12 +23,19 @@ import EmptyHealthNotification from '@/components/empty-health/EmptyHealthNotifi
 
 export default function Chat() {
     const { addOrUpdateChat } = useAppState();
-    const { steps, exercise, sleep, loaded: healthLoaded, empty: healthEmpty } = useHealthData();
+    const {
+        steps,
+        exercise,
+        sleep,
+        loaded: healthLoaded,
+        empty: healthEmpty,
+        warningNotificationStatus,
+        setWarningNotificationStatus,
+    } = useHealthData();
     const router = useRouter();
     const { id: chatId } = useLocalSearchParams<{ id: string }>();
     const posthog = usePostHog();
     const insets = useSafeAreaInsets();
-    const [ healthWarningDismissed, setHealthWarningDismissed ] = useState(false);
 
     const [ responseStreamed, setResponseStreamed ] = useState(false);
 
@@ -69,6 +76,9 @@ export default function Chat() {
     const [ title, setTitle ] = useState<string | null>(null);
 
     useEffect(() => {
+        if (healthEmpty && warningNotificationStatus === null)
+            setWarningNotificationStatus('show');
+
         (async () => {
             const chat = await getStorageChat(chatId);
             if (!chat)
@@ -143,9 +153,7 @@ export default function Chat() {
                                  isLoading={status === 'streaming' || status === 'submitted'}/>
                 </KeyboardAvoidingView>
 
-                {healthLoaded && healthEmpty && !healthWarningDismissed &&
-                    <EmptyHealthNotification onDismiss={() => setHealthWarningDismissed(true)}/>
-                }
+                {healthLoaded && healthEmpty && <EmptyHealthNotification/>}
             </Drawer>
         </SafeAreaView>
 

@@ -2,19 +2,24 @@ import { ExerciseCollection, HealthRecords, SleepCollection, StepsCollection } f
 import { create } from 'zustand';
 
 
+export type WarningNotificationStatus = null | 'show' | 'shown' | 'dismissed';
+
 export interface HealthDataState {
     loaded: boolean;
     empty: boolean;
+    warningNotificationStatus: WarningNotificationStatus;
     steps: StepsCollection;
     exercise: ExerciseCollection;
     sleep: SleepCollection;
     setHealthRecords: (records: HealthRecords) => void;
+    setWarningNotificationStatus: (status: WarningNotificationStatus) => void;
 }
 
 export const useHealthData = create<HealthDataState>(set => ({
     loaded: false,
     empty: true,
     steps: new Map(),
+    warningNotificationStatus: null,
     exercise: new Map(),
     sleep: new Map(),
     setHealthRecords: (records: HealthRecords) => set({
@@ -24,4 +29,5 @@ export const useHealthData = create<HealthDataState>(set => ({
         exercise: records.exercise,
         sleep: records.sleep,
     }),
+    setWarningNotificationStatus: status => set({ warningNotificationStatus: status }),
 }));
