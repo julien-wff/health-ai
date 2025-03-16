@@ -40,5 +40,5 @@ yarn-error.*
 .idea/
 
 # Native build
-android/
-ios/
+/android
+/ios
