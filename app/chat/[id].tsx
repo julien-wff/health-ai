@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { InteractionManager, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { Drawer } from 'react-native-drawer-layout';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import EmptyHealthNotification from '@/components/empty-health/EmptyHealthNotification';
+import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 
 export default function Chat() {
     const { addOrUpdateChat } = useAppState();
