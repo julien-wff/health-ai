@@ -31,7 +31,6 @@ export default function Chat() {
         loaded: healthLoaded,
         empty: healthEmpty,
         warningNotificationStatus,
-        setWarningNotificationStatus,
     } = useHealthData();
     const router = useRouter();
     const { id: chatId } = useLocalSearchParams<{ id: string }>();
@@ -77,9 +76,6 @@ export default function Chat() {
     const [ title, setTitle ] = useState<string | null>(null);
 
     useEffect(() => {
-        if (healthEmpty && warningNotificationStatus === null)
-            setWarningNotificationStatus('show');
-
         (async () => {
             const chat = await getStorageChat(chatId);
             if (!chat)
