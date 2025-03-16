@@ -24,7 +24,7 @@ export const useHealthData = create<HealthDataState>(set => ({
     sleep: new Map(),
     setHealthRecords: (records: HealthRecords) => set({
         loaded: true,
-        empty: records.steps.size === 0 && records.exercise.size === 0 && records.sleep.size === 0,
+        empty: records.steps.size === 0 && records.exercise.size === 0 && records.sleep.size === 0 || true,
         steps: records.steps,
         exercise: records.exercise,
         sleep: records.sleep,

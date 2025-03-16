@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import TroubleshootingStep from '@/components/troubleshoot/TroubleshootingStep';
-import * as OpenAndroidApp from '@/modules/open-android-application';
+import { healthConnect } from '@/utils/health/android';
 
 export default function TroubleshootAndroid() {
     const { empty } = useHealthData();
@@ -14,7 +14,7 @@ export default function TroubleshootAndroid() {
     const colorScheme = useColorScheme();
 
     function openHealthConnect() {
-        OpenAndroidApp.open('com.google.android.apps.healthdata');
+        healthConnect!.openHealthConnectSettings();
     }
 
     useEffect(() => {
