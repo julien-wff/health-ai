@@ -1,9 +1,10 @@
-import { SafeAreaView } from 'react-native-safe-area-context';
-import type { ReactNode } from 'react';
-import { Platform, Pressable, ScrollView, Text, View } from 'react-native';
-import { ArrowLeft } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
 import { useColors } from '@/hooks/useColors';
+import { useHealthData } from '@/hooks/useHealthData';
+import { useRouter } from 'expo-router';
+import { ArrowLeft } from 'lucide-react-native';
+import { ReactNode, useEffect } from 'react';
+import { Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface LayoutProps {
     children: ReactNode;
@@ -12,6 +13,12 @@ interface LayoutProps {
 export default function TroubleshootLayout({ children }: LayoutProps) {
     const router = useRouter();
     const colors = useColors();
+    const { empty } = useHealthData();
+
+    useEffect(() => {
+        if (!empty)
+            router.back();
+    }, [ empty ]);
 
     return <SafeAreaView className="p-4 flex gap-4 h-full">
         <View className="flex items-center gap-2 flex-row">
