@@ -31,7 +31,7 @@ const INDIGO_950 = '#1e1b4b';
 const BLUE_500 = '#3b82f6';
 
 const ORANGE_400 = '#fb923c';
-const ORANGE_500 = '#fb923c';
+const ORANGE_500 = '#f97316';
 
 type Gradient = [ string, string ];
 
