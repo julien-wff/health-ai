@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import { InteractionManager, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { Drawer } from 'react-native-drawer-layout';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import HealthDataFoundNotification from '@/components/notification/HealthDataFoundNotification';
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 
 export default function Chat() {
@@ -154,6 +155,7 @@ export default function Chat() {
                 </KeyboardAvoidingView>
 
                 {healthLoaded && healthEmpty && <EmptyHealthNotification/>}
+                {healthLoaded && !healthEmpty && warningNotificationStatus && <HealthDataFoundNotification/>}
             </Drawer>
         </SafeAreaView>
 
