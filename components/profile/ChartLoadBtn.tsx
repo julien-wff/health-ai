@@ -26,7 +26,7 @@ export default function ChartLoadBtn({ chart: Chart, noMargin, chartName, gradie
     }
 
     return <Pressable onPress={() => setLoad(true)}>
-        <View className={`w-full h-48 flex items-center justify-center rounded-xl  ${noMargin ? '' : 'my-2'}`}>
+        <View className={`w-full h-48 flex items-center justify-center rounded-xl ${noMargin ? '' : 'my-2'}`}>
             <LinearGradient colors={gradient}
                             start={vec(0, 0)}
                             end={vec(1, 1)}
