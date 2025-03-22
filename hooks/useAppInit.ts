@@ -27,7 +27,7 @@ export function useAppInit() {
     const loadStateFromStorage = async () => {
         const isOnboarded = await getIsOnboardedInStorage();
         setIsOnboarded(!!isOnboarded);
-        Sentry.captureEvent({ message: 'init_set_onboarded', extra: { isOnboarded } });
+        Sentry.captureEvent({ event_id: 'init_set_onboarded', level: 'info', extra: { isOnboarded } });
     };
 
     /**
@@ -37,7 +37,7 @@ export function useAppInit() {
      */
     const initHealthAndAsyncLoadState = async () => {
         // Pre-checks
-        Sentry.captureEvent({ message: 'init_health_precheck_start' });
+        Sentry.captureEvent({ event_id: 'init_health_precheck_start', level: 'info' });
         let preCheckSuccess: boolean;
         switch (Platform.OS) {
             case 'android':
@@ -48,7 +48,7 @@ export function useAppInit() {
                 break;
         }
 
-        Sentry.captureEvent({ message: 'init_health_precheck_end', extra: { preCheckSuccess } });
+        Sentry.captureEvent({ event_id: 'init_health_precheck_end', level: 'info', extra: { preCheckSuccess } });
         if (!preCheckSuccess)
             return;
 
@@ -70,7 +70,7 @@ export function useAppInit() {
                 break;
         }
 
-        Sentry.captureEvent({ message: 'init_health_init_end', extra: { healthInitSuccess } });
+        Sentry.captureEvent({ event_id: 'init_health_init_end', level: 'info', extra: { healthInitSuccess } });
         if (!healthInitSuccess) {
             await SplashScreen.hideAsync();
             return;
@@ -86,13 +86,13 @@ export function useAppInit() {
         await SplashScreen.hideAsync();
 
         // Load state from storage
-        Sentry.captureEvent({ message: 'init_load_state_start' });
+        Sentry.captureEvent({ event_id: 'init_load_state_start', level: 'info' });
         const chats = await getStoredChats();
         setChats(chats);
-        Sentry.captureEvent({ message: 'init_load_state_end', extra: { count: chats.length } });
+        Sentry.captureEvent({ event_id: 'init_load_state_end', level: 'info', extra: { count: chats.length } });
 
         // Load health records
-        Sentry.captureEvent({ message: 'init_load_health_data_start' });
+        Sentry.captureEvent({ event_id: 'init_load_health_data_start', level: 'info' });
         if (useAppState.getState().hasPermissions) {
             const healthRecords = await readHealthRecords();
             setHealthRecords(healthRecords);
