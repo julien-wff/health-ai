@@ -48,6 +48,6 @@ export default function ResetAppBtn() {
     return <Pressable onPress={showResetAlert}
                       className="flex flex-row items-center justify-start p-4 gap-2 rounded-lg active:bg-slate-200 active:dark:bg-slate-800">
         <Trash size={20} color={colors.text}/>
-        <Text className="font-bold text-slate-900 dark:text-slate-50">Reset application</Text>
+        <Text className="text-slate-900 dark:text-slate-50">Reset application</Text>
     </Pressable>;
 }
