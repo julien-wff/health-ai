@@ -58,9 +58,9 @@ export default function Profile() {
                 <Text className="text-slate-800 dark:text-slate-200 ml-4 mt-4">
                     Steps, Daily Exercise Time and Sleep Duration
                 </Text>
-                <ChartLoadBtn chart={StepsChart} chartName="steps" noMargin/>
-                <ChartLoadBtn chart={ExerciseChart} chartName="exercise" noMargin/>
-                <ChartLoadBtn chart={SleepChart} chartName="sleep" noMargin/>
+                <ChartLoadBtn chart={StepsChart} chartName="steps" noMargin gradient={colors.greenBackground}/>
+                <ChartLoadBtn chart={ExerciseChart} chartName="exercise" noMargin gradient={colors.redBackground}/>
+                <ChartLoadBtn chart={SleepChart} chartName="sleep" noMargin gradient={colors.indigoBackground}/>
 
                 <Text className="text-slate-800 dark:text-slate-200 ml-4 mt-4">Debug</Text>
                 <View className="bg-white dark:bg-slate-900 rounded-lg">
