@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react-native';
 import { ReactNode, useEffect } from 'react';
 import { Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTracking } from '@/hooks/useTracking';
 
 interface LayoutProps {
     children: ReactNode;
@@ -12,12 +13,20 @@ interface LayoutProps {
 
 export default function TroubleshootLayout({ children }: LayoutProps) {
     const router = useRouter();
+    const tracking = useTracking();
     const colors = useColors();
     const { empty } = useHealthData();
 
     useEffect(() => {
-        if (!empty)
+        return () => {
+            tracking.event('troubleshoot_closed', { resolved: !empty });
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!empty) {
             router.back();
+        }
     }, [ empty ]);
 
     return <SafeAreaView className="flex h-full gap-4 p-4">

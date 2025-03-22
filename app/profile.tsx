@@ -12,12 +12,15 @@ import SleepChart from '@/components/chart/SleepChart';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CopyStorageBtn from '@/components/profile/CopyStorageBtn';
 import ChartLoadBtn from '@/components/profile/ChartLoadBtn';
+import { useTracking } from '@/hooks/useTracking';
 
 export default function Profile() {
     const router = useRouter();
     const colors = useColors();
+    const tracking = useTracking();
 
     function handleOpenHealthApp() {
+        tracking.event('profile_open_health_app');
         switch (Platform.OS) {
             case 'android':
                 healthConnect?.openHealthConnectSettings();

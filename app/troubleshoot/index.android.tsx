@@ -1,25 +1,20 @@
 import { Text, TouchableOpacity, useColorScheme, View } from 'react-native';
 import TroubleshootLayout from '@/components/troubleshoot/TroubleshootLayout';
-import { useHealthData } from '@/hooks/useHealthData';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Image } from 'expo-image';
 import TroubleshootingStep from '@/components/troubleshoot/TroubleshootingStep';
 import { healthConnect } from '@/utils/health/android';
+import { useTracking } from '@/hooks/useTracking';
 
 export default function TroubleshootAndroid() {
-    const { empty } = useHealthData();
-    const router = useRouter();
     const [ imageHeight, setImageHeight ] = useState(0);
     const colorScheme = useColorScheme();
+    const tracking = useTracking();
 
     function openHealthConnect() {
+        tracking.event('troubleshoot_open_health_app');
         healthConnect!.openHealthConnectSettings();
     }
-
-    useEffect(() => {
-        if (!empty) router.back();
-    }, [ empty ]);
 
     return <TroubleshootLayout>
         <View className="flex gap-2">

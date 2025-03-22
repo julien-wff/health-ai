@@ -41,12 +41,9 @@ Sentry.init({
     ],
 });
 
-let posthogClient: PostHog | null = null;
-if (process.env.EXPO_PUBLIC_POSTHOG_AUTH_TOKEN) {
-    posthogClient = new PostHog(process.env.EXPO_PUBLIC_POSTHOG_AUTH_TOKEN, {
-        host: 'https://eu.i.posthog.com',
-    });
-}
+const posthogClient = new PostHog('phc_nDWFGdgxDYou6EFbpgmkVJRwpOv1Izk218FwFa5ksOT', {
+    host: 'https://eu.i.posthog.com',
+});
 
 dayjs.extend(duration);
 dayjs.extend(isBetween);
@@ -81,13 +78,17 @@ function Layout() {
         (async () => {
             await loadStateFromStorage();
             await initHealthAndAsyncLoadState();
+            Sentry.captureEvent({ event_id: 'layout_state_loaded', level: 'info' });
 
             // Reload health data when the app comes back from background
             subscription = AppState.addEventListener('change', () => {
                 if (!hasPermissions || AppState.currentState !== 'active')
                     return;
 
-                readHealthRecords().then(setHealthRecords);
+                Sentry.captureEvent({ event_id: 'layout_state_health_data_update_start', level: 'info' });
+                readHealthRecords()
+                    .then(setHealthRecords)
+                    .then(() => Sentry.captureEvent({ event_id: 'layout_state_health_data_updated', level: 'info' }));
             });
         })();
 
@@ -98,28 +99,24 @@ function Layout() {
         void setBackgroundColorAsync(colors.background);
     }, [ colors.background ]);
 
-    const result = <GestureHandlerRootView>
-        <StatusBar style={colorScheme === 'light' ? 'dark' : 'light'}
-                   translucent={false}
-                   backgroundColor={colors.background}/>
-        <Stack screenOptions={{ headerShown: false, animation: 'none' }}
-               screenLayout={({ children }) =>
-                   <View className="h-full bg-slate-50 dark:bg-slate-950">{children}</View>
-               }>
-            {/* Following screens have in and out animations, while all the others don't */}
-            <Stack.Screen name="troubleshoot/index" options={{ animation: 'default' }}/>
-            <Stack.Screen name="profile" options={{ animation: 'default' }}/>
-        </Stack>
-    </GestureHandlerRootView>;
-
-    if (posthogClient)
-        return <PostHogProvider client={posthogClient}
-                                autocapture={{
-                                    captureScreens: true,
-                                    captureLifecycleEvents: true,
-                                    captureTouches: true,
-                                }}>
-            {result}
-        </PostHogProvider>;
-    return result;
+    return <PostHogProvider client={posthogClient}
+                            autocapture={{
+                                captureScreens: true,
+                                captureLifecycleEvents: true,
+                                captureTouches: true,
+                            }}>
+        <GestureHandlerRootView>
+            <StatusBar style={colorScheme === 'light' ? 'dark' : 'light'}
+                       translucent={false}
+                       backgroundColor={colors.background}/>
+            <Stack screenOptions={{ headerShown: false, animation: 'none' }}
+                   screenLayout={({ children }) =>
+                       <View className="h-full bg-slate-50 dark:bg-slate-950">{children}</View>
+                   }>
+                {/* Following screens have in and out animations, while all the others don't */}
+                <Stack.Screen name="troubleshoot/index" options={{ animation: 'default' }}/>
+                <Stack.Screen name="profile" options={{ animation: 'default' }}/>
+            </Stack>
+        </GestureHandlerRootView>
+    </PostHogProvider>;
 }
