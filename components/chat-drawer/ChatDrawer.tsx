@@ -3,7 +3,7 @@ import ProjectIcon from '@/components/content/ProjectIcon';
 import { useAppState } from '@/hooks/useAppState';
 import { Link, useLocalSearchParams } from 'expo-router';
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { UserRoundCog } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
 
@@ -20,11 +20,12 @@ function ChatDrawer() {
         </View>
 
         <View className="flex-1 p-2">
-            {/* TODO: use ScrollView */}
             <Text className="text-slate-900 dark:text-slate-100 font-bold text-lg p-4">Chat history</Text>
-            {chats.map(
-                (chat) => <ChatElement chat={chat} key={chat.id} selected={chatId === chat.id}/>,
-            )}
+            <ScrollView fadingEdgeLength={192}>
+                {chats.map(
+                    (chat) => <ChatElement chat={chat} key={chat.id} selected={chatId === chat.id}/>,
+                )}
+            </ScrollView>
         </View>
 
         <Link href="/profile" asChild>
