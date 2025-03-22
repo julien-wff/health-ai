@@ -5,7 +5,7 @@ import { Pressable, Text, View } from 'react-native';
 import { useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 
-interface GraphLoadBtnProps {
+interface ChartLoadBtnProps {
     chart: typeof StepsChart | typeof ExerciseChart | typeof SleepChart;
     chartName: string;
     noMargin?: boolean;
@@ -14,11 +14,11 @@ interface GraphLoadBtnProps {
 export default function ChartLoadBtn({ chart: Chart, noMargin, chartName }: GraphLoadBtnProps) {
     const [ load, setLoad ] = useState(false);
 
-    const graphStartDate = useMemo(() => dayjs().add(-28, 'day'), []);
-    const graphEndDate = useMemo(() => dayjs(), []);
+    const chartStartDate = useMemo(() => dayjs().add(-28, 'day'), []);
+    const chartEndDate = useMemo(() => dayjs(), []);
 
     if (load) {
-        return <Chart startDate={graphStartDate} endDate={graphEndDate} noMargin={noMargin}/>;
+        return <Chart startDate={chartStartDate} endDate={chartEndDate} noMargin={noMargin}/>;
     }
 
     return <Pressable onPress={() => setLoad(true)}>
