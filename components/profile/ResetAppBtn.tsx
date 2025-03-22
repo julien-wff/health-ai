@@ -1,15 +1,14 @@
 import { useAppState } from '@/hooks/useAppState';
-import { useColors } from '@/hooks/useColors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { Trash } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
-import { Alert, Pressable, Text, useColorScheme } from 'react-native';
+import { Alert, useColorScheme } from 'react-native';
+import ProfileBtn from '@/components/profile/ProfileBtn';
 
 export default function ResetAppBtn() {
     const router = useRouter();
     const colorScheme = useColorScheme();
-    const colors = useColors();
     const { setChats } = useAppState();
     const posthog = usePostHog();
 
@@ -45,9 +44,7 @@ export default function ResetAppBtn() {
         router.replace('/onboarding');
     }
 
-    return <Pressable onPress={showResetAlert}
-                      className="flex flex-row items-center justify-start p-4 gap-2 rounded-lg active:bg-slate-200 active:dark:bg-slate-800">
-        <Trash size={20} color={colors.text}/>
-        <Text className="text-slate-900 dark:text-slate-50">Reset application</Text>
-    </Pressable>;
+    return <ProfileBtn onPress={showResetAlert} icon={Trash}>
+        Reset application
+    </ProfileBtn>;
 }
