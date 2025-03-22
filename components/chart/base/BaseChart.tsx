@@ -19,6 +19,7 @@ interface BaseChartProps {
     scaleUnit?: ScaleUnit;
     /** If `true`, 0 is on top and highest value on the bottom of the scale */
     reverse?: boolean;
+    noMargin?: boolean;
 }
 
 export default React.memo(function BaseChart({
@@ -31,6 +32,7 @@ export default React.memo(function BaseChart({
                                                  debug,
                                                  scaleUnit,
                                                  reverse,
+                                                 noMargin,
                                              }: BaseChartProps) {
     const [ height, setHeight ] = useState(0);
     const [ width, setWidth ] = useState(0);
@@ -47,7 +49,7 @@ export default React.memo(function BaseChart({
         setWidth(ev.nativeEvent.layout.width);
     }
 
-    return <View className="w-full h-48 my-2" onLayout={onLayout}>
+    return <View className={`w-full h-48 ${noMargin ? '' : 'my-2'}`} onLayout={onLayout}>
         <Canvas style={{ width, height }}>
             <RoundedRect width={width} height={height} r={12}>
                 <LinearGradient start={vec(0, 0)} end={vec(width, height)} colors={backgroundColor}/>
