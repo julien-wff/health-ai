@@ -14,13 +14,13 @@ import * as Sentry from '@sentry/react-native';
 import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { fetch as expoFetch } from 'expo/fetch';
-import { usePostHog } from 'posthog-react-native';
 import { useEffect, useState } from 'react';
 import { InteractionManager, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { Drawer } from 'react-native-drawer-layout';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import HealthDataFoundNotification from '@/components/notification/HealthDataFoundNotification';
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
+import { useTracking } from '@/hooks/useTracking';
 
 export default function Chat() {
     const { addOrUpdateChat } = useAppState();
@@ -34,8 +34,8 @@ export default function Chat() {
     } = useHealthData();
     const router = useRouter();
     const { id: chatId } = useLocalSearchParams<{ id: string }>();
-    const posthog = usePostHog();
     const insets = useSafeAreaInsets();
+    const tracking = useTracking();
 
     const [ responseStreamed, setResponseStreamed ] = useState(false);
 
@@ -54,20 +54,20 @@ export default function Chat() {
             switch (toolCall.toolName as keyof typeof tools) {
                 case 'get-daily-steps':
                 case 'display-steps':
-                    posthog.capture('chat_get_daily_steps', { display: toolCall.toolName.startsWith('display') });
+                    tracking.event('chat_get_daily_steps', { display: toolCall.toolName.startsWith('display') });
                     return formatCollection(filterCollectionRange(steps, startDate, endDate), 'steps');
                 case 'get-daily-exercise':
                 case 'display-exercise':
-                    posthog.capture('chat_get_daily_exercise', { display: toolCall.toolName.startsWith('display') });
+                    tracking.event('chat_get_daily_exercise', { display: toolCall.toolName.startsWith('display') });
                     return formatCollection(filterCollectionRange(exercise, startDate, endDate), 'exercise');
                 case 'get-daily-sleep':
                 case 'display-sleep':
-                    posthog.capture('chat_get_daily_sleep', { display: toolCall.toolName.startsWith('display') });
+                    tracking.event('chat_get_daily_sleep', { display: toolCall.toolName.startsWith('display') });
                     return formatCollection(filterCollectionRange(sleep, startDate, endDate), 'sleep');
             }
         },
         onResponse() {
-            posthog.capture('chat_response');
+            tracking.event('chat_response');
             setResponseStreamed(true);
         },
     });
@@ -81,6 +81,7 @@ export default function Chat() {
             if (!chat)
                 return;
 
+            tracking.event('chat_reopen');
             setMessages(chat.messages);
             setTitle(chat.title);
         })();
@@ -98,16 +99,18 @@ export default function Chat() {
             void saveStorageChat(chatId, messages, title);
         });
 
-        // Register new message to PostHog
+        // Register new message to Posthog and Sentry
         if (title)
-            posthog.capture('chat_message', { messageCount: messages.length });
+            tracking.event('chat_new_message', { messageCount: messages.length });
 
         if (messages.length !== 2 || title !== null)
             return;
 
         // Generate title if exactly 2 messages and no title
         InteractionManager.runAfterInteractions(() => {
-            generateConversationTitle(messages).then(setTitle);
+            generateConversationTitle(messages)
+                .then(setTitle)
+                .then(() => tracking.event('chat_title_generated', { length: messages.length }));
         });
     }, [ messages.length, status, title, responseStreamed ]);
 
@@ -119,11 +122,19 @@ export default function Chat() {
         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     }, [ messages ]);
 
+    // Report drawer status
+    useEffect(() => {
+        if (drawerOpened)
+            tracking.event('chat_drawer_open');
+        else
+            tracking.event('chat_drawer_close');
+    }, [ drawerOpened ]);
+
     /**
      * Stop current message streaming (if any) and navigate to new chat screen
      */
     function onNewChat() {
-        posthog.capture('chat_new_click');
+        tracking.event('chat_new_click');
         stop();
         router.replace('/chat');
     }

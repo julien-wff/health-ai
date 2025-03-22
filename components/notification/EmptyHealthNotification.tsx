@@ -4,19 +4,31 @@ import { useColors } from '@/hooks/useColors';
 import { Link } from 'expo-router';
 import { useHealthData } from '@/hooks/useHealthData';
 import BaseNotification from '@/components/notification/BaseNotification';
+import { useTracking } from '@/hooks/useTracking';
 
 
 export default function EmptyHealthNotification() {
     const colors = useColors();
+    const tracking = useTracking();
     const { warningNotificationStatus, setWarningNotificationStatus } = useHealthData();
+
+    function handleDismiss() {
+        tracking.event('notification_empty_health_dismissed');
+        setWarningNotificationStatus('dismissed');
+    }
+
+    function handleShown() {
+        tracking.event('notification_empty_health_show');
+        setWarningNotificationStatus('shown');
+    }
 
     if (warningNotificationStatus === 'dismissed')
         return <></>;
 
     return <BaseNotification showDelay={1000}
                              animateIn={warningNotificationStatus === 'show'}
-                             onShown={() => setWarningNotificationStatus('shown')}
-                             onDismissed={() => setWarningNotificationStatus('dismissed')}>
+                             onShown={handleShown}
+                             onDismissed={handleDismiss}>
         <Link href="/troubleshoot">
             <View className={`flex flex-row gap-4 items-center p-4 rounded-lg border
                               bg-orange-100 border-orange-500 dark:bg-orange-900 dark:border-orange-400`}>

@@ -10,15 +10,15 @@ import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { Footprints, Medal, MoonStar } from 'lucide-react-native';
-import { usePostHog } from 'posthog-react-native';
 import { useState } from 'react';
 import { Platform, Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTracking } from '@/hooks/useTracking';
 
 export default function Onboarding() {
     const colors = useColors();
     const router = useRouter();
-    const posthog = usePostHog();
+    const tracking = useTracking();
 
     const { setItem: setIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
     const { hasPermissions, setHasPermissions, setIsOnboarded } = useAppState();
@@ -29,11 +29,11 @@ export default function Onboarding() {
      * Ask for permissions (if not already granted), continue to the chat screen and fetch health records
      */
     async function handleContinueClick() {
-        posthog.capture('onboarding_start');
+        tracking.event('onboarding_start');
         setIsLoadingPermissions(true);
 
         if (hasPermissions) {
-            posthog.capture('onboarding_already_granted');
+            tracking.event('onboarding_permission_already_granted');
             await finishOnboarding();
             return;
         }
@@ -48,11 +48,11 @@ export default function Onboarding() {
             ToastAndroid.show('Please allow all...', ToastAndroid.SHORT);
             const permissions = await healthConnect!.requestPermission(REQUIRED_PERMISSIONS);
             if (hasAllRequiredPermissions(permissions)) {
-                posthog.capture('onboarding_granted');
+                tracking.event('onboarding_permission_granted');
                 setHasPermissions(true);
                 await finishOnboarding();
             } else {
-                posthog.capture('onboarding_denied');
+                tracking.event('onboarding_permission_denied');
                 ToastAndroid.show('Missing permissions', ToastAndroid.SHORT);
             }
         }
@@ -64,7 +64,7 @@ export default function Onboarding() {
      * Set isOnboarded to true, save it in storage, redirect to the chat screen and fetch health records
      */
     async function finishOnboarding() {
-        posthog.capture('onboarding_finish');
+        tracking.event('onboarding_finish');
         setIsOnboarded(true);
         await setIsOnboardedInStorage('1');
         router.replace('/chat');

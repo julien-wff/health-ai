@@ -1,13 +1,18 @@
 import TroubleshootingStep from '@/components/troubleshoot/TroubleshootingStep';
 import TroubleshootLayout from '@/components/troubleshoot/TroubleshootLayout';
 import { Linking, Text, TouchableOpacity } from 'react-native';
+import { useTracking } from '@/hooks/useTracking';
 
 export default function TroubleshootIos() {
+    const tracking = useTracking();
+
     function openAppleHealth() {
+        tracking.event('troubleshoot_open_health_app');
         void Linking.openURL('x-apple-health://');
     }
 
     function openAppSettings() {
+        tracking.event('troubleshoot_open_app_settings');
         void Linking.openSettings();
     }
 

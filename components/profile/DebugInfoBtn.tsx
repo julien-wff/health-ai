@@ -4,16 +4,19 @@ import * as Clipboard from 'expo-clipboard';
 import { Pressable, Text } from 'react-native';
 import { Info } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
+import { useTracking } from '@/hooks/useTracking';
 
 export default function DebugInfoBtn() {
     const posthog = usePostHog();
     const colors = useColors();
+    const tracking = useTracking();
 
     const env = process.env.APP_VARIANT || process.env.NODE_ENV;
     const debugInfo = `${Constants.expoConfig?.name} v${Constants.expoConfig?.version}-${env}`
         + `\nUID: ${posthog.getAnonymousId()}`;
 
     function copyDebugInfo() {
+        tracking.event('profile_debug_info_copy');
         void Clipboard.setStringAsync(debugInfo);
     }
 

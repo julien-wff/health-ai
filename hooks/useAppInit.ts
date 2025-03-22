@@ -8,6 +8,7 @@ import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { SplashScreen, useRouter } from 'expo-router';
 import { Platform } from 'react-native';
+import * as Sentry from '@sentry/react-native';
 
 /**
  * Platform-agnostic hook to initialize the app
@@ -26,6 +27,7 @@ export function useAppInit() {
     const loadStateFromStorage = async () => {
         const isOnboarded = await getIsOnboardedInStorage();
         setIsOnboarded(!!isOnboarded);
+        Sentry.captureEvent({ message: 'init_set_onboarded', extra: { isOnboarded } });
     };
 
     /**
@@ -35,6 +37,7 @@ export function useAppInit() {
      */
     const initHealthAndAsyncLoadState = async () => {
         // Pre-checks
+        Sentry.captureEvent({ message: 'init_health_precheck_start' });
         let preCheckSuccess: boolean;
         switch (Platform.OS) {
             case 'android':
@@ -45,6 +48,7 @@ export function useAppInit() {
                 break;
         }
 
+        Sentry.captureEvent({ message: 'init_health_precheck_end', extra: { preCheckSuccess } });
         if (!preCheckSuccess)
             return;
 
@@ -66,6 +70,7 @@ export function useAppInit() {
                 break;
         }
 
+        Sentry.captureEvent({ message: 'init_health_init_end', extra: { healthInitSuccess } });
         if (!healthInitSuccess) {
             await SplashScreen.hideAsync();
             return;
@@ -81,10 +86,13 @@ export function useAppInit() {
         await SplashScreen.hideAsync();
 
         // Load state from storage
+        Sentry.captureEvent({ message: 'init_load_state_start' });
         const chats = await getStoredChats();
         setChats(chats);
+        Sentry.captureEvent({ message: 'init_load_state_end', extra: { count: chats.length } });
 
         // Load health records
+        Sentry.captureEvent({ message: 'init_load_health_data_start' });
         if (useAppState.getState().hasPermissions) {
             const healthRecords = await readHealthRecords();
             setHealthRecords(healthRecords);

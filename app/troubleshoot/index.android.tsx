@@ -9,8 +9,10 @@ import { useTracking } from '@/hooks/useTracking';
 export default function TroubleshootAndroid() {
     const [ imageHeight, setImageHeight ] = useState(0);
     const colorScheme = useColorScheme();
+    const tracking = useTracking();
 
     function openHealthConnect() {
+        tracking.event('troubleshoot_open_health_app');
         healthConnect!.openHealthConnectSettings();
     }
 

@@ -78,13 +78,17 @@ function Layout() {
         (async () => {
             await loadStateFromStorage();
             await initHealthAndAsyncLoadState();
+            Sentry.captureEvent({ message: 'layout_state_loaded' });
 
             // Reload health data when the app comes back from background
             subscription = AppState.addEventListener('change', () => {
                 if (!hasPermissions || AppState.currentState !== 'active')
                     return;
 
-                readHealthRecords().then(setHealthRecords);
+                Sentry.captureEvent({ message: 'layout_state_health_data_update_start' });
+                readHealthRecords()
+                    .then(setHealthRecords)
+                    .then(() => Sentry.captureEvent({ message: 'layout_state_health_data_updated' }));
             });
         })();
 

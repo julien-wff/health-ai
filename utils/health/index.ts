@@ -3,6 +3,7 @@ import { readIosHealthRecords } from '@/utils/health/ios';
 import dayjs, { Dayjs } from 'dayjs';
 import { Duration } from 'dayjs/plugin/duration';
 import { Platform } from 'react-native';
+import * as Sentry from '@sentry/react-native';
 
 export interface StepsData {
     steps: number;
@@ -36,6 +37,7 @@ export interface HealthRecords {
  * Platform-agnostic function to read health records
  */
 export async function readHealthRecords(): Promise<HealthRecords> {
+    Sentry.captureEvent({ message: 'health_read_records' });
     switch (Platform.OS) {
         case 'android':
             return readAndroidHealthRecords();
