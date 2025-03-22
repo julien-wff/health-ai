@@ -76,10 +76,10 @@ export default function TroubleshootAndroid() {
             </Text>
         </TroubleshootingStep>
 
-        <TouchableOpacity className="mt-4 w-full p-4 bg-blue-500 dark:bg-blue-400 rounded-lg shadow"
+        <TouchableOpacity className="mt-4 w-full rounded-lg bg-blue-500 p-4 shadow dark:bg-blue-400"
                           activeOpacity={.8}
                           onPress={openHealthConnect}>
-            <Text className="text-slate-50 dark:text-slate-950 text-center uppercase">Open Health Connect</Text>
+            <Text className="text-center uppercase text-slate-50 dark:text-slate-950">Open Health Connect</Text>
         </TouchableOpacity>
     </TroubleshootLayout>;
 }

@@ -128,7 +128,7 @@ export default function Chat() {
         router.replace('/chat');
     }
 
-    return <View className="h-full relative">
+    return <View className="relative h-full">
         <SafeAreaView className="h-full">
             <Drawer open={drawerOpened}
                     onOpen={() => setDrawerOpened(true)}
@@ -155,7 +155,7 @@ export default function Chat() {
             </Drawer>
         </SafeAreaView>
 
-        <View className="w-full absolute bottom-0 bg-slate-50 dark:bg-slate-900"
+        <View className="absolute bottom-0 w-full bg-slate-50 dark:bg-slate-900"
               style={{ height: insets.bottom }}/>
     </View>;
 }

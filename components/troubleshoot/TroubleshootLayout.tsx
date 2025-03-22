@@ -20,8 +20,8 @@ export default function TroubleshootLayout({ children }: LayoutProps) {
             router.back();
     }, [ empty ]);
 
-    return <SafeAreaView className="p-4 flex gap-4 h-full">
-        <View className="flex items-center gap-2 flex-row">
+    return <SafeAreaView className="flex h-full gap-4 p-4">
+        <View className="flex flex-row items-center gap-2">
             <Pressable className="p-2" onPress={() => router.back()}>
                 <ArrowLeft size={24} color={colors.text}/>
             </Pressable>

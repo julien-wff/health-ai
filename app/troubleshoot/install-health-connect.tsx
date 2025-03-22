@@ -30,13 +30,13 @@ export default function InstallHealthConnect() {
         return () => subscription.remove();
     }, []);
 
-    return <View className="min-h-screen flex gap-4 p-4 bg-slate-50 dark:bg-slate-950">
-        <View className="flex-1 flex justify-center gap-4">
-            <View className="flex items-center mb-4">
+    return <View className="flex min-h-screen gap-4 bg-slate-50 p-4 dark:bg-slate-950">
+        <View className="flex flex-1 justify-center gap-4">
+            <View className="mb-4 flex items-center">
                 <TriangleAlert color={colors.red} size={96}/>
             </View>
 
-            <Text className="text-slate-800 dark:text-slate-200 text-2xl font-bold">
+            <Text className="text-2xl font-bold text-slate-800 dark:text-slate-200">
                 Health connect needed!
             </Text>
 
@@ -63,19 +63,19 @@ export default function InstallHealthConnect() {
 
         {!isAppInstalled ?
             <TouchableOpacity
-                className="bg-blue-500 dark:bg-blue-400 p-4 rounded-lg"
+                className="rounded-lg bg-blue-500 p-4 dark:bg-blue-400"
                 activeOpacity={.9}
                 onPress={handleInstallClick}>
-                <Text className="text-white font-bold text-lg text-center">
+                <Text className="text-center text-lg font-bold text-white">
                     Install on Play Store
                 </Text>
             </TouchableOpacity>
             :
             <TouchableOpacity
-                className="bg-green-500 dark:bg-green-400 p-4 rounded-lg"
+                className="rounded-lg bg-green-500 p-4 dark:bg-green-400"
                 activeOpacity={.9}
                 onPress={handleHealthConnectSetup}>
-                <Text className="text-white font-bold text-lg text-center">
+                <Text className="text-center text-lg font-bold text-white">
                     Health Connect configured!
                 </Text>
             </TouchableOpacity>

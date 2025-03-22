@@ -18,7 +18,7 @@ export default function DebugInfoBtn() {
     }
 
     return <Pressable
-        className="flex flex-row items-center gap-2 active:bg-slate-200 dark:active:bg-slate-800 p-4 rounded-lg"
+        className="flex flex-row items-center gap-2 rounded-lg p-4 active:bg-slate-200 dark:active:bg-slate-800"
         onPress={copyDebugInfo}>
         <Info size={20} color={colors.text}/>
         <Text className="text-slate-800 dark:text-slate-200">

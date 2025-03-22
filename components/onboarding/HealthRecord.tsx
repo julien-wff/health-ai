@@ -11,7 +11,7 @@ interface HealthRecordProps {
 }
 
 export default function HealthRecord({ icon: Icon, label, color, background }: HealthRecordProps) {
-    return <View className="flex flex-1 items-center gap-2 py-4 px-2">
+    return <View className="flex flex-1 items-center gap-2 px-2 py-4">
         <LinearGradient colors={background}
             // Tailwind doesn't seem to work, especially on iOS
                         style={{ borderRadius: 8, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}

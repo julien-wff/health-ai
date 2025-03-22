@@ -28,7 +28,7 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
                     contentContainerClassName="pb-4">
             {messages.map(m => (
                 <View key={m.id} className="my-2">
-                    <View className="flex items-center flex-row gap-2 mb-1">
+                    <View className="mb-1 flex flex-row items-center gap-2">
                         {m.role === 'user' ? <UserIcon/> : <AssistantIcon/>}
                         <Text className="font-bold text-slate-900 dark:text-slate-100">
                             {m.role === 'user' ? 'You' : 'Health AI'}
@@ -56,7 +56,7 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
 function UserIcon() {
     const colors = useColors();
 
-    return <View className="w-5 h-5 flex items-center justify-center rounded-full">
+    return <View className="flex h-5 w-5 items-center justify-center rounded-full">
         <LinearGradient colors={colors.greenBackground}
                         start={[ 0, 0 ]}
                         end={[ 1, 1 ]}
@@ -69,7 +69,7 @@ function UserIcon() {
 function AssistantIcon() {
     const colors = useColors();
 
-    return <View className="w-6 h-6 bg-white flex items-center justify-center rounded-full">
+    return <View className="flex h-6 w-6 items-center justify-center rounded-full bg-white">
         <LinearGradient colors={colors.blueBackground}
                         start={[ 0, 0 ]}
                         end={[ 1, 1 ]}

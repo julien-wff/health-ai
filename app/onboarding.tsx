@@ -72,10 +72,10 @@ export default function Onboarding() {
         setHealthRecords(healthRecords);
     }
 
-    return <SafeAreaView className="h-full flex gap-4 p-4">
-        <View className="flex-1 flex justify-center gap-4">
-            <View className="flex items-center mb-4">
-                <ProjectIcon className="w-24 h-24"/>
+    return <SafeAreaView className="flex h-full gap-4 p-4">
+        <View className="flex flex-1 justify-center gap-4">
+            <View className="mb-4 flex items-center">
+                <ProjectIcon className="h-24 w-24"/>
             </View>
 
             <Text className="text-2xl font-bold text-slate-900 dark:text-slate-50">
@@ -91,18 +91,18 @@ export default function Onboarding() {
                 <HealthRecord icon={Medal} label="Activity" color={colors.red} background={colors.redBackground}/>
             </View>
 
-            <Text className="text-lg text-slate-800 dark:text-slate-200 mt-4">
+            <Text className="mt-4 text-lg text-slate-800 dark:text-slate-200">
                 If you continue, you accept that these personal records will be anonymously shared with Google Gemini
                 via the LLM.
             </Text>
         </View>
 
         <TouchableOpacity
-            className="bg-blue-500 dark:bg-blue-400 p-4 rounded-lg"
+            className="rounded-lg bg-blue-500 p-4 dark:bg-blue-400"
             activeOpacity={.9}
             disabled={isLoadingPermissions}
             onPress={handleContinueClick}>
-            <Text className="text-white font-bold text-lg text-center">
+            <Text className="text-center text-lg font-bold text-white">
                 Continue
             </Text>
         </TouchableOpacity>

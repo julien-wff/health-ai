@@ -21,7 +21,7 @@ export default function HealthDataFoundNotification() {
                 <CircleCheck color={colors.green} size={36}/>
 
                 <View className="flex-1">
-                    <Text className="font-bold mb-1 text-slate-950 dark:text-slate-50">
+                    <Text className="mb-1 font-bold text-slate-950 dark:text-slate-50">
                         Health data loaded successfully
                     </Text>
                     <Text className="text-slate-800 dark:text-slate-200">
