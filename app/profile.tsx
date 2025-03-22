@@ -7,19 +7,15 @@ import DebugInfoBtn from '@/components/profile/DebugInfoBtn';
 import ProfileBtn from '@/components/profile/ProfileBtn';
 import { healthConnect } from '@/utils/health/android';
 import StepsChart from '@/components/chart/StepsChart';
-import dayjs from 'dayjs';
 import ExerciseChart from '@/components/chart/ExerciseChart';
 import SleepChart from '@/components/chart/SleepChart';
-import { useMemo } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CopyStorageBtn from '@/components/profile/CopyStorageBtn';
+import ChartLoadBtn from '@/components/profile/ChartLoadBtn';
 
 export default function Profile() {
     const router = useRouter();
     const colors = useColors();
-
-    const graphStartDate = useMemo(() => dayjs().add(-28, 'day'), []);
-    const graphEndDate = useMemo(() => dayjs(), []);
 
     function handleOpenHealthApp() {
         switch (Platform.OS) {
@@ -62,9 +58,9 @@ export default function Profile() {
                 <Text className="text-slate-800 dark:text-slate-200 ml-4 mt-4">
                     Steps, Daily Exercise Time and Sleep Duration
                 </Text>
-                <StepsChart startDate={graphStartDate} endDate={graphEndDate} noMargin/>
-                <ExerciseChart startDate={graphStartDate} endDate={graphEndDate} noMargin/>
-                <SleepChart startDate={graphStartDate} endDate={graphEndDate} noMargin/>
+                <ChartLoadBtn chart={StepsChart} chartName="steps" noMargin/>
+                <ChartLoadBtn chart={ExerciseChart} chartName="exercise" noMargin/>
+                <ChartLoadBtn chart={SleepChart} chartName="sleep" noMargin/>
 
                 <Text className="text-slate-800 dark:text-slate-200 ml-4 mt-4">Debug</Text>
                 <View className="bg-white dark:bg-slate-900 rounded-lg">
