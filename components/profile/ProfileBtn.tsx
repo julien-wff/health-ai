@@ -15,7 +15,7 @@ export default function ProfileBtn({ onPress, children, icon: Icon, separator }:
 
     return <View className={separator ? 'border-b border-slate-300 dark:border-slate-700' : ''}>
         <Pressable onPress={onPress}
-                   className="flex flex-row items-center justify-start p-4 gap-2 rounded-lg active:bg-slate-200 active:dark:bg-slate-800">
+                   className="flex flex-row items-center justify-start gap-2 rounded-lg p-4 active:bg-slate-200 active:dark:bg-slate-800">
             <Icon size={20} color={colors.text}/>
             <Text className="text-slate-900 dark:text-slate-50">
                 {children}

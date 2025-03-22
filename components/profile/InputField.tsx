@@ -14,7 +14,7 @@ export default function InputField({ label, separator, inputProps }: InputFieldP
                              className={`p-4 ${separator ? 'border-b border-slate-300 dark:border-slate-700' : ''}`}>
         <Text className="font-bold text-slate-900 dark:text-slate-50">{label}</Text>
         <TextInput ref={inputRef}
-                   className="text-blue-600 dark:text-blue-500 mt-2"
+                   className="mt-2 text-blue-600 dark:text-blue-500"
                    returnKeyType="done"
                    maxLength={64}
                    enterKeyHint="done"

@@ -55,7 +55,7 @@ export default function BaseNotification({
     }));
 
     return <GestureDetector gesture={pan}>
-        <Animated.View className="w-full px-8 absolute top-12" style={animatedStyles}>
+        <Animated.View className="absolute top-12 w-full px-8" style={animatedStyles}>
             {children}
         </Animated.View>
     </GestureDetector>;

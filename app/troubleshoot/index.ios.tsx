@@ -39,10 +39,10 @@ export default function TroubleshootIos() {
                 This screen should automatically disappear if the synchronization becomes successful.
             </Text>
 
-            <TouchableOpacity className="mt-2 w-full p-4 bg-blue-500 dark:bg-blue-400 rounded-lg shadow"
+            <TouchableOpacity className="mt-2 w-full rounded-lg bg-blue-500 p-4 shadow dark:bg-blue-400"
                               activeOpacity={.8}
                               onPress={openAppleHealth}>
-                <Text className="text-slate-50 dark:text-slate-950 text-center uppercase">Open Apple Health</Text>
+                <Text className="text-center uppercase text-slate-50 dark:text-slate-950">Open Apple Health</Text>
 
             </TouchableOpacity>
         </TroubleshootingStep>
@@ -52,10 +52,10 @@ export default function TroubleshootIos() {
                 Uninstall and reinstall Health AI, so the permissions are reset.
             </Text>
 
-            <TouchableOpacity className="mt-2 w-full p-4 bg-blue-500 dark:bg-blue-400 rounded-lg shadow"
+            <TouchableOpacity className="mt-2 w-full rounded-lg bg-blue-500 p-4 shadow dark:bg-blue-400"
                               activeOpacity={.8}
                               onPress={openAppSettings}>
-                <Text className="text-slate-50 dark:text-slate-950 text-center uppercase">Open App Settings</Text>
+                <Text className="text-center uppercase text-slate-50 dark:text-slate-950">Open App Settings</Text>
             </TouchableOpacity>
         </TroubleshootingStep>
     </TroubleshootLayout>;

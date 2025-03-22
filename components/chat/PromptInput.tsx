@@ -35,17 +35,17 @@ export default function PromptInput({ input, setInput, handleSubmit, isLoading }
     }
 
     return <View
-        className="p-4 shadow-xl shadow-black bg-slate-50 dark:bg-slate-900 rounded-t-[20px] flex flex-row items-center gap-4">
+        className="flex flex-row items-center gap-4 bg-slate-50 p-4 shadow-xl shadow-black rounded-t-[20px] dark:bg-slate-900">
         <TextInput
             ref={textInput}
-            className="flex-1 p-4 rounded-xl dark:placeholder:text-slate-500 dark:text-slate-200"
+            className="flex-1 rounded-xl p-4 dark:placeholder:text-slate-500 dark:text-slate-200"
             placeholder="Message the assistant"
             returnKeyType="send"
             value={input}
             onChangeText={setInput}
             onSubmitEditing={sendPrompt}
         />
-        <TouchableOpacity className="bg-blue-500 dark:bg-blue-400 p-4 rounded-xl disabled:opacity-75 h-14 w-14"
+        <TouchableOpacity className="h-14 w-14 rounded-xl bg-blue-500 p-4 disabled:opacity-75 dark:bg-blue-400"
                           disabled={isLoading}
                           onPress={() => sendPrompt()}>
             {isLoading ?

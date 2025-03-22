@@ -33,7 +33,7 @@ function AnimatedLoadingIcon({ size, color, duration: inputDuration }: AnimatedL
         c3y.value = withDelay(duration * (2 / 5), upDownAnimation());
     }, []);
 
-    return <Canvas className="w-full h-full" style={{ width: size, height: size }}>
+    return <Canvas className="h-full w-full" style={{ width: size, height: size }}>
         <Circle r={r} cx={r} cy={c1y} color={color}/>
         <Circle r={r} cx={size / 2} cy={c2y} color={color}/>
         <Circle r={r} cx={size - r} cy={c3y} color={color}/>

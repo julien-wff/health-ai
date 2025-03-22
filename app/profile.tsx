@@ -28,8 +28,8 @@ export default function Profile() {
         }
     }
 
-    return <SafeAreaView className="h-full flex gap-4 p-4 bg-slate-50 dark:bg-slate-950">
-        <View className="flex items-center gap-2 flex-row">
+    return <SafeAreaView className="flex h-full gap-4 bg-slate-50 p-4 dark:bg-slate-950">
+        <View className="flex flex-row items-center gap-2">
             <Pressable className="p-2" onPress={() => router.back()}>
                 <ArrowLeft size={24} color={colors.text}/>
             </Pressable>
@@ -41,29 +41,29 @@ export default function Profile() {
         <ScrollView>
             <View className="flex gap-4">
 
-                {/*<Text className="text-slate-800 dark:text-slate-200 ml-4">Personal informations</Text>*/}
-                {/*<View className="bg-white dark:bg-slate-900 rounded-lg">*/}
+                {/*<Text className="ml-4 text-slate-800 dark:text-slate-200">Personal informations</Text>*/}
+                {/*<View className="rounded-lg bg-white dark:bg-slate-900">*/}
                 {/*    <InputField label="Display name" separator/>*/}
                 {/*    <InputField label="Age" inputProps={{ keyboardType: 'numeric', maxLength: 2 }}/>*/}
                 {/*</View>*/}
 
-                <Text className="text-slate-800 dark:text-slate-200 ml-4 mt-4">General settings</Text>
-                <View className="bg-white dark:bg-slate-900 rounded-lg">
+                <Text className="mt-4 ml-4 text-slate-800 dark:text-slate-200">General settings</Text>
+                <View className="rounded-lg bg-white dark:bg-slate-900">
                     <ProfileBtn icon={SquareArrowOutUpRight} separator onPress={handleOpenHealthApp}>
                         {Platform.select({ ios: 'Open Apple Health', android: 'Open Health Connect' })}
                     </ProfileBtn>
                     <ResetAppBtn/>
                 </View>
 
-                <Text className="text-slate-800 dark:text-slate-200 ml-4 mt-4">
+                <Text className="mt-4 ml-4 text-slate-800 dark:text-slate-200">
                     Steps, Daily Exercise Time and Sleep Duration
                 </Text>
                 <ChartLoadBtn chart={StepsChart} chartName="steps" noMargin gradient={colors.greenBackground}/>
                 <ChartLoadBtn chart={ExerciseChart} chartName="exercise" noMargin gradient={colors.redBackground}/>
                 <ChartLoadBtn chart={SleepChart} chartName="sleep" noMargin gradient={colors.indigoBackground}/>
 
-                <Text className="text-slate-800 dark:text-slate-200 ml-4 mt-4">Debug</Text>
-                <View className="bg-white dark:bg-slate-900 rounded-lg">
+                <Text className="mt-4 ml-4 text-slate-800 dark:text-slate-200">Debug</Text>
+                <View className="rounded-lg bg-white dark:bg-slate-900">
                     <CopyStorageBtn/>
                     <DebugInfoBtn/>
                 </View>
