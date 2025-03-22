@@ -8,9 +8,10 @@ import { useMemo } from 'react';
 interface StepsChartProps {
     startDate: Dayjs,
     endDate: Dayjs,
+    noMargin?: boolean,
 }
 
-export default function StepsChart({ startDate, endDate }: StepsChartProps) {
+export default function StepsChart({ startDate, endDate, noMargin }: StepsChartProps) {
     const colors = useColors();
     const { steps: stepsRecords } = useHealthData();
 
@@ -26,5 +27,6 @@ export default function StepsChart({ startDate, endDate }: StepsChartProps) {
     return <BaseChart barColor={colors.green}
                       backgroundColor={colors.greenBackground}
                       values={stepCount}
-                      labels={weekLabel}/>;
+                      labels={weekLabel}
+                      noMargin={noMargin}/>;
 }

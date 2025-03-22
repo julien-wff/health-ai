@@ -8,9 +8,10 @@ import { useMemo } from 'react';
 interface SleepChartProps {
     startDate: Dayjs,
     endDate: Dayjs,
+    noMargin?: boolean,
 }
 
-export default function SleepChart({ startDate, endDate }: SleepChartProps) {
+export default function SleepChart({ startDate, endDate, noMargin }: SleepChartProps) {
     const colors = useColors();
     const { sleep: sleepRecords } = useHealthData();
 
@@ -49,5 +50,6 @@ export default function SleepChart({ startDate, endDate }: SleepChartProps) {
                       valuesOffset={offset}
                       reverse
                       scaleValueOffset={earliestHoursMinutes}
-                      labels={labels}/>;
+                      labels={labels}
+                      noMargin={noMargin}/>;
 }

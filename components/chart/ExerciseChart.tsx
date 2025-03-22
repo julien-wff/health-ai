@@ -9,9 +9,10 @@ import { useMemo } from 'react';
 interface ExerciseChartProps {
     startDate: Dayjs,
     endDate: Dayjs,
+    noMargin?: boolean,
 }
 
-export default function ExerciseChart({ startDate, endDate }: ExerciseChartProps) {
+export default function ExerciseChart({ startDate, endDate, noMargin }: ExerciseChartProps) {
     const colors = useColors();
     const { exercise: exerciseRecords } = useHealthData();
 
@@ -46,5 +47,6 @@ export default function ExerciseChart({ startDate, endDate }: ExerciseChartProps
                       backgroundColor={colors.redBackground}
                       values={stepCount}
                       labels={weekLabel}
-                      scaleUnit="duration"/>;
+                      scaleUnit="duration"
+                      noMargin={noMargin}/>;
 }
