@@ -16,7 +16,7 @@ import { StatusBar } from 'expo-status-bar';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import { PostHog, PostHogProvider } from 'posthog-react-native';
 import { useEffect } from 'react';
-import { AppState, NativeEventSubscription, useColorScheme, View } from 'react-native';
+import { AppState, NativeEventSubscription, Platform, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
@@ -43,6 +43,7 @@ Sentry.init({
 
 const posthogClient = new PostHog('phc_nDWFGdgxDYou6EFbpgmkVJRwpOv1Izk218FwFa5ksOT', {
     host: 'https://eu.i.posthog.com',
+    persistence: [ 'ios', 'android' ].includes(Platform.OS) ? 'file' : 'memory',
 });
 
 dayjs.extend(duration);
