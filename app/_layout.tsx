@@ -117,6 +117,7 @@ function Layout() {
                 {/* Following screens have in and out animations, while all the others don't */}
                 <Stack.Screen name="troubleshoot/index" options={{ animation: 'default' }}/>
                 <Stack.Screen name="profile" options={{ animation: 'default' }}/>
+                <Stack.Screen name="advanced-debug" options={{ animation: 'default' }}/>
             </Stack>
         </GestureHandlerRootView>
     </PostHogProvider>;

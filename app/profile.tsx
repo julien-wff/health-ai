@@ -13,12 +13,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import CopyStorageBtn from '@/components/profile/CopyStorageBtn';
 import ChartLoadBtn from '@/components/profile/ChartLoadBtn';
 import { useTracking } from '@/hooks/useTracking';
+import { useAppState } from '@/hooks/useAppState';
+import AdvancedDebugBtn from '@/components/profile/AdvancedDebugBtn';
 import ViewHeaderWithBack from '@/components/common/ViewHeaderWithBack';
 
 export default function Profile() {
     const router = useRouter();
     const colors = useColors();
     const tracking = useTracking();
+    const { hasDebugAccess } = useAppState();
 
     function handleOpenHealthApp() {
         tracking.event('profile_open_health_app');
@@ -62,6 +65,7 @@ export default function Profile() {
                 <Text className="mt-4 ml-4 text-slate-800 dark:text-slate-200">Debug</Text>
                 <View className="rounded-lg bg-white dark:bg-slate-900">
                     <CopyStorageBtn/>
+                    {hasDebugAccess && <AdvancedDebugBtn/>}
                     <DebugInfoBtn/>
                 </View>
 
