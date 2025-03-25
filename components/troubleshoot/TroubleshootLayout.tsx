@@ -1,4 +1,3 @@
-import { useColors } from '@/hooks/useColors';
 import { useHealthData } from '@/hooks/useHealthData';
 import { useRouter } from 'expo-router';
 import { ReactNode, useEffect } from 'react';
@@ -14,7 +13,6 @@ interface LayoutProps {
 export default function TroubleshootLayout({ children }: LayoutProps) {
     const router = useRouter();
     const tracking = useTracking();
-    const colors = useColors();
     const { empty } = useHealthData();
 
     useEffect(() => {

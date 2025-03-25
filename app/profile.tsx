@@ -1,6 +1,5 @@
 import { Linking, Platform, ScrollView, Text, View } from 'react-native';
 import { SquareArrowOutUpRight } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
 import { useColors } from '@/hooks/useColors';
 import ResetAppBtn from '@/components/profile/ResetAppBtn';
 import DebugInfoBtn from '@/components/profile/DebugInfoBtn';
@@ -18,7 +17,6 @@ import AdvancedDebugBtn from '@/components/profile/AdvancedDebugBtn';
 import ViewHeaderWithBack from '@/components/common/ViewHeaderWithBack';
 
 export default function Profile() {
-    const router = useRouter();
     const colors = useColors();
     const tracking = useTracking();
     const { hasDebugAccess } = useAppState();
