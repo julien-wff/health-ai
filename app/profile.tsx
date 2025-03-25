@@ -1,5 +1,5 @@
-import { Linking, Platform, Pressable, ScrollView, Text, View } from 'react-native';
-import { ArrowLeft, SquareArrowOutUpRight } from 'lucide-react-native';
+import { Linking, Platform, ScrollView, Text, View } from 'react-native';
+import { SquareArrowOutUpRight } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useColors } from '@/hooks/useColors';
 import ResetAppBtn from '@/components/profile/ResetAppBtn';
@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import CopyStorageBtn from '@/components/profile/CopyStorageBtn';
 import ChartLoadBtn from '@/components/profile/ChartLoadBtn';
 import { useTracking } from '@/hooks/useTracking';
+import ViewHeaderWithBack from '@/components/common/ViewHeaderWithBack';
 
 export default function Profile() {
     const router = useRouter();
@@ -32,14 +33,7 @@ export default function Profile() {
     }
 
     return <SafeAreaView className="flex h-full gap-4 bg-slate-50 p-4 dark:bg-slate-950">
-        <View className="flex flex-row items-center gap-2">
-            <Pressable className="p-2" onPress={() => router.back()}>
-                <ArrowLeft size={24} color={colors.text}/>
-            </Pressable>
-            <Text className="text-xl font-bold text-slate-900 dark:text-slate-50">
-                Settings
-            </Text>
-        </View>
+        <ViewHeaderWithBack>Settings</ViewHeaderWithBack>
 
         <ScrollView>
             <View className="flex gap-4">
