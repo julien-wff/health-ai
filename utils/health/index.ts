@@ -37,7 +37,7 @@ export interface HealthRecords {
  * Platform-agnostic function to read health records
  */
 export async function readHealthRecords(): Promise<HealthRecords> {
-    Sentry.captureEvent({ message: 'health_read_records' });
+    Sentry.captureEvent({ event_id: 'health_read_records', level: 'info' });
     switch (Platform.OS) {
         case 'android':
             return readAndroidHealthRecords();
