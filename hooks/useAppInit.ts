@@ -4,7 +4,7 @@ import { useHealthData } from '@/hooks/useHealthData';
 import { getStoredChats } from '@/utils/chat';
 import { readHealthRecords } from '@/utils/health';
 import { isHealthKitAvailable } from '@/utils/health/ios';
-import { IS_ONBOARDED } from '@/utils/storageKeys';
+import { HAS_DEBUG_ACCESS, IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { SplashScreen, useRouter } from 'expo-router';
 import { Platform } from 'react-native';
@@ -16,7 +16,8 @@ import * as Sentry from '@sentry/react-native';
  */
 export function useAppInit() {
     const { getItem: getIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
-    const { setIsOnboarded, setChats, setHasPermissions } = useAppState();
+    const { getItem: getHasDebugAccessInStorage } = useAsyncStorage(HAS_DEBUG_ACCESS);
+    const { setIsOnboarded, setChats, setHasPermissions, setHasDebugAccess } = useAppState();
     const androidHealth = useAndroidHealthInit();
     const router = useRouter();
     const { setHealthRecords } = useHealthData();
@@ -27,7 +28,9 @@ export function useAppInit() {
     const loadStateFromStorage = async () => {
         const isOnboarded = await getIsOnboardedInStorage();
         setIsOnboarded(!!isOnboarded);
-        Sentry.captureEvent({ event_id: 'init_set_onboarded', level: 'info', extra: { isOnboarded } });
+        const hasDebugAccess = await getHasDebugAccessInStorage();
+        setHasDebugAccess(!!hasDebugAccess);
+        Sentry.captureEvent({ event_id: 'init_set_onboarded', level: 'info', extra: { isOnboarded, hasDebugAccess } });
     };
 
     /**

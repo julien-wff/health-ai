@@ -1,6 +1,5 @@
-import { Linking, Platform, Pressable, ScrollView, Text, View } from 'react-native';
-import { ArrowLeft, SquareArrowOutUpRight } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
+import { Linking, Platform, ScrollView, Text, View } from 'react-native';
+import { SquareArrowOutUpRight } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
 import ResetAppBtn from '@/components/profile/ResetAppBtn';
 import DebugInfoBtn from '@/components/profile/DebugInfoBtn';
@@ -13,11 +12,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import CopyStorageBtn from '@/components/profile/CopyStorageBtn';
 import ChartLoadBtn from '@/components/profile/ChartLoadBtn';
 import { useTracking } from '@/hooks/useTracking';
+import { useAppState } from '@/hooks/useAppState';
+import AdvancedDebugBtn from '@/components/profile/AdvancedDebugBtn';
+import ViewHeaderWithBack from '@/components/common/ViewHeaderWithBack';
 
 export default function Profile() {
-    const router = useRouter();
     const colors = useColors();
     const tracking = useTracking();
+    const { hasDebugAccess } = useAppState();
 
     function handleOpenHealthApp() {
         tracking.event('profile_open_health_app');
@@ -32,14 +34,7 @@ export default function Profile() {
     }
 
     return <SafeAreaView className="flex h-full gap-4 bg-slate-50 p-4 dark:bg-slate-950">
-        <View className="flex flex-row items-center gap-2">
-            <Pressable className="p-2" onPress={() => router.back()}>
-                <ArrowLeft size={24} color={colors.text}/>
-            </Pressable>
-            <Text className="text-xl font-bold text-slate-900 dark:text-slate-50">
-                Settings
-            </Text>
-        </View>
+        <ViewHeaderWithBack>Settings</ViewHeaderWithBack>
 
         <ScrollView>
             <View className="flex gap-4">
@@ -68,6 +63,7 @@ export default function Profile() {
                 <Text className="mt-4 ml-4 text-slate-800 dark:text-slate-200">Debug</Text>
                 <View className="rounded-lg bg-white dark:bg-slate-900">
                     <CopyStorageBtn/>
+                    {hasDebugAccess && <AdvancedDebugBtn/>}
                     <DebugInfoBtn/>
                 </View>
 

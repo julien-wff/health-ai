@@ -1,11 +1,11 @@
 import ChatElement from '@/components/chat-drawer/ChatElement';
-import ProjectIcon from '@/components/content/ProjectIcon';
 import { useAppState } from '@/hooks/useAppState';
 import { Link, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { UserRoundCog } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
+import ProjectIconWithDebug from '@/components/chat-drawer/ProjectIconWithDebug';
 
 export default React.memo(ChatDrawer);
 
@@ -16,7 +16,7 @@ function ChatDrawer() {
 
     return <View className="flex h-full bg-slate-50 dark:bg-slate-950">
         <View className="my-4 flex items-center justify-center">
-            <ProjectIcon className="h-24 w-24"/>
+            <ProjectIconWithDebug/>
         </View>
 
         <View className="flex-1 p-2">

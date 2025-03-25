@@ -5,6 +5,8 @@ import { create } from 'zustand';
 interface AppState {
     isOnboarded: boolean;
     setIsOnboarded: (isOnboarded: boolean) => void;
+    hasDebugAccess: boolean;
+    setHasDebugAccess: (hasDebugAccess: boolean) => void;
     hasPermissions: boolean;
     setHasPermissions: (hasPermissions: boolean) => void;
     chats: StorageChat[];
@@ -17,9 +19,11 @@ interface AppState {
  */
 export const useAppState = create<AppState>((set) => ({
     isOnboarded: false,
+    hasDebugAccess: false,
     hasPermissions: false,
     chats: [],
     setIsOnboarded: (isOnboarded: boolean) => set({ isOnboarded }),
+    setHasDebugAccess: (hasDebugAccess: boolean) => set({ hasDebugAccess }),
     setHasPermissions: (hasPermissions: boolean) => set({ hasPermissions }),
     setChats: (chats: StorageChat[]) => set({
         chats: chats.sort((a, b) => b.lastUpdated.getTime() - a.lastUpdated.getTime()),
