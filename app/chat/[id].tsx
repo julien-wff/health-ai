@@ -21,6 +21,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import HealthDataFoundNotification from '@/components/notification/HealthDataFoundNotification';
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
+import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 
 export default function Chat() {
     const { addOrUpdateChat, requireNewChat, setRequireNewChat } = useAppState();
@@ -36,13 +37,14 @@ export default function Chat() {
     const { id: chatId } = useLocalSearchParams<{ id: string }>();
     const insets = useSafeAreaInsets();
     const tracking = useTracking();
+    const { agentMode } = useFeatureFlags();
 
     const [ responseStreamed, setResponseStreamed ] = useState(false);
 
     const { messages, setInput, input, handleSubmit, setMessages, stop, status } = useChat({
         id: chatId,
         fetch: expoFetch as unknown as typeof globalThis.fetch,
-        api: generateAPIUrl('/api/chat'),
+        api: generateAPIUrl(`/api/chat/${agentMode}`),
         maxSteps: 5,
         onError: error => {
             Sentry.captureException(error);
