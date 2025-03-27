@@ -1,5 +1,5 @@
 import { StorageChat } from '@/utils/chat';
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams } from 'expo-router';
 import { usePostHog } from 'posthog-react-native';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -8,7 +8,6 @@ import type { AiProfile } from '@/hooks/useFeatureFlags';
 
 interface ChatElementProps {
     chat: StorageChat;
-    selected?: boolean;
 }
 
 function AgentModeIndicator({ mode }: { mode: AiProfile }) {
@@ -21,9 +20,12 @@ function AgentModeIndicator({ mode }: { mode: AiProfile }) {
     </View>;
 }
 
-export default function ChatElement({ chat, selected }: ChatElementProps) {
+export default function ChatElement({ chat }: ChatElementProps) {
     const posthog = usePostHog();
     const { hasDebugAccess } = useAppState();
+    const { id: chatId } = useLocalSearchParams<{ id: string }>();
+
+    const selected = chatId === chat.id;
 
     return <Link href={`/chat/${chat.id}`} replace asChild>
         <Pressable
