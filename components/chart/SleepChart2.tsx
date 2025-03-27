@@ -18,24 +18,18 @@ export default function SleepChart2({ startDate, endDate, noMargin }: SleepChart
 
     const [ sleep, offset, labels, earliestHoursMinutes ] = useMemo(() => {
         const filteredRecords = filterCollectionRange(sleepRecords, startDate, endDate);
-        console.log("Filtered Sleep records: ", filteredRecords);
-
 
         const sleep: number[] = [];
         const offset: number[] = [];
         const offsetData: { start: Dayjs, stop: Dayjs, sameDay: boolean }[] = [];
         const labels: Dayjs[] = [];
 
-        // The earliest is 2 days in minutes?
-        // So, for each day we will plot
         let earliestHoursMinutes = 2 * 60 * 24;
 
         for (const [ startTime, record ] of filteredRecords.entries()) {
             // Check if a sleep record  started and finished same day
             const sameDay = startTime.isSame(record.endTime, 'day');
 
-            // Compute the start time of sleep in minutes
-            // If it stared and finished same day, we will add 1 day offset
             const startHourMinutes = startTime.hour() * 60 + startTime.minute() + (sameDay ? 24 * 60 : 0);
 
             if (startHourMinutes < earliestHoursMinutes)
@@ -80,16 +74,6 @@ export default function SleepChart2({ startDate, endDate, noMargin }: SleepChart
 
             labelIndex++;
         }
-
-
-        console.log("Sleep: ", sleep);
-        console.log("Offset: ", offset);
-        console.log("Labels: ", labels);
-        console.log("earliest: ", earliestHoursMinutes);
-
-        console.log("Grouped sleep: ", groupedSleep);
-        console.log("Grouped offset: ", groupedOffset);
-        console.log("Grouped labels: ", groupedLabels);
 
         return [ groupedSleep, groupedOffset, groupedLabels, earliestHoursMinutes ];
     }, [ sleepRecords, startDate, endDate ]);
