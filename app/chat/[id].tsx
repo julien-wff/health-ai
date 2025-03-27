@@ -76,6 +76,12 @@ export default function Chat() {
 
     const [ drawerOpened, setDrawerOpened ] = useState(false);
     const [ title, setTitle ] = useState<string | null>(null);
+    const [ chatAgentMode, setChatAgentMode ] = useState(agentMode);
+
+    useEffect(() => {
+        if (chatAgentMode === undefined && agentMode)
+            setChatAgentMode(agentMode);
+    }, [ agentMode ]);
 
     useFocusEffect(
         useCallback(() => {
@@ -95,19 +101,20 @@ export default function Chat() {
             tracking.event('chat_reopen');
             setMessages(chat.messages);
             setTitle(chat.title);
+            setChatAgentMode(chat.agentMode);
         })();
     }, []);
 
     useEffect(() => {
-        if (status !== 'ready' || messages.length < 2 || !responseStreamed)
+        if (status !== 'ready' || messages.length < 2 || !responseStreamed || !chatAgentMode)
             return;
 
         // Save chat if more than 2 messages and title is set
         InteractionManager.runAfterInteractions(() => {
             if (!title)
                 return;
-            addOrUpdateChat(chatId, messages, title);
-            void saveStorageChat(chatId, messages, title);
+            addOrUpdateChat(chatId, messages, title, chatAgentMode);
+            void saveStorageChat(chatId, messages, title, chatAgentMode);
         });
 
         // Register new message to Posthog and Sentry
