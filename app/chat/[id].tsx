@@ -6,7 +6,7 @@ import PromptInput from '@/components/chat/PromptInput';
 import { useAppState } from '@/hooks/useAppState';
 import { useHealthData } from '@/hooks/useHealthData';
 import { DateRangeParams, generateConversationTitle, tools } from '@/utils/ai';
-import { getStorageChat, saveStorageChat } from '@/utils/chat';
+import { createChatSystemPrompt, getStorageChat, isChatSystemPrompt, saveStorageChat } from '@/utils/chat';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterCollectionRange, formatCollection } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
@@ -77,7 +77,6 @@ export default function Chat() {
 
     const [ drawerOpened, setDrawerOpened ] = useState(false);
     const [ title, setTitle ] = useState<string | null>(null);
-    const [ chatAgentMode, setChatAgentMode ] = useState(agentMode);
 
     useEffect(() => {
         if (chatAgentMode === undefined && agentMode)
@@ -94,10 +93,22 @@ export default function Chat() {
     );
 
     useEffect(() => {
+        if (isChatSystemPrompt(input))
+            handleSubmit();
+    }, [ input ]);
+
+    useEffect(() => {
         (async () => {
             const chat = await getStorageChat(chatId);
-            if (!chat)
+            if (!chat) {
+                if (chatAgentMode === 'extrovert')
+                    setInput(createChatSystemPrompt(
+                        'Start the conversation with the user. '
+                        + 'Don\'t say to him what you can do, just do something.',
+                    ));
+
                 return;
+            }
 
             tracking.event('chat_reopen');
             setMessages(chat.messages);

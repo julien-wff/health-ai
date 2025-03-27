@@ -42,3 +42,10 @@ export async function getStoredChats() {
         ([ _, value ]) => superJson.parse<StorageChat>(value!),
     );
 }
+
+
+export const createChatSystemPrompt = (message: string) =>
+    `<SYSTEM PROMPT, INVISIBLE TO THE USER> ${message} </SYSTEM PROMPT>`;
+
+export const isChatSystemPrompt = (message: string) =>
+    message.startsWith('<SYSTEM PROMPT') && message.endsWith('</SYSTEM PROMPT>');
