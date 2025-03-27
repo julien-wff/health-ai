@@ -40,11 +40,12 @@ export default function Chat() {
     const { agentMode } = useFeatureFlags();
 
     const [ responseStreamed, setResponseStreamed ] = useState(false);
+    const [ chatAgentMode, setChatAgentMode ] = useState(agentMode);
 
     const { messages, setInput, input, handleSubmit, setMessages, stop, status } = useChat({
         id: chatId,
         fetch: expoFetch as unknown as typeof globalThis.fetch,
-        api: generateAPIUrl(`/api/chat/${agentMode}`),
+        api: generateAPIUrl(`/api/chat/${chatAgentMode}`),
         maxSteps: 5,
         onError: error => {
             Sentry.captureException(error);
