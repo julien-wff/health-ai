@@ -6,7 +6,7 @@ import PromptInput from '@/components/chat/PromptInput';
 import { useAppState } from '@/hooks/useAppState';
 import { useHealthData } from '@/hooks/useHealthData';
 import { DateRangeParams, generateConversationTitle, tools } from '@/utils/ai';
-import { getStorageChat, saveStorageChat } from '@/utils/chat';
+import { createChatSystemPrompt, getStorageChat, isChatSystemPrompt, saveStorageChat } from '@/utils/chat';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterCollectionRange, formatCollection } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
@@ -40,11 +40,12 @@ export default function Chat() {
     const { agentMode } = useFeatureFlags();
 
     const [ responseStreamed, setResponseStreamed ] = useState(false);
+    const [ chatAgentMode, setChatAgentMode ] = useState(agentMode);
 
     const { messages, setInput, input, handleSubmit, setMessages, stop, status } = useChat({
         id: chatId,
         fetch: expoFetch as unknown as typeof globalThis.fetch,
-        api: generateAPIUrl(`/api/chat/${agentMode}`),
+        api: generateAPIUrl(`/api/chat/${chatAgentMode}`),
         maxSteps: 5,
         onError: error => {
             Sentry.captureException(error);
@@ -77,6 +78,11 @@ export default function Chat() {
     const [ drawerOpened, setDrawerOpened ] = useState(false);
     const [ title, setTitle ] = useState<string | null>(null);
 
+    useEffect(() => {
+        if (chatAgentMode === undefined && agentMode)
+            setChatAgentMode(agentMode);
+    }, [ agentMode ]);
+
     useFocusEffect(
         useCallback(() => {
             if (messages.length > 0 && requireNewChat) {
@@ -87,27 +93,40 @@ export default function Chat() {
     );
 
     useEffect(() => {
+        if (isChatSystemPrompt(input))
+            handleSubmit();
+    }, [ input ]);
+
+    useEffect(() => {
         (async () => {
             const chat = await getStorageChat(chatId);
-            if (!chat)
+            if (!chat) {
+                if (chatAgentMode === 'extrovert')
+                    setInput(createChatSystemPrompt(
+                        'Start the conversation with the user. '
+                        + 'Don\'t say to him what you can do, just do something.',
+                    ));
+
                 return;
+            }
 
             tracking.event('chat_reopen');
             setMessages(chat.messages);
             setTitle(chat.title);
+            setChatAgentMode(chat.agentMode);
         })();
     }, []);
 
     useEffect(() => {
-        if (status !== 'ready' || messages.length < 2 || !responseStreamed)
+        if (status !== 'ready' || messages.length < 2 || !responseStreamed || !chatAgentMode)
             return;
 
         // Save chat if more than 2 messages and title is set
         InteractionManager.runAfterInteractions(() => {
             if (!title)
                 return;
-            addOrUpdateChat(chatId, messages, title);
-            void saveStorageChat(chatId, messages, title);
+            addOrUpdateChat(chatId, messages, title, chatAgentMode);
+            void saveStorageChat(chatId, messages, title, chatAgentMode);
         });
 
         // Register new message to Posthog and Sentry
@@ -169,6 +188,7 @@ export default function Chat() {
                     <PromptInput input={input}
                                  setInput={setInput}
                                  handleSubmit={handleSubmit}
+                                 chatAgentMode={chatAgentMode}
                                  isLoading={status === 'streaming' || status === 'submitted'}/>
                 </KeyboardAvoidingView>
 

@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { HeartPulse, User } from 'lucide-react-native';
 import { useEffect, useRef } from 'react';
 import { ScrollView, Text, View } from 'react-native';
+import { isChatSystemPrompt } from '@/utils/chat';
 
 interface ChatMessagesProps {
     messages: UIMessage[];
@@ -26,7 +27,7 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
                     ref={scrollView}
                     onLayout={() => updateScroll()}
                     contentContainerClassName="pb-4">
-            {messages.map(m => (
+            {messages.map(m => !isChatSystemPrompt(m.content) && (
                 <View key={m.id} className="my-2">
                     <View className="mb-1 flex flex-row items-center gap-2">
                         {m.role === 'user' ? <UserIcon/> : <AssistantIcon/>}

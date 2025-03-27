@@ -1,6 +1,7 @@
 import { StorageChat } from '@/utils/chat';
 import { UIMessage } from 'ai';
 import { create } from 'zustand';
+import type { AiProfile } from '@/hooks/useFeatureFlags';
 
 interface AppState {
     isOnboarded: boolean;
@@ -13,7 +14,7 @@ interface AppState {
     setRequireNewChat: (requireNewChat: boolean) => void;
     chats: StorageChat[];
     setChats: (chats: StorageChat[]) => void;
-    addOrUpdateChat: (id: string, messages: UIMessage[], title: string) => void;
+    addOrUpdateChat: (id: string, messages: UIMessage[], title: string, agentMode: AiProfile) => void;
 }
 
 /**
@@ -32,9 +33,9 @@ export const useAppState = create<AppState>((set) => ({
     setChats: (chats: StorageChat[]) => set({
         chats: chats.sort((a, b) => b.lastUpdated.getTime() - a.lastUpdated.getTime()),
     }),
-    addOrUpdateChat: (id, messages, title) => set((state) => ({
+    addOrUpdateChat: (id, messages, title, agentMode) => set((state) => ({
         chats: [
-            { id, messages, title, lastUpdated: new Date() },
+            { id, messages, title, agentMode, lastUpdated: new Date() },
             ...state.chats.filter((chat) => chat.id !== id),
         ],
     })),
