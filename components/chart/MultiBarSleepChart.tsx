@@ -12,7 +12,7 @@ interface SleepChartProps {
     noMargin?: boolean,
 }
 
-export default function SleepChart2({ startDate, endDate, noMargin }: SleepChartProps) {
+export default function MultiBarSleepChart({ startDate, endDate, noMargin }: SleepChartProps) {
     const colors = useColors();
     const { sleep: sleepRecords } = useHealthData();
 
