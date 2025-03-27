@@ -12,9 +12,9 @@ import { filterCollectionRange, formatCollection } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
 import * as Sentry from '@sentry/react-native';
 import * as Haptics from 'expo-haptics';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { fetch as expoFetch } from 'expo/fetch';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { InteractionManager, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { Drawer } from 'react-native-drawer-layout';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,7 +23,7 @@ import EmptyHealthNotification from '@/components/notification/EmptyHealthNotifi
 import { useTracking } from '@/hooks/useTracking';
 
 export default function Chat() {
-    const { addOrUpdateChat } = useAppState();
+    const { addOrUpdateChat, requireNewChat, setRequireNewChat } = useAppState();
     const {
         steps,
         exercise,
@@ -74,6 +74,15 @@ export default function Chat() {
 
     const [ drawerOpened, setDrawerOpened ] = useState(false);
     const [ title, setTitle ] = useState<string | null>(null);
+
+    useFocusEffect(
+        useCallback(() => {
+            if (messages.length > 0 && requireNewChat) {
+                setRequireNewChat(false);
+                router.replace('/chat');
+            }
+        }, [ requireNewChat ]),
+    );
 
     useEffect(() => {
         (async () => {
