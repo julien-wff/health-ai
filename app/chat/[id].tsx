@@ -104,7 +104,9 @@ export default function Chat() {
                 if (chatAgentMode === 'extrovert')
                     setInput(createChatSystemPrompt(
                         'Start the conversation with the user. '
-                        + 'Don\'t say to him what you can do, just do something.',
+                        + 'Don\'t say to him what you can do, just do something. '
+                        + 'For example, analyze his activity or sleep, and make a suggestion or compliment. '
+                        + 'Don\'t ask to display the data, just do it. ',
                     ));
 
                 return;
