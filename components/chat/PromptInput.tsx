@@ -18,7 +18,7 @@ interface PromptInputProps {
     setInput: (value: string) => void;
     handleSubmit: (e?: FormEvent) => void;
     isLoading?: boolean;
-    chatAgentMode: AiProfile;
+    chatAgentMode: AiProfile | undefined;
 }
 
 export default function PromptInput({ input, setInput, handleSubmit, isLoading, chatAgentMode }: PromptInputProps) {
