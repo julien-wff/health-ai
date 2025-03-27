@@ -1,17 +1,14 @@
-import ChatElement from '@/components/chat-drawer/ChatElement';
-import { useAppState } from '@/hooks/useAppState';
-import { Link, useLocalSearchParams } from 'expo-router';
+import { Link } from 'expo-router';
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { UserRoundCog } from 'lucide-react-native';
 import { useColors } from '@/hooks/useColors';
 import ProjectIconWithDebug from '@/components/chat-drawer/ProjectIconWithDebug';
+import ChatsSection from '@/components/chat-drawer/ChatsSection';
 
 export default React.memo(ChatDrawer);
 
 function ChatDrawer() {
-    const { chats } = useAppState();
-    const { id: chatId } = useLocalSearchParams<{ id: string }>();
     const colors = useColors();
 
     return <View className="flex h-full bg-slate-50 dark:bg-slate-950">
@@ -22,9 +19,12 @@ function ChatDrawer() {
         <View className="flex-1 p-2">
             <Text className="p-4 text-lg font-bold text-slate-900 dark:text-slate-100">Chat history</Text>
             <ScrollView fadingEdgeLength={192}>
-                {chats.map(
-                    (chat) => <ChatElement chat={chat} key={chat.id} selected={chatId === chat.id}/>,
-                )}
+                <ChatsSection title="Today" startDay={0}/>
+                <ChatsSection title="Yesterday" startDay={1} endDay={2}/>
+                <ChatsSection title="Last 7 days" startDay={2} endDay={8}/>
+                <ChatsSection title="Last 14 days" startDay={8} endDay={15}/>
+                <ChatsSection title="Last month" startDay={15} endDay={31}/>
+                <ChatsSection title="Older" startDay={31} endDay={Number.POSITIVE_INFINITY}/>
             </ScrollView>
         </View>
 
