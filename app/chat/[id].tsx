@@ -176,6 +176,7 @@ export default function Chat() {
                     <PromptInput input={input}
                                  setInput={setInput}
                                  handleSubmit={handleSubmit}
+                                 chatAgentMode={chatAgentMode!}
                                  isLoading={status === 'streaming' || status === 'submitted'}/>
                 </KeyboardAvoidingView>
 
