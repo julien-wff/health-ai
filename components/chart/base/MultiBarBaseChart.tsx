@@ -3,7 +3,7 @@ import DebugLines from '@/components/chart/base/DebugLines';
 import { ScaleUnit } from '@/components/chart/base/graph-values';
 import Scale from '@/components/chart/base/Scale';
 import { Canvas, LinearGradient, RoundedRect, vec } from '@shopify/react-native-skia';
-import React, { useMemo, useState } from 'react';
+import React, {Fragment, useMemo, useState} from 'react';
 import { LayoutChangeEvent, View } from 'react-native';
 
 
@@ -79,9 +79,9 @@ export default React.memo(function MultiBarBaseChart({
                    reverse={reverse}/>
 
             {values.map((row, index) => (
-                <>
+                <Fragment key={index}>
                     {row.map((value, index2) => (
-                        <ChartBar key={`${index}_${index2}`}
+                        <ChartBar key={`${index}-${index2}`}
                                   value={value / maxValue * 100}
                                   offset={(valuesOffset?.[index][index2] ?? 0) / maxValue * 100}
                                   index={index}
@@ -92,7 +92,7 @@ export default React.memo(function MultiBarBaseChart({
                                   canvasHeight={height}
                                   canvasWidth={width}/>
                     ))}
-                </>
+                </Fragment>
             ))}
 
             {debug && <DebugLines canvasHeight={height} canvasWidth={width}/>}
