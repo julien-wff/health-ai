@@ -47,7 +47,16 @@ export default React.memo(function MultiBarBaseChart({
     );
 
     const flatValues: number[] = useMemo(
-        () => values.flat(),
+        () => {
+            // Sum values together with the offset
+            const valuesWithOffset = [...values.map((value, index) => {
+                return [...value.map((value2, index2) => {
+                    return value2 + valuesOffset?.[index]?.[index2]! })]
+            })];
+
+            // Flatten the matrix to an array
+            return valuesWithOffset.flat();
+        },
         [ values ]
     );
 
