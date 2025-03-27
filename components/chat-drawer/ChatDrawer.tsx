@@ -24,7 +24,7 @@ function ChatDrawer() {
                 <ChatsSection title="Last 7 days" startDay={2} endDay={8}/>
                 <ChatsSection title="Last 14 days" startDay={8} endDay={15}/>
                 <ChatsSection title="Last month" startDay={15} endDay={31}/>
-                <ChatsSection title="Older" startDay={31} endDay={Infinity}/>
+                <ChatsSection title="Older" startDay={31} endDay={Number.POSITIVE_INFINITY}/>
             </ScrollView>
         </View>
 
