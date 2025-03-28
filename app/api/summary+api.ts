@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         });
     } catch (e) {
         console.error(e);
-        return new Response('Failed to generate title', { status: 500 });
+        return new Response('Failed to generate summary', { status: 500 });
     }
 
     return new Response(result.text);
