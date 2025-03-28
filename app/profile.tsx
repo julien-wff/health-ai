@@ -15,7 +15,6 @@ import { useTracking } from '@/hooks/useTracking';
 import { useAppState } from '@/hooks/useAppState';
 import AdvancedDebugBtn from '@/components/profile/AdvancedDebugBtn';
 import ViewHeaderWithBack from '@/components/common/ViewHeaderWithBack';
-import MultiBarSleepChart from '@/components/chart/MultiBarSleepChart';
 
 export default function Profile() {
     const colors = useColors();
@@ -59,8 +58,7 @@ export default function Profile() {
                 </Text>
                 <ChartLoadBtn chart={StepsChart} chartName="steps" noMargin gradient={colors.greenBackground}/>
                 <ChartLoadBtn chart={ExerciseChart} chartName="exercise" noMargin gradient={colors.redBackground}/>
-                {/*<ChartLoadBtn chart={SleepChart} chartName="sleep" noMargin gradient={colors.indigoBackground}/>*/}
-                <ChartLoadBtn chart={MultiBarSleepChart} chartName="sleep" noMargin gradient={colors.indigoBackground}/>
+                <ChartLoadBtn chart={SleepChart} chartName="sleep" noMargin gradient={colors.indigoBackground}/>
 
                 <Text className="mt-4 ml-4 text-slate-800 dark:text-slate-200">Debug</Text>
                 <View className="rounded-lg bg-white dark:bg-slate-900">

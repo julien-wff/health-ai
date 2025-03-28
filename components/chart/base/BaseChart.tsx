@@ -10,8 +10,8 @@ import { LayoutChangeEvent, View } from 'react-native';
 interface BaseChartProps {
     barColor: string;
     backgroundColor: [ string, string ];
-    values: number[];
-    valuesOffset?: number[];
+    values: (number | number[])[];
+    valuesOffset?: (number | number[])[];
     labels: string[];
     /** Offset to add to the lowest value (0) of the scale */
     scaleValueOffset?: number;
@@ -37,12 +37,32 @@ export default React.memo(function BaseChart({
     const [ height, setHeight ] = useState(0);
     const [ width, setWidth ] = useState(0);
 
-    const maxValue = useMemo(
-        () => Math.max(
-            ...values.map((value, index) => value + (valuesOffset?.[index] ?? 0)),
-        ),
-        [ values, valuesOffset ],
+    // Convert 1D arrays to 2D arrays with one element per item
+    const values2D: number[][] = useMemo(
+        () => values.map(value => Array.isArray(value) ? value : [ value ]),
+        [ values ],
     );
+
+    const valuesOffset2D: number[][] | undefined = useMemo(
+        () => valuesOffset?.map(value => Array.isArray(value) ? value : [ value ]),
+        [ valuesOffset ],
+    );
+
+    // Calculate maxValue and flatValues using flat()
+    const { maxValue, flatValues } = useMemo(() => {
+        // Create array of total values (value + offset)
+        const totals = values2D.map((valueRow, rowIndex) =>
+            valueRow.map((value, colIndex) => {
+                const offset = valuesOffset2D?.[rowIndex]?.[colIndex] ?? 0;
+                return value + offset;
+            }),
+        );
+
+        const flat = totals.flat();
+        const max = Math.max(...flat);
+
+        return { maxValue: max, flatValues: flat };
+    }, [ values2D, valuesOffset2D ]);
 
     function onLayout(ev: LayoutChangeEvent) {
         setHeight(ev.nativeEvent.layout.height);
@@ -55,27 +75,30 @@ export default React.memo(function BaseChart({
                 <LinearGradient start={vec(0, 0)} end={vec(width, height)} colors={backgroundColor}/>
             </RoundedRect>
 
-            <Scale values={values}
+            <Scale values={flatValues}
                    canvasHeight={height}
                    canvasWidth={width}
                    scaleUnit={scaleUnit}
                    scaleValueOffset={scaleValueOffset}
                    reverse={reverse}/>
 
-            {values.map((value, index) => (
-                <ChartBar key={index}
-                          value={value / maxValue * 100}
-                          offset={(valuesOffset?.[index] ?? 0) / maxValue * 100}
-                          index={index}
-                          label={labels[index]}
-                          barsCount={values.length}
-                          color={barColor}
-                          reverse={reverse}
-                          canvasHeight={height}
-                          canvasWidth={width}/>
-            ))}
+            {values2D.map((row, rowIndex) =>
+                row.map((value, colIndex) => (
+                    <ChartBar key={`${rowIndex}-${colIndex}`}
+                              value={value / maxValue * 100}
+                              offset={(valuesOffset2D?.[rowIndex]?.[colIndex] ?? 0) / maxValue * 100}
+                              index={rowIndex}
+                              label={labels[rowIndex]}
+                              barsCount={values2D.length}
+                              color={barColor}
+                              reverse={reverse}
+                              canvasHeight={height}
+                              canvasWidth={width}/>
+                )),
+            )}
 
             {debug && <DebugLines canvasHeight={height} canvasWidth={width}/>}
         </Canvas>
     </View>;
 });
+
