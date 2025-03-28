@@ -5,7 +5,7 @@ import ChatTopBar from '@/components/chat/ChatTopBar';
 import PromptInput from '@/components/chat/PromptInput';
 import { useAppState } from '@/hooks/useAppState';
 import { useHealthData } from '@/hooks/useHealthData';
-import { DateRangeParams, generateConversationTitle, tools } from '@/utils/ai';
+import { DateRangeParams, generateConversationSummary, generateConversationTitle, tools } from '@/utils/ai';
 import { createChatSystemPrompt, getStorageChat, isChatSystemPrompt, saveStorageChat } from '@/utils/chat';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterCollectionRange, formatCollection } from '@/utils/health';
@@ -120,31 +120,45 @@ export default function Chat() {
     }, []);
 
     useEffect(() => {
-        if (status !== 'ready' || messages.length < 2 || !responseStreamed || !chatAgentMode)
+        /**
+         * Early return if:
+         * - Chat is streaming a response
+         * - Only user message is present, AI hasn't answered yet
+         * - AI message is not the last one
+         * - The chat has been loaded from storage, no messages have been sent yet
+         * - Agent mode is undefined
+         */
+        if (status !== 'ready' || messages.length < 2 || messages.length % 2 === 1 || !responseStreamed || !chatAgentMode)
             return;
 
         // Save chat if more than 2 messages and title is set
-        InteractionManager.runAfterInteractions(() => {
+        InteractionManager.runAfterInteractions(async () => {
             if (!title)
                 return;
-            addOrUpdateChat(chatId, messages, title, chatAgentMode);
-            void saveStorageChat(chatId, messages, title, chatAgentMode);
+            const chat = {
+                id: chatId,
+                messages,
+                title,
+                agentMode: chatAgentMode,
+                summary: await generateConversationSummary(messages),
+            };
+            addOrUpdateChat(chat);
+            void saveStorageChat(chat);
         });
 
         // Register new message to Posthog and Sentry
         if (title)
             tracking.event('chat_new_message', { messageCount: messages.length });
 
-        if (messages.length !== 2 || title !== null)
-            return;
-
         // Generate title if exactly 2 messages and no title
-        InteractionManager.runAfterInteractions(() => {
-            generateConversationTitle(messages)
-                .then(setTitle)
-                .then(() => tracking.event('chat_title_generated', { length: messages.length }));
-        });
-    }, [ messages.length, status, title, responseStreamed ]);
+        if (messages.length === 2 || title === null) {
+            InteractionManager.runAfterInteractions(() => {
+                generateConversationTitle(messages)
+                    .then(setTitle)
+                    .then(() => tracking.event('chat_title_generated', { length: messages.length }));
+            });
+        }
+    }, [ messages.length, status, title, responseStreamed, chatAgentMode ]);
 
     // Slight vibration each time a part of a message is received
     useEffect(() => {

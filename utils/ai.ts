@@ -1,11 +1,12 @@
-import { generateAPIUrl } from '@/utils/endpoints';
 import { ToolSet, UIMessage } from 'ai';
 import { fetch as expoFetch } from 'expo/fetch';
 import { z } from 'zod';
 import dedent from 'dedent';
+import { generateAPIUrl } from '@/utils/endpoints';
 
-export async function generateConversationTitle(messages: UIMessage[]) {
-    const response = await expoFetch(generateAPIUrl('/api/title'), {
+
+async function callGenerationAPIWithChats(url: string, messages: UIMessage[], errorMessage?: string) {
+    const response = await expoFetch(generateAPIUrl(url), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -16,10 +17,27 @@ export async function generateConversationTitle(messages: UIMessage[]) {
     });
 
     if (!response.ok)
-        throw new Error('Failed to generate conversation title');
+        throw new Error(`Failed to generate ${errorMessage}`);
 
     return response.text().then(r => r.trim());
 }
+
+
+/**
+ * Generate a short conversation title based on the messages.
+ * @param messages Agent and user messages.
+ */
+export const generateConversationTitle = (messages: UIMessage[]) =>
+    callGenerationAPIWithChats('/api/title', messages, 'conversation title');
+
+
+/**
+ * Generate a short conversation summary based on the messages.
+ * @param messages Agent and user messages.
+ */
+export const generateConversationSummary = (messages: UIMessage[]) =>
+    callGenerationAPIWithChats('/api/summary', messages, 'conversation summary');
+
 
 export interface DateRangeParams {
     startDate?: string;
