@@ -100,7 +100,8 @@ function formatExerciseCollection(collection: ExerciseCollection) {
  */
 function formatSleepCollection(collection: SleepCollection) {
     return Array.from(collection.entries()).map(([ key, value ]) =>
-        `${key.format('YYYY-MM-DD')}: ${value.duration.format('H[h] mm[min]')} of sleep`,
+        `${key.format('YYYY-MM-DD')}: ${value.duration.format('H[h] mm[min]')} of sleep, `
+        + `from ${key.format('HH:mm')} to ${value.endTime.format('HH:mm')}`,
     );
 }
 
