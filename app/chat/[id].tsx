@@ -120,6 +120,14 @@ export default function Chat() {
     }, []);
 
     useEffect(() => {
+        /**
+         * Early return if:
+         * - Chat is streaming a response
+         * - Only user message is present, AI hasn't answered yet
+         * - AI message is not the last one
+         * - The chat has been loaded from storage, no messages have been sent yet
+         * - Agent mode is undefined
+         */
         if (status !== 'ready' || messages.length < 2 || messages.length % 2 === 1 || !responseStreamed || !chatAgentMode)
             return;
 
