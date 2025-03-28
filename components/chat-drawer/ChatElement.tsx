@@ -24,7 +24,6 @@ function AgentModeIndicator({ mode }: { mode: AiProfile }) {
 }
 
 export default function ChatElement({ chat }: ChatElementProps) {
-    // TODO: Check if this is the best way
     const { chats, setChats } = useAppState();
     const posthog = usePostHog();
     const { hasDebugAccess } = useAppState();
