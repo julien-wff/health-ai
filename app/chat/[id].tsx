@@ -120,7 +120,7 @@ export default function Chat() {
     }, []);
 
     useEffect(() => {
-        if (status !== 'ready' || messages.length < 2 || !responseStreamed || !chatAgentMode)
+        if (status !== 'ready' || messages.length < 2 || messages.length % 2 === 1 || !responseStreamed || !chatAgentMode)
             return;
 
         // Save chat if more than 2 messages and title is set
