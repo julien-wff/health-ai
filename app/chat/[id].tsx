@@ -6,24 +6,25 @@ import PromptInput from '@/components/chat/PromptInput';
 import { useAppState } from '@/hooks/useAppState';
 import { useHealthData } from '@/hooks/useHealthData';
 import { DateRangeParams, generateConversationTitle, tools } from '@/utils/ai';
-import { getStorageChat, saveStorageChat } from '@/utils/chat';
+import { createChatSystemPrompt, getStorageChat, isChatSystemPrompt, saveStorageChat } from '@/utils/chat';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterCollectionRange, formatCollection } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
 import * as Sentry from '@sentry/react-native';
 import * as Haptics from 'expo-haptics';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { fetch as expoFetch } from 'expo/fetch';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { InteractionManager, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { Drawer } from 'react-native-drawer-layout';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import HealthDataFoundNotification from '@/components/notification/HealthDataFoundNotification';
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
+import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 
 export default function Chat() {
-    const { addOrUpdateChat } = useAppState();
+    const { addOrUpdateChat, requireNewChat, setRequireNewChat } = useAppState();
     const {
         steps,
         exercise,
@@ -36,13 +37,15 @@ export default function Chat() {
     const { id: chatId } = useLocalSearchParams<{ id: string }>();
     const insets = useSafeAreaInsets();
     const tracking = useTracking();
+    const { agentMode } = useFeatureFlags();
 
     const [ responseStreamed, setResponseStreamed ] = useState(false);
+    const [ chatAgentMode, setChatAgentMode ] = useState(agentMode);
 
     const { messages, setInput, input, handleSubmit, setMessages, stop, status } = useChat({
         id: chatId,
         fetch: expoFetch as unknown as typeof globalThis.fetch,
-        api: generateAPIUrl('/api/chat'),
+        api: generateAPIUrl(`/api/chat/${chatAgentMode}`),
         maxSteps: 5,
         onError: error => {
             Sentry.captureException(error);
@@ -76,27 +79,56 @@ export default function Chat() {
     const [ title, setTitle ] = useState<string | null>(null);
 
     useEffect(() => {
+        if (chatAgentMode === undefined && agentMode)
+            setChatAgentMode(agentMode);
+    }, [ agentMode ]);
+
+    useFocusEffect(
+        useCallback(() => {
+            if (messages.length > 0 && requireNewChat) {
+                setRequireNewChat(false);
+                router.replace('/chat');
+            }
+        }, [ requireNewChat ]),
+    );
+
+    useEffect(() => {
+        if (isChatSystemPrompt(input))
+            handleSubmit();
+    }, [ input ]);
+
+    useEffect(() => {
         (async () => {
             const chat = await getStorageChat(chatId);
-            if (!chat)
+            if (!chat) {
+                if (chatAgentMode === 'extrovert')
+                    setInput(createChatSystemPrompt(
+                        'Start the conversation with the user. '
+                        + 'Don\'t say to him what you can do, just do something. '
+                        + 'For example, analyze his activity or sleep, and make a suggestion or compliment. '
+                        + 'Don\'t ask to display the data, just do it. ',
+                    ));
+
                 return;
+            }
 
             tracking.event('chat_reopen');
             setMessages(chat.messages);
             setTitle(chat.title);
+            setChatAgentMode(chat.agentMode);
         })();
     }, []);
 
     useEffect(() => {
-        if (status !== 'ready' || messages.length < 2 || !responseStreamed)
+        if (status !== 'ready' || messages.length < 2 || !responseStreamed || !chatAgentMode)
             return;
 
         // Save chat if more than 2 messages and title is set
         InteractionManager.runAfterInteractions(() => {
             if (!title)
                 return;
-            addOrUpdateChat(chatId, messages, title);
-            void saveStorageChat(chatId, messages, title);
+            addOrUpdateChat(chatId, messages, title, chatAgentMode);
+            void saveStorageChat(chatId, messages, title, chatAgentMode);
         });
 
         // Register new message to Posthog and Sentry
@@ -158,6 +190,7 @@ export default function Chat() {
                     <PromptInput input={input}
                                  setInput={setInput}
                                  handleSubmit={handleSubmit}
+                                 chatAgentMode={chatAgentMode}
                                  isLoading={status === 'streaming' || status === 'submitted'}/>
                 </KeyboardAvoidingView>
 

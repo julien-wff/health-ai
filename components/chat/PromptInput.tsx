@@ -10,17 +10,21 @@ import {
     View,
 } from 'react-native';
 import { useTracking } from '@/hooks/useTracking';
+import { AiProfile } from '@/hooks/useFeatureFlags';
+import { useAppState } from '@/hooks/useAppState';
 
 interface PromptInputProps {
     input: string;
     setInput: (value: string) => void;
     handleSubmit: (e?: FormEvent) => void;
     isLoading?: boolean;
+    chatAgentMode: AiProfile | undefined;
 }
 
-export default function PromptInput({ input, setInput, handleSubmit, isLoading }: PromptInputProps) {
+export default function PromptInput({ input, setInput, handleSubmit, isLoading, chatAgentMode }: PromptInputProps) {
     const tracking = useTracking();
     const textInput = useRef<TextInput>(null);
+    const { hasDebugAccess } = useAppState();
 
     function sendPrompt(e?: NativeSyntheticEvent<TextInputSubmitEditingEventData>) {
         if (input.trim().length > 0) {
@@ -45,13 +49,13 @@ export default function PromptInput({ input, setInput, handleSubmit, isLoading }
             onChangeText={setInput}
             onSubmitEditing={sendPrompt}
         />
-        <TouchableOpacity className="h-14 w-14 rounded-xl bg-blue-500 p-4 disabled:opacity-75 dark:bg-blue-400"
+        <TouchableOpacity className={`h-14 w-14 rounded-xl p-4 disabled:opacity-75 
+                                          ${!hasDebugAccess || !chatAgentMode ? 'bg-blue-500 dark:bg-blue-400' : chatAgentMode === 'extrovert' ? 'bg-red-500' : 'bg-green-500'}`}
                           disabled={isLoading}
                           onPress={() => sendPrompt()}>
-            {isLoading ?
-                <AnimatedLoadingIcon size={20} color="white"/>
-                :
-                <Send size={20} color="white"/>
+            {isLoading
+                ? <AnimatedLoadingIcon size={20} color="white"/>
+                : <Send size={20} color="white"/>
             }
         </TouchableOpacity>
     </View>;
