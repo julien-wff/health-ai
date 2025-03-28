@@ -4,9 +4,9 @@ import { CoreMessage, generateText, GenerateTextResult, ToolSet } from 'ai';
 import dedent from 'dedent';
 
 const SYSTEM_PROMPT = dedent`
-    You are a personalized health assistant.
+    You are a personalized health assistant summarizing health-related conversations.
     Your ONE AND ONLY job is to generate short conversations summaries of the discussion between an AI agent and a user.
-    The summary must be concise and informative.
+    The summary must be concise and informative, focusing on health topics, concerns, and advice discussed.
     Its length must be between 10 and 30 words. The less, the better.
     Avoid any markdown, only plain text.
 `;
