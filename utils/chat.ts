@@ -11,6 +11,7 @@ export interface StorageChat {
     lastUpdated: Date;
     messages: UIMessage[];
     agentMode: AiProfile;
+    summary: string | null;
 }
 
 export async function getStorageChat(id: string) {
@@ -22,19 +23,23 @@ export async function getStorageChat(id: string) {
 }
 
 
-export async function saveStorageChat(id: string, messages: UIMessage[], title: string | null, agentMode: AiProfile) {
-    const chat: StorageChat = {
-        id,
-        title,
-        messages,
-        agentMode,
+/**
+ * Save a chat to AsyncStorage.
+ * @param chat The chat to save. The lastUpdated date will be automatically updated.
+ */
+export async function saveStorageChat(chat: Omit<StorageChat, 'lastUpdated'>) {
+    const storageChat: StorageChat = {
+        ...chat,
         lastUpdated: new Date(),
     } satisfies StorageChat;
 
-    await asyncStorage.setItem(chatKeyFromId(id), superJson.stringify(chat));
+    await asyncStorage.setItem(chatKeyFromId(chat.id), superJson.stringify(storageChat));
 }
 
 
+/**
+ * Get all stored chats from AsyncStorage in no particular order.
+ */
 export async function getStoredChats() {
     const keys = await asyncStorage.getAllKeys();
     const chats = await asyncStorage.multiGet(keys.filter(key => key.startsWith(CHAT)));

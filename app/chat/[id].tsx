@@ -127,23 +127,29 @@ export default function Chat() {
         InteractionManager.runAfterInteractions(() => {
             if (!title)
                 return;
-            addOrUpdateChat(chatId, messages, title, chatAgentMode);
-            void saveStorageChat(chatId, messages, title, chatAgentMode);
+            const chat = {
+                id: chatId,
+                messages,
+                title,
+                agentMode: chatAgentMode,
+                summary: null,
+            };
+            addOrUpdateChat(chat);
+            void saveStorageChat(chat);
         });
 
         // Register new message to Posthog and Sentry
         if (title)
             tracking.event('chat_new_message', { messageCount: messages.length });
 
-        if (messages.length !== 2 || title !== null)
-            return;
-
         // Generate title if exactly 2 messages and no title
-        InteractionManager.runAfterInteractions(() => {
-            generateConversationTitle(messages)
-                .then(setTitle)
-                .then(() => tracking.event('chat_title_generated', { length: messages.length }));
-        });
+        if (messages.length === 2 || title === null) {
+            InteractionManager.runAfterInteractions(() => {
+                generateConversationTitle(messages)
+                    .then(setTitle)
+                    .then(() => tracking.event('chat_title_generated', { length: messages.length }));
+            });
+        }
     }, [ messages.length, status, title, responseStreamed ]);
 
     // Slight vibration each time a part of a message is received
