@@ -5,7 +5,7 @@ import ChatTopBar from '@/components/chat/ChatTopBar';
 import PromptInput from '@/components/chat/PromptInput';
 import { useAppState } from '@/hooks/useAppState';
 import { useHealthData } from '@/hooks/useHealthData';
-import { DateRangeParams, generateConversationTitle, tools } from '@/utils/ai';
+import { DateRangeParams, generateConversationSummary, generateConversationTitle, tools } from '@/utils/ai';
 import { createChatSystemPrompt, getStorageChat, isChatSystemPrompt, saveStorageChat } from '@/utils/chat';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterCollectionRange, formatCollection } from '@/utils/health';
@@ -124,7 +124,7 @@ export default function Chat() {
             return;
 
         // Save chat if more than 2 messages and title is set
-        InteractionManager.runAfterInteractions(() => {
+        InteractionManager.runAfterInteractions(async () => {
             if (!title)
                 return;
             const chat = {
@@ -132,7 +132,7 @@ export default function Chat() {
                 messages,
                 title,
                 agentMode: chatAgentMode,
-                summary: null,
+                summary: await generateConversationSummary(messages),
             };
             addOrUpdateChat(chat);
             void saveStorageChat(chat);
@@ -150,7 +150,7 @@ export default function Chat() {
                     .then(() => tracking.event('chat_title_generated', { length: messages.length }));
             });
         }
-    }, [ messages.length, status, title, responseStreamed ]);
+    }, [ messages.length, status, title, responseStreamed, chatAgentMode ]);
 
     // Slight vibration each time a part of a message is received
     useEffect(() => {
