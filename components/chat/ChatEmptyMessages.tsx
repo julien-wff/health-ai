@@ -12,7 +12,7 @@ const CONVERSATION_STARTERS: ConversationStarterProps[] = [
         iconColor: '#6366f1',
     },
     {
-        title: 'Exercice plan',
+        title: 'Exercise plan',
         prompt: 'Create me an adapted exercise plan based on my current activity',
         icon: Dumbbell,
         iconColor: '#ef4444',
