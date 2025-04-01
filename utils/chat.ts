@@ -5,6 +5,15 @@ import superJson from 'superjson';
 import type { AiProfile } from '@/hooks/useFeatureFlags';
 import dayjs from 'dayjs';
 
+
+/**
+ * Extra data to send along each time the user sends a message to the chat.
+ */
+export interface ChatRequestBody {
+    agentMode: AiProfile;
+}
+
+
 export interface StorageChat {
     id: string;
     title: string | null;

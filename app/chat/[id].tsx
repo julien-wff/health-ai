@@ -6,7 +6,13 @@ import PromptInput from '@/components/chat/PromptInput';
 import { useAppState } from '@/hooks/useAppState';
 import { useHealthData } from '@/hooks/useHealthData';
 import { DateRangeParams, generateConversationSummary, generateConversationTitle, tools } from '@/utils/ai';
-import { createChatSystemPrompt, getStorageChat, isChatSystemPrompt, saveStorageChat } from '@/utils/chat';
+import {
+    type ChatRequestBody,
+    createChatSystemPrompt,
+    getStorageChat,
+    isChatSystemPrompt,
+    saveStorageChat,
+} from '@/utils/chat';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterCollectionRange, formatCollection } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
@@ -45,7 +51,13 @@ export default function Chat() {
     const { messages, setInput, input, handleSubmit, setMessages, stop, status } = useChat({
         id: chatId,
         fetch: expoFetch as unknown as typeof globalThis.fetch,
-        api: generateAPIUrl(`/api/chat/${chatAgentMode}`),
+        api: generateAPIUrl(`/api/chat`),
+        experimental_prepareRequestBody(options) {
+            options.requestBody = {
+                agentMode: chatAgentMode ?? 'introvert',
+            } satisfies ChatRequestBody;
+            return options;
+        },
         maxSteps: 5,
         onError: error => {
             Sentry.captureException(error);
