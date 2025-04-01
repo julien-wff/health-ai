@@ -44,8 +44,10 @@ interface ChatEmptyMessagesProps {
 
 
 export default function ChatEmptyMessages({ onPromptClick }: Readonly<ChatEmptyMessagesProps>) {
-    // TODO: select x starters out of the list
-    const starters = useMemo(() => CONVERSATION_STARTERS, []);
+    // Select X random starters from the list
+    const starters = useMemo(() => {
+        return [ ...CONVERSATION_STARTERS ].sort(() => 0.5 - Math.random()).slice(0, 3);
+    }, []);
 
     return <View className="flex gap-8 flex-1 items-center justify-center">
         <Text className="text-center text-2xl font-bold text-slate-900 dark:text-slate-50">
