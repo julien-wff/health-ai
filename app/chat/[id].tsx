@@ -209,7 +209,7 @@ export default function Chat() {
                     <ChatTopBar onOpen={() => setDrawerOpened(true)} onNew={onNewChat} text={title}/>
 
                     {messages.length === 0
-                        ? <ChatEmptyMessages/>
+                        ? <ChatEmptyMessages onPromptClick={p => setInput(p)}/>
                         : <ChatMessages messages={messages}/>
                     }
 
