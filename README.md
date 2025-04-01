@@ -25,7 +25,7 @@ The goal of the application is to be a personalized AI chatbot that uses your he
 insights. The chatbot will be able to answer questions about your health, provide recommendations for improving your
 well-being, and help you track your progress over time.
 
-More specifically, there are two version of the chatbot:
+More specifically, there are two versions of the chatbot:
 
 |                                                                     | Introvert                                                     | Extravert                                                                                                |
 |---------------------------------------------------------------------|---------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
