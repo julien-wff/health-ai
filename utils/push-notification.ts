@@ -41,7 +41,7 @@ export async function scheduleNotification(title?: string, body?: string, date?:
         },
         trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,
-            channelId: '0', // TODO: Check this
+            channelId: 'goals',
             date: triggerDate,
         },
     })
