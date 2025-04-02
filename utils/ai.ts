@@ -44,6 +44,12 @@ export interface DateRangeParams {
     endDate?: string;
 }
 
+export interface NotificationParams {
+    title?: string;
+    message?: string;
+    date?: string;
+}
+
 export const tools = {
     'get-daily-steps': {
         description: 'Get day-by-day walked steps count from the user.',
@@ -87,6 +93,19 @@ export const tools = {
             endDate: z.string().optional().describe('End date of the range to display, of the format yyyy-mm-dd. Inclusive'),
         }),
     },
+    'schedule-notification': {
+        description: 'Schedule a notification which will be displayed to the user.',
+        parameters: z.object({
+            date: z.string().optional().describe('Date and time (hour and minutes), of the format YYYY-MM-DD hh:mm.'),
+            title: z.string().optional().describe('The notification title to display.'),
+            body: z.string().optional().describe('The notification message to display.'),
+        }),
+    },
+    'get-current-time': {
+        description: 'Get the current date and time of the user’s device. This can help you in notifications scheduling process.',
+        parameters: z.object({}),
+    },
+
 } satisfies ToolSet;
 
 

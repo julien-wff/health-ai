@@ -5,7 +5,13 @@ import ChatTopBar from '@/components/chat/ChatTopBar';
 import PromptInput from '@/components/chat/PromptInput';
 import { useAppState } from '@/hooks/useAppState';
 import { useHealthData } from '@/hooks/useHealthData';
-import { DateRangeParams, generateConversationSummary, generateConversationTitle, tools } from '@/utils/ai';
+import {
+    DateRangeParams,
+    generateConversationSummary,
+    generateConversationTitle,
+    NotificationParams,
+    tools,
+} from '@/utils/ai';
 import {
     type ChatRequestBody,
     createChatSystemPrompt,
@@ -28,6 +34,8 @@ import HealthDataFoundNotification from '@/components/notification/HealthDataFou
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
+import dayjs from 'dayjs';
+import { scheduleNotification } from '@/utils/push-notification';
 
 export default function Chat() {
     const { addOrUpdateChat, requireNewChat, setRequireNewChat } = useAppState();
@@ -79,6 +87,14 @@ export default function Chat() {
                 case 'display-sleep':
                     tracking.event('chat_get_daily_sleep', { display: toolCall.toolName.startsWith('display') });
                     return formatCollection(filterCollectionRange(sleep, startDate, endDate), 'sleep');
+                case 'schedule-notification':
+                    tracking.event('chat_schedule_notification', {});
+
+                    const { title, message, date } = toolCall.args as NotificationParams;
+                    return scheduleNotification(title, message, date);
+                case 'get-current-time':
+                    tracking.event('chat_get_current_time', {});
+                    return dayjs().format('YYYY-MM-DD HH:mm:ss');
             }
         },
         onResponse() {
