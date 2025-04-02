@@ -3,11 +3,25 @@ import dayjs from 'dayjs';
 
 
 export async function scheduleNotification(title?: string, body?: string, date?: string) {
-    const triggerDate = dayjs(date).toDate();
+    const dayjsDate = dayjs(date);
 
-    if (!title || !body || !date) {
-        return 'Error: Invalid parameters.';
+    if (!dayjsDate.isValid()) {
+        return 'Error: Invalid date.';
     }
+
+    if (!title) {
+        return 'Error: Invalid title (undefined).';
+    }
+
+    if (!body) {
+        return 'Error: Invalid body (undefined).';
+    }
+
+    if (!date) {
+        return 'Error: Invalid date (undefined).';
+    }
+
+    const triggerDate = dayjs(date).toDate();
 
     // First, set the handler that will cause the notification
     // to show the alert
@@ -19,6 +33,7 @@ export async function scheduleNotification(title?: string, body?: string, date?:
         }),
     });
 
+    let responseText = '';
     await Notifications.scheduleNotificationAsync({
         content: {
             title: title,
@@ -29,14 +44,15 @@ export async function scheduleNotification(title?: string, body?: string, date?:
             channelId: '0', // TODO: Check this
             date: triggerDate,
         },
-    }).then(
-        (value) => {
+    })
+        .then((value) => {
+            responseText = 'Successfully scheduled notification.';
             console.log('Notification scheduled');
-        },
-        (error) => {
-            console.log('Notification error', error);
-        },
-    );
+        })
+        .catch((e) => {
+            responseText = 'Error while scheduling notification: ' + e.message;
+            console.log('Error: ', e?.message);
+        });
 
-    return 'Successfully scheduled notification';
+    return responseText;
 }
