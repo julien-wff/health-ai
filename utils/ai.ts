@@ -46,7 +46,7 @@ export interface DateRangeParams {
 
 export interface NotificationParams {
     title?: string;
-    message?: string;
+    body?: string;
     date?: string;
 }
 

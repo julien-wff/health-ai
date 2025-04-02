@@ -90,8 +90,10 @@ export default function Chat() {
                 case 'schedule-notification':
                     tracking.event('chat_schedule_notification', {});
 
-                    const { title, message, date } = toolCall.args as NotificationParams;
-                    return scheduleNotification(title, message, date);
+                    const { title, body, date } = toolCall.args as NotificationParams;
+
+                    console.log({ title, body, date });
+                    return scheduleNotification(title, body, date);
                 case 'get-current-time':
                     tracking.event('chat_get_current_time', {});
                     return dayjs().format('YYYY-MM-DD HH:mm:ss');
