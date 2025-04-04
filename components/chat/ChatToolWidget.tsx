@@ -5,18 +5,31 @@ import { tools } from '@/utils/ai';
 import { parseRange } from '@/utils/health';
 import { ToolInvocation } from 'ai';
 import { useMemo } from 'react';
+import NotificationSuccessWidget from '@/components/chat/NotificationSuccessWidget';
+import dayjs from 'dayjs';
 
 interface ChatToolWidgetProps {
     invocation: ToolInvocation;
 }
 
 export default function ChatToolWidget({ invocation }: ChatToolWidgetProps) {
+    const toolName = useMemo(
+        () => invocation.toolName as keyof typeof tools,
+        [ invocation.toolName ],
+    );
+
+    if (toolName == 'schedule-notification') {
+        const [ date, title ] = useMemo(() => [ dayjs(invocation.args.date), invocation.args.title ], [ invocation.args.date, invocation.args.title ]);
+        return <NotificationSuccessWidget title={title} date={date}/>;
+        //return <Text style={{ color: 'red' }}>Notification was scheduled on {invocation.args.date}</Text>;
+    }
+
     const [ start, end ] = useMemo(
         () => parseRange(invocation.args.startDate, invocation.args.endDate),
         [ invocation.args.startDate, invocation.args.endDate ],
     );
 
-    switch (invocation.toolName as keyof typeof tools) {
+    switch (toolName) {
         case 'display-steps':
             return <StepsChart startDate={start} endDate={end}/>;
         case 'display-exercise':
