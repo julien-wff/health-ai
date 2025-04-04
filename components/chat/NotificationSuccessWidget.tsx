@@ -1,6 +1,10 @@
 import { Dayjs } from 'dayjs';
 import { useColors } from '@/hooks/useColors';
 import { Text, View } from 'react-native';
+import { useMemo } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import { CircleCheck } from 'lucide-react-native';
+import { vec } from '@shopify/react-native-skia';
 
 interface NotificationWidgetProps {
     title: string,
@@ -10,8 +14,17 @@ interface NotificationWidgetProps {
 export default function NotificationSuccessWidget({ title, date }: NotificationWidgetProps) {
     const colors = useColors();
 
-    return <View className={`w-full h-15 flex flex-col justify-center border-2 border-blue-500 p-1 rounded`}>
-        <Text>Notification successfully created on {date.format('DD MMM YYYY [at] HH:mm')}</Text>
+    const formattedDate = useMemo(() => date.format('DD MMM YYYY [at] HH:mm'), [date]);
+
+    return <View className={`w-full flex flex-row items-center p-1`}>
+        <LinearGradient colors={colors.indigoBackground}
+                        start={vec(0, 0)}
+                        end={vec(1, 1)}
+                        style={{ borderRadius: 12, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}/>
+        <CircleCheck color={colors.blue}/>
+        <Text className="flex-1 px-1">
+            Notification scheduled for {formattedDate}
+        </Text>
     </View>;
 
 }
