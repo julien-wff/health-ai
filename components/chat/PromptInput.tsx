@@ -51,7 +51,7 @@ export default function PromptInput({
     }
 
     return <View>
-        {suggestions && <ChatSuggestions suggestions={suggestions} onSuggestionPress={setInput}/>}
+        <ChatSuggestions suggestions={suggestions ?? []} onSuggestionPress={setInput}/>
         <View
             className="flex flex-row items-center gap-4 bg-slate-50 p-4 shadow-xl shadow-black rounded-t-[20px] dark:bg-slate-900">
             <TextInput

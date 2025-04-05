@@ -7,7 +7,7 @@ interface ChatSuggestionsProps {
 
 export default function ChatSuggestions({ suggestions, onSuggestionPress }: Readonly<ChatSuggestionsProps>) {
     return <ScrollView horizontal>
-        <View className="mb-2 flex flex-row gap-2 p-2">
+        <View className="mb-1 flex flex-row gap-2 p-2 h-14">
             {suggestions.map((suggestion) =>
                 <TouchableOpacity key={suggestion}
                                   activeOpacity={.75}

@@ -25,8 +25,7 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
     return (
         <ScrollView className="flex-1 px-4"
                     ref={scrollView}
-                    onLayout={() => updateScroll()}
-                    contentContainerClassName="pb-4">
+                    onLayout={() => updateScroll()}>
             {messages.map(m => !isChatSystemPrompt(m.content) && (
                 <View key={m.id} className="my-2">
                     <View className="mb-1 flex flex-row items-center gap-2">
