@@ -39,6 +39,11 @@ export const generateConversationSummary = (messages: UIMessage[]) =>
     callGenerationAPIWithChats('/api/summary', messages, 'conversation summary');
 
 
+export const generateConversationSuggestions = async (messages: UIMessage[]) =>
+    callGenerationAPIWithChats('/api/suggestions', messages, 'conversation suggestions')
+        .then(r => JSON.parse(r) as string[]);
+
+
 export interface DateRangeParams {
     startDate?: string;
     endDate?: string;

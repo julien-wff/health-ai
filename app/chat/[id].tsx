@@ -5,7 +5,13 @@ import ChatTopBar from '@/components/chat/ChatTopBar';
 import PromptInput from '@/components/chat/PromptInput';
 import { useAppState } from '@/hooks/useAppState';
 import { useHealthData } from '@/hooks/useHealthData';
-import { DateRangeParams, generateConversationSummary, generateConversationTitle, tools } from '@/utils/ai';
+import {
+    DateRangeParams,
+    generateConversationSuggestions,
+    generateConversationSummary,
+    generateConversationTitle,
+    tools,
+} from '@/utils/ai';
 import {
     type ChatRequestBody,
     createChatSystemPrompt,
@@ -47,6 +53,7 @@ export default function Chat() {
 
     const [ responseStreamed, setResponseStreamed ] = useState(false);
     const [ chatAgentMode, setChatAgentMode ] = useState(agentMode);
+    const [ suggestions, setSuggestions ] = useState<string[]>([]);
 
     const { messages, setInput, input, handleSubmit, setMessages, stop, status } = useChat({
         id: chatId,
@@ -156,6 +163,7 @@ export default function Chat() {
             };
             addOrUpdateChat(chat);
             void saveStorageChat(chat);
+            void generateConversationSuggestions(messages).then(setSuggestions);
         });
 
         // Register new message to Posthog and Sentry
@@ -217,6 +225,8 @@ export default function Chat() {
                                  setInput={setInput}
                                  handleSubmit={handleSubmit}
                                  chatAgentMode={chatAgentMode}
+                                 suggestions={suggestions}
+                                 setSuggestions={setSuggestions}
                                  isLoading={status === 'streaming' || status === 'submitted'}/>
                 </KeyboardAvoidingView>
 
