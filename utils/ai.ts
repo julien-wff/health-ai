@@ -101,10 +101,6 @@ export const tools = {
             body: z.string().optional().describe('The notification message to display.'),
         }),
     },
-    'get-current-time': {
-        description: 'Get the current date and time of the user’s device. This can help you in notifications scheduling process.',
-        parameters: z.object({}),
-    },
 
 } satisfies ToolSet;
 

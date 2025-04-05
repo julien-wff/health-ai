@@ -34,7 +34,6 @@ import HealthDataFoundNotification from '@/components/notification/HealthDataFou
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
-import dayjs from 'dayjs';
 import { scheduleNotification } from '@/utils/push-notification';
 
 export default function Chat() {
@@ -94,9 +93,6 @@ export default function Chat() {
 
                     console.log({ title, body, date });
                     return scheduleNotification(title, body, date);
-                case 'get-current-time':
-                    tracking.event('chat_get_current_time', {});
-                    return dayjs().format('YYYY-MM-DD HH:mm:ss');
             }
         },
         onResponse() {
