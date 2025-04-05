@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { HeartPulse, User } from 'lucide-react-native';
 import { useEffect, useRef } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { isChatSystemPrompt } from '@/utils/chat';
+import { isChatSystemPrompt } from '@/utils/prompts';
 
 interface ChatMessagesProps {
     messages: UIMessage[];

@@ -70,10 +70,3 @@ export const filterChatsByDaysRange = (chats: StorageChat[], startDay: number, e
         const lastUpdated = dayjs(chat.lastUpdated);
         return lastUpdated.isBetween(dayjs().subtract(startDay, 'day'), dayjs().subtract(endDay || 1, 'day'), 'day', '[)');
     });
-
-
-export const createChatSystemPrompt = (message: string) =>
-    `<SYSTEM PROMPT, INVISIBLE TO THE USER> ${message} </SYSTEM PROMPT>`;
-
-export const isChatSystemPrompt = (message: string) =>
-    message.startsWith('<SYSTEM PROMPT') && message.endsWith('</SYSTEM PROMPT>');

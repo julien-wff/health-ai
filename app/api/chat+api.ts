@@ -1,7 +1,8 @@
-import { getSystemPrompt, tools } from '@/utils/ai';
+import { tools } from '@/utils/ai';
 import { google } from '@ai-sdk/google';
 import { type CoreMessage, streamText } from 'ai';
 import type { ChatRequestBody } from '@/utils/chat';
+import { getChatPrompt } from '@/utils/prompts';
 
 
 interface RequestJson {
@@ -15,12 +16,12 @@ export async function POST(req: Request) {
 
     let systemPrompt: string;
     if (agentMode === 'introvert') {
-        systemPrompt = getSystemPrompt({
+        systemPrompt = getChatPrompt({
             tone: 'neutral and objective',
             adviceMode: 'only when the user asks for it',
         });
     } else {
-        systemPrompt = getSystemPrompt({
+        systemPrompt = getChatPrompt({
             tone: 'friendly and encouraging',
             adviceMode: 'even if the user is not asking for it, be proactive in giving advice and suggestions',
         });
