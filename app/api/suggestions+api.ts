@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     let result: GenerateTextResult<ToolSet, string[]>;
     try {
         result = await generateText({
-            model: google('gemini-2.0-flash-001'),
+            model: google('gemini-2.0-flash'),
             messages,
             system: getSuggestionPrompt(),
             maxTokens: 500,

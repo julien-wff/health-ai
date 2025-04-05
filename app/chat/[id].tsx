@@ -12,13 +12,8 @@ import {
     generateConversationTitle,
     tools,
 } from '@/utils/ai';
-import {
-    type ChatRequestBody,
-    createChatSystemPrompt,
-    getStorageChat,
-    isChatSystemPrompt,
-    saveStorageChat,
-} from '@/utils/chat';
+import { type ChatRequestBody, getStorageChat, saveStorageChat } from '@/utils/chat';
+import { getExtrovertFirstMessagePrompt, isChatSystemPrompt } from '@/utils/prompts';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterCollectionRange, formatCollection } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
@@ -121,12 +116,7 @@ export default function Chat() {
             const chat = await getStorageChat(chatId);
             if (!chat) {
                 if (chatAgentMode === 'extrovert')
-                    setInput(createChatSystemPrompt(
-                        'Start the conversation with the user. '
-                        + 'Don\'t say to him what you can do, just do something. '
-                        + 'For example, analyze his activity or sleep, and make a suggestion or compliment. '
-                        + 'Don\'t ask to display the data, just do it. ',
-                    ));
+                    setInput(getExtrovertFirstMessagePrompt());
 
                 return;
             }

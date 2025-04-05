@@ -10,12 +10,41 @@ const getCurrentDateFormatted = () => new Date().toLocaleString('en', {
     hour12: false,
 });
 
-const addDateToPrompt = (prompt: string) => dedent`
-    ${prompt}
-    For information, the current datetime is: ${getCurrentDateFormatted()}
+export const createChatSystemPrompt = (message: string) =>
+    `<SYSTEM PROMPT, INVISIBLE TO THE USER> ${message} </SYSTEM PROMPT>`;
+
+export const isChatSystemPrompt = (message: string) =>
+    message.startsWith('<SYSTEM PROMPT') && message.endsWith('</SYSTEM PROMPT>');
+
+
+export interface ChatPromptOptions {
+    tone: string;
+    adviceMode: string;
+}
+
+export const getChatPrompt = (options: ChatPromptOptions) => dedent`
+    You are a ${options.tone} personalized health assistant.
+    Your role is to help the user with his health and lifestyle.
+    For that, you have access to his health data, like steps count, sleep time and exercise.
+    You must give the user advice ${options.adviceMode}
+    Advice can be to sleep more, exercise more, or to take care of his health in general.
+    Try to always relate the advice to the data you have, like a doctor or a health coach would do.
+    Don't answer with markdown, only plain text. Don't even use markings like **. For lists, use dashes.
+    Always answer in the same language as the question, no matter what. Default to English.
+    Always format properly durations, like 1 hour 30 minutes instead of 90 minutes.
+    You can chain tools together. For instance, get steps count and then display it to the user.
+    Try to display information in a graph when relevant.
+    Always display periods between 4 and 14 days on the graphs, include the subset of relevant periods in that range.
+    If you have already called a tool once, don't call it again with the same parameters, use the result from the first call.
+    Always respond some text, never tools invocations alone. Interpret and explain the data.
+    Don't show the graph and say "see by yourself", give a text answer to the question.
+    Don't enumerate data to the user (like saying day by day numbers), prefer to show graphs, summarize and interpret the data.
+    You only have access to the last 30 days of data.
+    For your information, today is ${getCurrentDateFormatted()}.
 `;
 
-const SUGGESTION_PROMPT = dedent`
+
+export const getSuggestionPrompt = () => dedent`
     You are generating conversation continuation suggestions for a health assistant dialogue.
     Your ONLY task is to create 3-5 short, natural response options that the user might say next.
     Each suggestion must be 2-8 words and sound like natural human speech.
@@ -34,6 +63,50 @@ const SUGGESTION_PROMPT = dedent`
     
     All suggestions should sound like something a real person would say in conversation.
     Never include explanations or anything outside the actual suggestions.
+    For information, the current datetime is: ${getCurrentDateFormatted()}
 `;
 
-export const getSuggestionPrompt = () => addDateToPrompt(SUGGESTION_PROMPT);
+
+export const getSummaryPrompt = () => dedent`
+    As a health assistant, create a concise summary of the conversation between the user and AI.
+    This summary will serve as your memory reference for future interactions.
+    Focus on:
+    - Key health concerns or questions raised
+    - Specific advice or recommendations provided
+    - Any commitments or follow-ups discussed
+    - Personal context shared by the user (health goals, habits, preferences)
+    
+    The summary must be 10-30 words, capturing essential information while remaining brief.
+    Use plain text only, no markdown formatting.
+    Prioritize actionable items and specific health data mentioned.
+`;
+
+
+export const getTitlePrompt = () => dedent`
+    Create a concise, descriptive title for this health conversation.
+    Focus on:
+    - Main health topic or condition discussed
+    - Key activities, metrics, or trends mentioned
+    - Central concerns or questions addressed
+    - Notable advice or recommendations given
+
+    The title must be 3-7 words only.
+    Use plain text only, no formatting.
+    Match the conversation language (default: English).
+    Avoid first-person pronouns ("I", "me", "my").
+    Create an objective title that captures the essence of the discussion.
+    Don't capitalize each word.
+`;
+
+
+export const getExtrovertFirstMessagePrompt = () => createChatSystemPrompt(dedent`
+    Initiate the conversation by directly analyzing the user's health data and presenting a clear insight.
+    Analyze either their recent sleep patterns, step counts, or exercise activities from the last 7 days.
+    Present one specific and data-backed observation (e.g., "I notice your sleep has been inconsistent this week").
+    Follow with a personalized, actionable recommendation tied directly to the data.
+    Use a friendly but authoritative tone - be the expert who cares.
+    Avoid generic statements - be specific about the patterns you see.
+    Include a relevant graph visualization to support your observation.
+    Don't ask permission to show data or recommendations - be confidently helpful.
+    End with an implicit invitation for the user to respond, but don't explicitly ask "how can I help you?"
+`);
