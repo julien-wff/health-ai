@@ -53,16 +53,18 @@ export default function PromptInput({
     return <View>
         <ChatSuggestions suggestions={suggestions ?? []} onSuggestionPress={setInput}/>
         <View
-            className="flex flex-row items-center gap-4 bg-slate-50 p-4 shadow-xl shadow-black rounded-t-[20px] dark:bg-slate-900">
+            className="flex max-h-36 flex-row items-center gap-4 bg-slate-50 p-4 shadow-xl shadow-black rounded-t-[20px] dark:bg-slate-900">
             <TextInput
                 ref={textInput}
+                multiline
+                submitBehavior="blurAndSubmit"
+                textAlignVertical="top"
                 className="flex-1 rounded-xl p-4 dark:placeholder:text-slate-500 dark:text-slate-200"
                 placeholder="Message the assistant"
                 returnKeyType="send"
                 value={input}
                 onChangeText={setInput}
-                onSubmitEditing={sendPrompt}
-            />
+                onSubmitEditing={sendPrompt}/>
             <TouchableOpacity className={`h-14 w-14 rounded-xl p-4 disabled:opacity-75 
                                           ${!hasDebugAccess || !chatAgentMode ? 'bg-blue-500 dark:bg-blue-400' : chatAgentMode === 'extrovert' ? 'bg-red-500' : 'bg-green-500'}`}
                               disabled={isLoading}
