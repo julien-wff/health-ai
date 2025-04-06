@@ -18,6 +18,7 @@ import { PostHog, PostHogProvider } from 'posthog-react-native';
 import { useEffect } from 'react';
 import { AppState, NativeEventSubscription, Platform, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import * as Notifications from 'expo-notifications';
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
     // Only in native builds, not in Expo Go.
@@ -50,6 +51,14 @@ dayjs.extend(duration);
 dayjs.extend(isBetween);
 void SplashScreen.preventAutoHideAsync();
 
+// Set the handler that will cause the notification to show the alert
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+    }),
+});
 
 export default Sentry.wrap(Layout);
 
