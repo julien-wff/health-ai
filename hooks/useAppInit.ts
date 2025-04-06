@@ -83,7 +83,7 @@ export function useAppInit() {
         if (useAppState.getState().isOnboarded && useAppState.getState().hasPermissions)
             router.replace('/chat');
         else
-            router.replace('/onboarding');
+            router.replace('/onboarding/health');
 
         // Hide the splash screen
         await SplashScreen.hideAsync();

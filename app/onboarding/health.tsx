@@ -15,7 +15,7 @@ import { Platform, Text, ToastAndroid, TouchableOpacity, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTracking } from '@/hooks/useTracking';
 
-export default function Onboarding() {
+export default function Health() {
     const colors = useColors();
     const router = useRouter();
     const tracking = useTracking();
@@ -26,33 +26,33 @@ export default function Onboarding() {
     const [ isLoadingPermissions, setIsLoadingPermissions ] = useState(false);
 
     /**
-     * Ask for permissions (if not already granted), continue to the chat screen and fetch health records
+     * Ask for permissions (if not already granted), continue to the notification onboarding screen and fetch health records
      */
     async function handleContinueClick() {
-        tracking.event('onboarding_start');
+        tracking.event('onboarding_health_start');
         setIsLoadingPermissions(true);
 
         if (hasPermissions) {
-            tracking.event('onboarding_permission_already_granted');
-            await finishOnboarding();
+            tracking.event('onboarding_health_permission_already_granted');
+            await finishHealthOnboarding();
             return;
         }
 
         if (Platform.OS === 'ios') {
             await initHealthKit();
-            setHasPermissions(true);
-            await finishOnboarding();
+            //setHasPermissions(true);
+            await finishHealthOnboarding();
         }
 
         if (Platform.OS === 'android') {
             ToastAndroid.show('Please allow all...', ToastAndroid.SHORT);
             const permissions = await healthConnect!.requestPermission(REQUIRED_PERMISSIONS);
             if (hasAllRequiredPermissions(permissions)) {
-                tracking.event('onboarding_permission_granted');
-                setHasPermissions(true);
-                await finishOnboarding();
+                tracking.event('onboarding_health_permission_granted');
+                //setHasPermissions(true);
+                await finishHealthOnboarding();
             } else {
-                tracking.event('onboarding_permission_denied');
+                tracking.event('onboarding_health_permission_denied');
                 ToastAndroid.show('Missing permissions', ToastAndroid.SHORT);
             }
         }
@@ -61,13 +61,11 @@ export default function Onboarding() {
     }
 
     /**
-     * Set isOnboarded to true, save it in storage, redirect to the chat screen and fetch health records
+     * Go to the next onboarding screen
      */
-    async function finishOnboarding() {
-        tracking.event('onboarding_finish');
-        setIsOnboarded(true);
-        await setIsOnboardedInStorage('1');
-        router.replace('/chat');
+    async function finishHealthOnboarding() {
+        tracking.event('onboarding_health_finish');
+        router.replace('/onboarding/notification');
         const healthRecords = await readHealthRecords();
         setHealthRecords(healthRecords);
     }
