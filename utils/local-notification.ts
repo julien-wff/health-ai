@@ -31,7 +31,7 @@ export async function scheduleNotification(title?: string, body?: string, date?:
         },
         trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,
-            channelId: 'goals',
+            channelId: 'default',
             date: triggerDate,
         },
     })
