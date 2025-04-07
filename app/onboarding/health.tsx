@@ -80,7 +80,7 @@ export default function Health() {
                 Welcome to your Health Chatbot
             </Text>
             <Text className="text-lg text-slate-800 dark:text-slate-200">
-                In order to provide recommandations, we need to access the following health records from your device:
+                In order to provide recommendations, we need to access the following health records from your device:
             </Text>
 
             <View className="flex flex-row gap-4">

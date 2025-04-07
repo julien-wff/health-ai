@@ -7,18 +7,14 @@ import { useAppState } from '@/hooks/useAppState';
 import { useHealthData } from '@/hooks/useHealthData';
 import {
     DateRangeParams,
+    generateConversationSuggestions,
     generateConversationSummary,
     generateConversationTitle,
     NotificationParams,
     tools,
 } from '@/utils/ai';
-import {
-    type ChatRequestBody,
-    createChatSystemPrompt,
-    getStorageChat,
-    isChatSystemPrompt,
-    saveStorageChat,
-} from '@/utils/chat';
+import { type ChatRequestBody, getStorageChat, saveStorageChat } from '@/utils/chat';
+import { getExtrovertFirstMessagePrompt, isChatSystemPrompt } from '@/utils/prompts';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterCollectionRange, formatCollection } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
@@ -54,6 +50,7 @@ export default function Chat() {
 
     const [ responseStreamed, setResponseStreamed ] = useState(false);
     const [ chatAgentMode, setChatAgentMode ] = useState(agentMode);
+    const [ suggestions, setSuggestions ] = useState<string[]>([]);
 
     const { messages, setInput, input, handleSubmit, setMessages, stop, status } = useChat({
         id: chatId,
@@ -128,12 +125,7 @@ export default function Chat() {
             const chat = await getStorageChat(chatId);
             if (!chat) {
                 if (chatAgentMode === 'extrovert')
-                    setInput(createChatSystemPrompt(
-                        'Start the conversation with the user. '
-                        + 'Don\'t say to him what you can do, just do something. '
-                        + 'For example, analyze his activity or sleep, and make a suggestion or compliment. '
-                        + 'Don\'t ask to display the data, just do it. ',
-                    ));
+                    setInput(getExtrovertFirstMessagePrompt());
 
                 return;
             }
@@ -170,6 +162,7 @@ export default function Chat() {
             };
             addOrUpdateChat(chat);
             void saveStorageChat(chat);
+            void generateConversationSuggestions(messages).then(setSuggestions);
         });
 
         // Register new message to Posthog and Sentry
@@ -231,6 +224,8 @@ export default function Chat() {
                                  setInput={setInput}
                                  handleSubmit={handleSubmit}
                                  chatAgentMode={chatAgentMode}
+                                 suggestions={suggestions}
+                                 setSuggestions={setSuggestions}
                                  isLoading={status === 'streaming' || status === 'submitted'}/>
                 </KeyboardAvoidingView>
 
