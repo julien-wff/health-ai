@@ -5,6 +5,7 @@ import { tools } from '@/utils/ai';
 import { parseRange } from '@/utils/health';
 import { ToolInvocation } from 'ai';
 import { useMemo } from 'react';
+import GoalCreatedWidget from '@/components/goals/GoalCreatedWidget';
 
 interface ChatToolWidgetProps {
     invocation: ToolInvocation;
@@ -23,6 +24,8 @@ export default function ChatToolWidget({ invocation }: ChatToolWidgetProps) {
             return <ExerciseChart startDate={start} endDate={end}/>;
         case 'display-sleep':
             return <SleepChart startDate={start} endDate={end}/>;
+        case 'create-user-goal':
+            return <GoalCreatedWidget toolParams={invocation.args}/>;
         default:
             return <></>;
     }
