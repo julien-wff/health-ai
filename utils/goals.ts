@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GOALS } from '@/utils/storageKeys';
 import dedent from 'dedent';
+import superJson from 'superjson';
 
 
 export const POSSIBLE_GOAL_TYPES = [ 'sleep', 'steps', 'exercise', 'other' ] as const;
@@ -30,8 +31,8 @@ export interface Goal extends EditGoalsParams {
  */
 export async function getGoalsFromStorage(): Promise<Goal[]> {
     const jsonGoals = await AsyncStorage.getItem(GOALS);
-    const goals = jsonGoals ? JSON.parse(jsonGoals) : [];
-    return goals.filter((goal: Goal) => !goal.isDeleted);
+    const goals = jsonGoals ? superJson.parse<Goal[]>(jsonGoals) : [];
+    return goals.filter(goal => !goal.isDeleted);
 }
 
 /**
@@ -39,7 +40,7 @@ export async function getGoalsFromStorage(): Promise<Goal[]> {
  * @param goals List of goals to save
  */
 export async function saveGoalsToStorage(goals: Goal[]) {
-    await AsyncStorage.setItem(GOALS, JSON.stringify(goals));
+    await AsyncStorage.setItem(GOALS, superJson.stringify(goals));
 }
 
 export async function createGoalAndSave(newGoal: CreateGoalsParams, goals: Goal[]): Promise<Goal> {
