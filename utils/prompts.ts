@@ -41,6 +41,17 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     Always display periods between 4 and 14 days on the graphs, include the subset of relevant periods in that range.
     If you have already called a tool once, don't call it again with the same parameters, use the result from the first call.
     You can chain tools together. For instance, get steps count and then display it to the user.
+    
+    # Goals
+    You can set goals to the user. 
+    Goals are personal objectives that the user must react in a short period of time (less than a week).
+    You decide the goals and their deadline. Never ask the user by when he wants to achieve the goal. Goals can be:
+    - Have a more consistent sleep schedule
+    - Sleep x hours a night
+    - Exercise x hours each days
+    And so on. Don't create a goal if it already exists. Only create goals on data that you can see.
+    It's your job to evaluate if the user reach the goal or not.
+    When creating a goal, it is then automatically shown to the user, no need to call a tool to show it.
 
     # Response Guidelines
     Always respond some text, never tools invocations alone. Interpret and explain the data.
@@ -69,6 +80,7 @@ export const getSuggestionPrompt = () => dedent`
     - Add follow-up question options when appropriate
     
     If the assistant made statements or gave advice:
+    - Include the option to create an in-app goal from the advice
     - Include options to ask for clarification or details
     - Suggest ways to request specific health advice (sleep, exercise, steps, etc.)
     - Add options to share personal experiences related to the topic
