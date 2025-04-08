@@ -38,7 +38,7 @@ export default function GoalWidget({ goal }: Readonly<GoalCreatedWidgetProps>) {
         <Icon color={iconColor} size={32} className="w-6 h-6"/>
 
         <View className="flex flex-1 justify-center">
-            <Text className="text-slate-800 dark:text-slate-200" numberOfLines={1}>
+            <Text className="text-slate-800 dark:text-slate-200">
                 Goal: {description}
             </Text>
 
