@@ -9,6 +9,7 @@ import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { SplashScreen, useRouter } from 'expo-router';
 import { Platform } from 'react-native';
 import * as Sentry from '@sentry/react-native';
+import { getGoalsFromStorage } from '@/utils/goals';
 
 /**
  * Platform-agnostic hook to initialize the app
@@ -17,7 +18,7 @@ import * as Sentry from '@sentry/react-native';
 export function useAppInit() {
     const { getItem: getIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
     const { getItem: getHasDebugAccessInStorage } = useAsyncStorage(HAS_DEBUG_ACCESS);
-    const { setIsOnboarded, setChats, setHasPermissions, setHasDebugAccess } = useAppState();
+    const { setIsOnboarded, setChats, setHasPermissions, setHasDebugAccess, setGoals } = useAppState();
     const androidHealth = useAndroidHealthInit();
     const router = useRouter();
     const { setHealthRecords } = useHealthData();
@@ -92,6 +93,8 @@ export function useAppInit() {
         Sentry.captureEvent({ event_id: 'init_load_state_start', level: 'info' });
         const chats = await getStoredChats();
         setChats(chats);
+        const goals = await getGoalsFromStorage();
+        setGoals(goals);
         Sentry.captureEvent({ event_id: 'init_load_state_end', level: 'info', extra: { count: chats.length } });
 
         // Load health records
