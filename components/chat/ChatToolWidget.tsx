@@ -5,13 +5,16 @@ import { tools } from '@/utils/ai';
 import { parseRange } from '@/utils/health';
 import { ToolInvocation } from 'ai';
 import { useMemo } from 'react';
-import GoalCreatedWidget from '@/components/goals/GoalCreatedWidget';
+import GoalWidget from '@/components/goals/GoalWidget';
+import { useAppState } from '@/hooks/useAppState';
 
 interface ChatToolWidgetProps {
     invocation: ToolInvocation;
 }
 
-export default function ChatToolWidget({ invocation }: ChatToolWidgetProps) {
+export default function ChatToolWidget({ invocation }: Readonly<ChatToolWidgetProps>) {
+    const { goals } = useAppState();
+
     const [ start, end ] = useMemo(
         () => parseRange(invocation.args.startDate, invocation.args.endDate),
         [ invocation.args.startDate, invocation.args.endDate ],
@@ -25,7 +28,15 @@ export default function ChatToolWidget({ invocation }: ChatToolWidgetProps) {
         case 'display-sleep':
             return <SleepChart startDate={start} endDate={end}/>;
         case 'create-user-goal':
-            return <GoalCreatedWidget toolParams={invocation.args}/>;
+            return <GoalWidget goal={invocation.args}/>;
+        case 'display-user-goal': {
+            const goalId = invocation.args.id as number;
+            const goal = goals.find(g => g.id === goalId);
+            if (!goal) {
+                return <></>;
+            }
+            return <GoalWidget goal={goal}/>;
+        }
         default:
             return <></>;
     }

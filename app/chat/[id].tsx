@@ -29,7 +29,7 @@ import HealthDataFoundNotification from '@/components/notification/HealthDataFou
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
-import { createGoalAndSave, CreateGoalsParams, formatGoalForAI } from '@/utils/goals';
+import { createGoalAndSave, CreateGoalsParams, formatGoalForAI, formatGoalsForAI } from '@/utils/goals';
 
 export default function Chat() {
     const { addOrUpdateChat, requireNewChat, setRequireNewChat, goals, addGoal } = useAppState();
@@ -82,11 +82,25 @@ export default function Chat() {
                 case 'display-sleep':
                     tracking.event('chat_get_daily_sleep', { display: toolCall.toolName.startsWith('display') });
                     return formatCollection(filterCollectionRange(sleep, startDate, endDate), 'sleep');
-                case 'create-user-goal':
+                case 'create-user-goal': {
                     const goal = await createGoalAndSave(toolCall.args as CreateGoalsParams, goals);
                     addGoal(goal);
                     tracking.event('chat_create_user_goal');
                     return formatGoalForAI(goal);
+                }
+                case 'list-user-goals':
+                    tracking.event('chat_list_user_goals');
+                    return formatGoalsForAI(goals);
+                case 'display-user-goal': {
+                    tracking.event('chat_display_user_goals');
+                    const goalId = (toolCall.args as typeof tools['display-user-goal']['parameters']['_type']).id;
+                    const goal = goals.find(g => g.id === goalId);
+                    if (!goal) {
+                        return `Goal #${goalId} not found. Max ID: ${goals.length}.`;
+                    } else {
+                        return formatGoalForAI(goal);
+                    }
+                }
             }
         },
         onResponse() {

@@ -8,12 +8,12 @@ import dayjs from 'dayjs';
 
 
 interface GoalCreatedWidgetProps {
-    toolParams: CreateGoalsParams;
+    goal: CreateGoalsParams;
 }
 
-export default function GoalCreatedWidget({ toolParams }: Readonly<GoalCreatedWidgetProps>) {
+export default function GoalWidget({ goal }: Readonly<GoalCreatedWidgetProps>) {
     const colors = useColors();
-    const { description, type, mustBeCompletedBy } = toolParams;
+    const { description, type, mustBeCompletedBy } = goal;
 
     const [ iconColor, bgColor, Icon ] = useMemo(() => {
         switch (type) {
