@@ -29,9 +29,10 @@ import HealthDataFoundNotification from '@/components/notification/HealthDataFou
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
+import { createGoalAndSave, CreateGoalsParams, formatGoalForAI } from '@/utils/goals';
 
 export default function Chat() {
-    const { addOrUpdateChat, requireNewChat, setRequireNewChat } = useAppState();
+    const { addOrUpdateChat, requireNewChat, setRequireNewChat, goals, addGoal } = useAppState();
     const {
         steps,
         exercise,
@@ -65,7 +66,7 @@ export default function Chat() {
             Sentry.captureException(error);
             console.error(error, 'ERROR');
         },
-        onToolCall({ toolCall }) {
+        async onToolCall({ toolCall }) {
             const { startDate, endDate } = toolCall.args as DateRangeParams;
 
             switch (toolCall.toolName as keyof typeof tools) {
@@ -81,6 +82,11 @@ export default function Chat() {
                 case 'display-sleep':
                     tracking.event('chat_get_daily_sleep', { display: toolCall.toolName.startsWith('display') });
                     return formatCollection(filterCollectionRange(sleep, startDate, endDate), 'sleep');
+                case 'create-user-goal':
+                    const goal = await createGoalAndSave(toolCall.args as CreateGoalsParams, goals);
+                    addGoal(goal);
+                    tracking.event('chat_create_user_goal');
+                    return formatGoalForAI(goal);
             }
         },
         onResponse() {

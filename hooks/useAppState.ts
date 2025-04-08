@@ -16,6 +16,7 @@ interface AppState {
     addOrUpdateChat: (chat: Omit<StorageChat, 'lastUpdated'>) => void;
     goals: Goal[];
     setGoals: (goals: Goal[]) => void;
+    addGoal: (goal: Goal) => void;
 }
 
 /**
@@ -44,4 +45,7 @@ export const useAppState = create<AppState>((set) => ({
     setGoals: (goals: Goal[]) => set({
         goals: [ ...goals ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
     }),
+    addGoal: (goal: Goal) => set((state) => ({
+        goals: [ ...state.goals, goal ],
+    })),
 }) satisfies AppState);

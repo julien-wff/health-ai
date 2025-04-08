@@ -7,7 +7,7 @@ export type GoalType = 'sleep' | 'activity' | 'other';
 
 export interface CreateGoalsParams {
     description: string;
-    mustBeCompletedBy: Date | null;
+    mustBeCompletedBy: Date | string | null;
     type: GoalType;
 }
 
@@ -20,6 +20,7 @@ export interface Goal extends EditGoalsParams {
     id: number;
     createdAt: Date;
     updatedAt: Date;
+    mustBeCompletedBy: Date | null;
 }
 
 /**
@@ -38,6 +39,21 @@ export async function getGoalsFromStorage(): Promise<Goal[]> {
  */
 export async function saveGoalsToStorage(goals: Goal[]) {
     await AsyncStorage.setItem(GOALS, JSON.stringify(goals));
+}
+
+export async function createGoalAndSave(newGoal: CreateGoalsParams, goals: Goal[]): Promise<Goal> {
+    const goal: Goal = {
+        ...newGoal,
+        id: goals.length + 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        mustBeCompletedBy: newGoal.mustBeCompletedBy ? new Date(newGoal.mustBeCompletedBy) : null,
+        isCompleted: false,
+        isDeleted: false,
+    };
+
+    await saveGoalsToStorage([ ...goals, goal ]);
+    return goal;
 }
 
 /**

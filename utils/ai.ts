@@ -91,4 +91,12 @@ export const tools = {
             endDate: z.string().optional().describe('End date of the range to display, of the format yyyy-mm-dd. Inclusive'),
         }),
     },
+    'create-user-goal': {
+        description: 'Create a new health-related goal for the user to reach.',
+        parameters: z.object({
+            description: z.string().describe('Description of the goal, what the user must achieve.'),
+            type: z.enum([ 'sleep', 'activity', 'other' ]).describe('Type of the goal.'),
+            mustBeCompletedBy: z.string().optional().describe('Expected date of completion of the goal by the user, in the format of a valid javascript date or datetime.'),
+        }).describe('Returns the created goal, notably its ID.'),
+    },
 } satisfies ToolSet;
