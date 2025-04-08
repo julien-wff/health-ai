@@ -2,6 +2,7 @@ import { ToolSet, UIMessage } from 'ai';
 import { fetch as expoFetch } from 'expo/fetch';
 import { z } from 'zod';
 import { generateAPIUrl } from '@/utils/endpoints';
+import { POSSIBLE_GOAL_TYPES } from '@/utils/goals';
 
 
 async function callGenerationAPIWithChats(url: string, messages: UIMessage[], errorMessage?: string) {
@@ -95,7 +96,7 @@ export const tools = {
         description: 'Create a new health-related goal for the user to reach.',
         parameters: z.object({
             description: z.string().describe('Description of the goal, what the user must achieve.'),
-            type: z.enum([ 'sleep', 'activity', 'other' ]).describe('Type of the goal.'),
+            type: z.enum(POSSIBLE_GOAL_TYPES).describe('Type of the goal.'),
             mustBeCompletedBy: z.string().optional().describe('Expected date of completion of the goal by the user, in the format of a valid javascript date or datetime.'),
         }).describe('Returns the created goal, notably its ID.'),
     },

@@ -3,7 +3,8 @@ import { GOALS } from '@/utils/storageKeys';
 import dedent from 'dedent';
 
 
-export type GoalType = 'sleep' | 'activity' | 'other';
+export const POSSIBLE_GOAL_TYPES = [ 'sleep', 'steps', 'exercise', 'other' ] as const;
+export type GoalType = typeof POSSIBLE_GOAL_TYPES[number];
 
 export interface CreateGoalsParams {
     description: string;
