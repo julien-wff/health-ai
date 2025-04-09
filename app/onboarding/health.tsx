@@ -6,8 +6,6 @@ import { useHealthData } from '@/hooks/useHealthData';
 import { readHealthRecords } from '@/utils/health';
 import { hasAllRequiredPermissions, healthConnect, REQUIRED_PERMISSIONS } from '@/utils/health/android';
 import { initHealthKit } from '@/utils/health/ios';
-import { IS_ONBOARDED } from '@/utils/storageKeys';
-import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { Footprints, Medal, MoonStar } from 'lucide-react-native';
 import { useState } from 'react';
@@ -20,8 +18,7 @@ export default function Health() {
     const router = useRouter();
     const tracking = useTracking();
 
-    const { setItem: setIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
-    const { hasPermissions, setHasPermissions, setIsOnboarded } = useAppState();
+    const { hasHealthPermissions, setHasHealthPermissions } = useAppState();
     const { setHealthRecords } = useHealthData();
     const [ isLoadingPermissions, setIsLoadingPermissions ] = useState(false);
 
@@ -32,7 +29,7 @@ export default function Health() {
         tracking.event('onboarding_health_start');
         setIsLoadingPermissions(true);
 
-        if (hasPermissions) {
+        if (hasHealthPermissions) {
             tracking.event('onboarding_health_permission_already_granted');
             await finishHealthOnboarding();
             return;
@@ -40,7 +37,7 @@ export default function Health() {
 
         if (Platform.OS === 'ios') {
             await initHealthKit();
-            //setHasPermissions(true);
+            setHasHealthPermissions(true);
             await finishHealthOnboarding();
         }
 
@@ -49,7 +46,7 @@ export default function Health() {
             const permissions = await healthConnect!.requestPermission(REQUIRED_PERMISSIONS);
             if (hasAllRequiredPermissions(permissions)) {
                 tracking.event('onboarding_health_permission_granted');
-                //setHasPermissions(true);
+                setHasHealthPermissions(true);
                 await finishHealthOnboarding();
             } else {
                 tracking.event('onboarding_health_permission_denied');

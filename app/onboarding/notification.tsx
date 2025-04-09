@@ -2,19 +2,15 @@ import ProjectIcon from '@/components/content/ProjectIcon';
 import HealthRecord from '@/components/onboarding/HealthRecord';
 import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
-import { useHealthData } from '@/hooks/useHealthData';
-import { readHealthRecords } from '@/utils/health';
-import { hasAllRequiredPermissions, healthConnect, REQUIRED_PERMISSIONS } from '@/utils/health/android';
-import { initHealthKit } from '@/utils/health/ios';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import { Bell, Footprints, Medal, MoonStar } from 'lucide-react-native';
+import { Bell } from 'lucide-react-native';
 import { useState } from 'react';
 import { Linking, Platform, Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTracking } from '@/hooks/useTracking';
-import * as Notifications from 'expo-notifications'
+import * as Notifications from 'expo-notifications';
 import { AndroidImportance } from 'expo-notifications';
 
 export default function Notification() {
@@ -23,25 +19,41 @@ export default function Notification() {
     const tracking = useTracking();
 
     const { setItem: setIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
-    const { hasPermissions, setHasPermissions, setIsOnboarded } = useAppState();
-    const { setHealthRecords } = useHealthData();
+    const { hasNotificationPermissions, setHasNotificationPermissions, setIsOnboarded } = useAppState();
     const [ isLoadingPermissions, setIsLoadingPermissions ] = useState(false);
 
     /**
-     * Ask for permissions (if not already granted), continue to the chat screen and fetch health records
+     * Ask for permissions (if not already granted), continue to the chat screen
      */
     async function handleContinueClick() {
         tracking.event('onboarding_notification_start');
         setIsLoadingPermissions(true);
 
+        if (hasNotificationPermissions) {
+            tracking.event('onboarding_notification_permission_already_granted');
+            await finishOnboarding();
+            return;
+        }
+
+        if (Platform.OS === 'android')
+            await checkPermissionsOnAndroid();
+        else if (Platform.OS === 'ios')
+            await checkPermissionsOnIOS();
+
+        setIsLoadingPermissions(false);
+    }
+
+    async function checkPermissionsOnAndroid() {
+        // Starting with Android 13, we need a notification Channel before we can
+        // display a prompt to ask for notifications
         await Notifications.setNotificationChannelAsync(
             'default',
             {
                 name: 'default',
                 importance: AndroidImportance.MAX,
-                vibrationPattern: [0, 250, 250, 250],
+                vibrationPattern: [ 0, 250, 250, 250 ],
                 lightColor: '#FF231F7C',
-            }
+            },
         );
 
         const permissionsStatus = await Notifications.requestPermissionsAsync({
@@ -50,29 +62,28 @@ export default function Notification() {
                 allowBadge: true,
                 allowSound: true,
             },
-            ios: {
-                allowAlert: true,
-                allowBadge: true,
-                allowSound: true,
-            }
         });
 
-
-        if (permissionsStatus.granted || permissionsStatus.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL) {
+        if (permissionsStatus.granted) {
             tracking.event('onboarding_notification_permission_granted');
-            setHasPermissions(true);
+            setHasNotificationPermissions(true);
             await finishOnboarding();
         } else {
             tracking.event('onboarding_permission_denied');
 
             // TODO: Check for iOS permissions
             if (!permissionsStatus.canAskAgain) {
+                ToastAndroid.show('Please allow notifications.', ToastAndroid.SHORT);
                 await Linking.openSettings();
             }
 
         }
 
-        setIsLoadingPermissions(false);
+
+    }
+
+    async function checkPermissionsOnIOS() {
+
     }
 
     /**
@@ -95,11 +106,13 @@ export default function Notification() {
                 One last step
             </Text>
             <Text className="text-lg text-slate-800 dark:text-slate-200">
-                Our assistant will send you tailored notifications to help you stay consistent with your health and wellness goals. Allow notifications to get started.
+                Our assistant will send you tailored notifications to help you stay consistent with your health and
+                wellness goals. Allow notifications to get started.
             </Text>
 
             <View className="flex flex-row gap-4">
-                <HealthRecord icon={Bell} label="Notifications" color={colors.blue} background={colors.indigoBackground}/>
+                <HealthRecord icon={Bell} label="Notifications" color={colors.blue}
+                              background={colors.indigoBackground}/>
             </View>
         </View>
 

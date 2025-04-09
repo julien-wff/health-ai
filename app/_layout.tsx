@@ -66,7 +66,7 @@ function Layout() {
     const colorScheme = useColorScheme();
     const colors = useColors();
     const { loadStateFromStorage, initHealthAndAsyncLoadState } = useAppInit();
-    const { hasPermissions } = useAppState();
+    const { hasHealthPermissions } = useAppState();
     const { setHealthRecords } = useHealthData();
 
     const ref = useNavigationContainerRef();
@@ -92,7 +92,7 @@ function Layout() {
 
             // Reload health data when the app comes back from background
             subscription = AppState.addEventListener('change', () => {
-                if (!hasPermissions || AppState.currentState !== 'active')
+                if (!hasHealthPermissions || AppState.currentState !== 'active')
                     return;
 
                 Sentry.captureEvent({ event_id: 'layout_state_health_data_update_start', level: 'info' });
