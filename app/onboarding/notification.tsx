@@ -50,9 +50,8 @@ export default function Notification() {
             'default',
             {
                 name: 'default',
-                importance: AndroidImportance.MAX,
-                vibrationPattern: [ 0, 250, 250, 250 ],
-                lightColor: '#FF231F7C',
+                importance: AndroidImportance.HIGH,
+                enableVibrate: true
             },
         );
 
@@ -64,14 +63,14 @@ export default function Notification() {
             },
         });
 
+        console.log('permissionsStatus', permissionsStatus);
+
         if (permissionsStatus.granted) {
             tracking.event('onboarding_notification_permission_granted');
             setHasNotificationPermissions(true);
             await finishOnboarding();
         } else {
             tracking.event('onboarding_permission_denied');
-
-            // TODO: Check for iOS permissions
             if (!permissionsStatus.canAskAgain) {
                 ToastAndroid.show('Please allow notifications.', ToastAndroid.SHORT);
                 await Linking.openSettings();

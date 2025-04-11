@@ -2,47 +2,45 @@ import * as Notifications from 'expo-notifications';
 import dayjs from 'dayjs';
 
 
-export async function scheduleNotification(title?: string, body?: string, date?: string) {
+interface ScheduleNotificationResponse {
+    status: 'success' | 'error';
+    message: string;
+    notificationId?: string;
+}
+
+export async function onScheduleNotificationToolCall(title?: string, body?: string, date?: string, chatId?: string) {
+    const result = await scheduleNotification(title, body, date, chatId);
+
+    return result.status;
+}
+
+export async function scheduleNotification(title?: string, body?: string, date?: string, chatId?: string): Promise<ScheduleNotificationResponse> {
     const dayjsDate = dayjs(date);
 
+    if (!title || !body || !date) {
+        return { status: 'error', message: 'Missing title, body, or date.' };
+    }
+
     if (!dayjsDate.isValid()) {
-        return 'Error: Invalid date.';
-    }
-
-    if (!title) {
-        return 'Error: Invalid title (undefined).';
-    }
-
-    if (!body) {
-        return 'Error: Invalid body (undefined).';
-    }
-
-    if (!date) {
-        return 'Error: Invalid date (undefined).';
+        return { status: 'error', message: 'Invalid date format.' };
     }
 
     const triggerDate = dayjsDate.toDate();
 
-    let responseText = '';
-    await Notifications.scheduleNotificationAsync({
+    const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
             title: title,
             body: body,
+            data: {
+                chatId: chatId,
+            },
         },
         trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,
             channelId: 'default',
             date: triggerDate,
         },
-    })
-        .then((value) => {
-            responseText = 'Successfully scheduled notification.';
-            console.log('Notification scheduled');
-        })
-        .catch((e) => {
-            responseText = 'Error while scheduling notification: ' + e.message;
-            console.log('Error: ', e?.message);
-        });
+    });
 
-    return responseText;
+    return {status: 'success', message: 'Notification scheduled successfully.', notificationId: notificationId};
 }
