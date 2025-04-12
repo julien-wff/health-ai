@@ -2,13 +2,13 @@ import * as Notifications from 'expo-notifications';
 import { AndroidImportance } from 'expo-notifications';
 import dayjs from 'dayjs';
 
-interface ScheduleNotificationResponse {
+export interface ScheduleNotificationResponse {
     status: 'success' | 'error';
     message: string;
     notificationId?: string;
 }
 
-enum NotificationChannel {
+export enum NotificationChannel {
     General = 'general',
 }
 

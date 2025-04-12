@@ -52,19 +52,16 @@ export default function Notification() {
             },
         });
 
-        console.log('permissionsStatus', permissionsStatus);
-
         if (permissionsStatus.granted) {
             tracking.event('onboarding_notification_permission_granted');
             setHasNotificationPermissions(true);
             await finishOnboarding();
         } else {
-            tracking.event('onboarding_permission_denied');
+            tracking.event('onboarding_notification_permission_denied');
             if (!permissionsStatus.canAskAgain) {
                 ToastAndroid.show('Please allow notifications.', ToastAndroid.SHORT);
                 await Linking.openSettings();
             }
-
         }
 
 
@@ -75,7 +72,7 @@ export default function Notification() {
     }
 
     /**
-     * Set isOnboarded to true, save it in storage, redirect to the chat screen and fetch health records
+     * Set isOnboarded to true, save it in storage and redirect to the chat screen
      */
     async function finishOnboarding() {
         tracking.event('onboarding_notification_finish');
