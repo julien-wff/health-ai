@@ -19,6 +19,7 @@ import { useEffect } from 'react';
 import { AppState, NativeEventSubscription, Platform, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Notifications from 'expo-notifications';
+import { createNotificationChannels } from '@/utils/local-notification';
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
     // Only in native builds, not in Expo Go.
@@ -108,6 +109,11 @@ function Layout() {
     useEffect(() => {
         void setBackgroundColorAsync(colors.background);
     }, [ colors.background ]);
+
+    // Initialize notification channels
+    useEffect(() => {
+        createNotificationChannels();
+    }, []);
 
     return <PostHogProvider client={posthogClient}
                             autocapture={{

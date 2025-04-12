@@ -1,11 +1,28 @@
 import * as Notifications from 'expo-notifications';
+import { AndroidImportance } from 'expo-notifications';
 import dayjs from 'dayjs';
-
 
 interface ScheduleNotificationResponse {
     status: 'success' | 'error';
     message: string;
     notificationId?: string;
+}
+
+enum NotificationChannel {
+    General = 'general',
+}
+
+export async function createNotificationChannels() {
+    await Notifications.setNotificationChannelAsync(
+        NotificationChannel.General,
+        {
+            name: 'General',
+            description: 'General notification channel',
+            importance: AndroidImportance.MAX,
+            vibrationPattern: [ 0, 250, 250, 250 ],
+            enableVibrate: true,
+        },
+    );
 }
 
 export async function onScheduleNotificationToolCall(title?: string, body?: string, date?: string, chatId?: string) {
@@ -37,10 +54,10 @@ export async function scheduleNotification(title?: string, body?: string, date?:
         },
         trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,
-            channelId: 'default',
+            channelId: NotificationChannel.General,
             date: triggerDate,
         },
     });
 
-    return {status: 'success', message: 'Notification scheduled successfully.', notificationId: notificationId};
+    return { status: 'success', message: 'Notification scheduled successfully.', notificationId: notificationId };
 }

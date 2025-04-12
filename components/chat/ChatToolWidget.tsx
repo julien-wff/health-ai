@@ -18,10 +18,9 @@ export default function ChatToolWidget({ invocation }: ChatToolWidgetProps) {
         [ invocation.toolName ],
     );
 
-    if (toolName == 'schedule-notification') {
+    if (toolName === 'schedule-notification' && invocation.state === 'result' && invocation.result === 'success') {
         const [ date, title ] = useMemo(() => [ dayjs(invocation.args.date), invocation.args.title ], [ invocation.args.date, invocation.args.title ]);
         return <NotificationSuccessWidget title={title} date={date}/>;
-        //return <Text style={{ color: 'red' }}>Notification was scheduled on {invocation.args.date}</Text>;
     }
 
     const [ start, end ] = useMemo(

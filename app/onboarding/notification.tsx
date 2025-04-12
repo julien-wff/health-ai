@@ -11,7 +11,6 @@ import { Linking, Platform, Text, ToastAndroid, TouchableOpacity, View } from 'r
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTracking } from '@/hooks/useTracking';
 import * as Notifications from 'expo-notifications';
-import { AndroidImportance } from 'expo-notifications';
 
 export default function Notification() {
     const colors = useColors();
@@ -44,16 +43,6 @@ export default function Notification() {
     }
 
     async function checkPermissionsOnAndroid() {
-        // Starting with Android 13, we need a notification Channel before we can
-        // display a prompt to ask for notifications
-        await Notifications.setNotificationChannelAsync(
-            'default',
-            {
-                name: 'default',
-                importance: AndroidImportance.HIGH,
-                enableVibrate: true
-            },
-        );
 
         const permissionsStatus = await Notifications.requestPermissionsAsync({
             android: {
