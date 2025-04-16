@@ -42,22 +42,34 @@ export async function scheduleNotification(title?: string, body?: string, date?:
         return { status: 'error', message: 'Invalid date format.' };
     }
 
+    if (dayjsDate.isBefore(dayjs())) {
+        return { status: 'error', message: 'Cannot schedule notifications in the past.' };
+    }
+
     const triggerDate = dayjsDate.toDate();
 
-    const notificationId = await Notifications.scheduleNotificationAsync({
-        content: {
-            title: title,
-            body: body,
-            data: {
-                chatId: chatId,
+    let notificationId = null;
+    try {
+        notificationId = await Notifications.scheduleNotificationAsync({
+            content: {
+                title: title,
+                body: body,
+                data: {
+                    chatId: chatId,
+                },
             },
-        },
-        trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.DATE,
-            channelId: NotificationChannel.General,
-            date: triggerDate,
-        },
-    });
+            trigger: {
+                type: Notifications.SchedulableTriggerInputTypes.DATE,
+                channelId: NotificationChannel.General,
+                date: triggerDate,
+            },
+        });
+    } catch (error) {
+        return {
+            status: 'error',
+            message: `Failed to schedule notification: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        };
+    }
 
     return { status: 'success', message: 'Notification scheduled successfully.', notificationId: notificationId };
 }
