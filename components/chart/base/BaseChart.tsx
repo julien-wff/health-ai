@@ -21,6 +21,7 @@ interface BaseChartProps {
     /** If `true`, 0 is on top and highest value on the bottom of the scale */
     reverse?: boolean;
     noMargin?: boolean;
+    emptyDataText?: string;
 }
 
 export default React.memo(function BaseChart({
@@ -34,6 +35,7 @@ export default React.memo(function BaseChart({
                                                  scaleUnit,
                                                  reverse,
                                                  noMargin,
+                                                 emptyDataText,
                                              }: BaseChartProps) {
     const colors = useColors();
 
@@ -81,11 +83,11 @@ export default React.memo(function BaseChart({
         const p = Skia.ParagraphBuilder
             .Make({ textAlign: TextAlign.Center })
             .pushStyle({ fontSize: 14, color: Skia.Color(colors.text) })
-            .addText('No data found for the selected period.\nCheck your health provider.')
+            .addText(emptyDataText ?? 'No data found for the selected period.\nCheck your health provider.')
             .build();
         p.layout(width);
         return p;
-    }, [ areValuesEmpty, colors.text, width ]);
+    }, [ areValuesEmpty, colors.text, width, emptyDataText ]);
 
     return <View className={`w-full h-48 ${noMargin ? '' : 'my-2'}`} onLayout={onLayout}>
         <Canvas style={{ width, height }}>

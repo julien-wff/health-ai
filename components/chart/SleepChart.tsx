@@ -5,6 +5,7 @@ import { filterCollectionRange } from '@/utils/health';
 import { Dayjs } from 'dayjs';
 import { useMemo } from 'react';
 import { addToMapArray } from '@/utils/data-structures';
+import dedent from 'dedent';
 
 interface SleepChartProps {
     startDate: Dayjs,
@@ -50,6 +51,11 @@ export default function SleepChart({ startDate, endDate, noMargin }: SleepChartP
         ];
     }, [ sleepRecords, startDate, endDate ]);
 
+    const emptyDataText = useMemo(() => dedent`
+        No sleep records found from ${startDate.format('MMMM D')} to ${endDate.format('MMMM D')}.
+        Please check your health data provider.
+    `, [ startDate, endDate ]);
+
     return <BaseChart barColor={colors.indigo}
                       scaleUnit="time"
                       backgroundColor={colors.indigoBackground}
@@ -58,5 +64,6 @@ export default function SleepChart({ startDate, endDate, noMargin }: SleepChartP
                       reverse
                       scaleValueOffset={earliestHoursMinutes}
                       labels={labels}
-                      noMargin={noMargin}/>;
+                      noMargin={noMargin}
+                      emptyDataText={emptyDataText}/>;
 }

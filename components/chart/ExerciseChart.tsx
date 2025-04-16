@@ -5,6 +5,7 @@ import { filterCollectionRange } from '@/utils/health';
 import dayjs, { Dayjs } from 'dayjs';
 import { Duration } from 'dayjs/plugin/duration';
 import { useMemo } from 'react';
+import dedent from 'dedent';
 
 interface ExerciseChartProps {
     startDate: Dayjs,
@@ -43,10 +44,16 @@ export default function ExerciseChart({ startDate, endDate, noMargin }: Exercise
         return [ activeMinutes, labels ];
     }), [ exerciseRecords, startDate, endDate ]);
 
+    const emptyDataText = useMemo(() => dedent`
+        No exercise records found from ${startDate.format('MMMM D')} to ${endDate.format('MMMM D')}.
+        Please check your health data provider.
+    `, [ startDate, endDate ]);
+
     return <BaseChart barColor={colors.red}
                       backgroundColor={colors.redBackground}
                       values={stepCount}
                       labels={weekLabel}
                       scaleUnit="duration"
-                      noMargin={noMargin}/>;
+                      noMargin={noMargin}
+                      emptyDataText={emptyDataText}/>;
 }
