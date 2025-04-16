@@ -17,7 +17,7 @@ export default function ExerciseChart({ startDate, endDate, noMargin }: Exercise
     const colors = useColors();
     const { exercise: exerciseRecords } = useHealthData();
 
-    const [ stepCount, weekLabel ] = useMemo((() => {
+    const [ formattedExercise, weekLabel ] = useMemo((() => {
         // Default: last 7 days
         const filteredRecords = filterCollectionRange(exerciseRecords, startDate, endDate);
 
@@ -51,7 +51,7 @@ export default function ExerciseChart({ startDate, endDate, noMargin }: Exercise
 
     return <BaseChart barColor={colors.red}
                       backgroundColor={colors.redBackground}
-                      values={stepCount}
+                      values={formattedExercise}
                       labels={weekLabel}
                       scaleUnit="duration"
                       noMargin={noMargin}
