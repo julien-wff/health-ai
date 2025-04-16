@@ -87,7 +87,7 @@ export default React.memo(function BaseChart({
             .build();
         p.layout(width);
         return p;
-    }, [ areValuesEmpty, colors.text, width, emptyDataText ]);
+    }, [ colors.text, width, emptyDataText ]);
 
     return <View className={`w-full h-48 ${noMargin ? '' : 'my-2'}`} onLayout={onLayout}>
         <Canvas style={{ width, height }}>
