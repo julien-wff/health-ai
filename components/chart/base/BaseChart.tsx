@@ -2,9 +2,10 @@ import ChartBar from '@/components/chart/base/ChartBar';
 import DebugLines from '@/components/chart/base/DebugLines';
 import { ScaleUnit } from '@/components/chart/base/graph-values';
 import Scale from '@/components/chart/base/Scale';
-import { Canvas, LinearGradient, RoundedRect, vec } from '@shopify/react-native-skia';
+import { Canvas, LinearGradient, Paragraph, RoundedRect, Skia, TextAlign, vec } from '@shopify/react-native-skia';
 import React, { useMemo, useState } from 'react';
 import { LayoutChangeEvent, View } from 'react-native';
+import { useColors } from '@/hooks/useColors';
 
 
 interface BaseChartProps {
@@ -20,6 +21,7 @@ interface BaseChartProps {
     /** If `true`, 0 is on top and highest value on the bottom of the scale */
     reverse?: boolean;
     noMargin?: boolean;
+    emptyDataText?: string;
 }
 
 export default React.memo(function BaseChart({
@@ -33,9 +35,17 @@ export default React.memo(function BaseChart({
                                                  scaleUnit,
                                                  reverse,
                                                  noMargin,
+                                                 emptyDataText,
                                              }: BaseChartProps) {
+    const colors = useColors();
+
     const [ height, setHeight ] = useState(0);
     const [ width, setWidth ] = useState(0);
+
+    const areValuesEmpty = useMemo(
+        () => values.length === 0 || values.flat().every(value => value === 0),
+        [ values ],
+    );
 
     // Convert 1D arrays to 2D arrays with one element per item
     const values2D: number[][] = useMemo(
@@ -69,20 +79,39 @@ export default React.memo(function BaseChart({
         setWidth(ev.nativeEvent.layout.width);
     }
 
+    const emptyDataParagraph = useMemo(() => {
+        const p = Skia.ParagraphBuilder
+            .Make({ textAlign: TextAlign.Center })
+            .pushStyle({ fontSize: 14, color: Skia.Color(colors.text) })
+            .addText(emptyDataText ?? 'No data found for the selected period.\nCheck your health provider.')
+            .build();
+        p.layout(width);
+        return p;
+    }, [ colors.text, width, emptyDataText ]);
+
     return <View className={`w-full h-48 ${noMargin ? '' : 'my-2'}`} onLayout={onLayout}>
         <Canvas style={{ width, height }}>
             <RoundedRect width={width} height={height} r={12}>
                 <LinearGradient start={vec(0, 0)} end={vec(width, height)} colors={backgroundColor}/>
             </RoundedRect>
 
-            <Scale values={flatValues}
-                   canvasHeight={height}
-                   canvasWidth={width}
-                   scaleUnit={scaleUnit}
-                   scaleValueOffset={scaleValueOffset}
-                   reverse={reverse}/>
+            {areValuesEmpty &&
+                <Paragraph paragraph={emptyDataParagraph}
+                           width={width}
+                           x={0}
+                           y={height / 2 - emptyDataParagraph.getHeight() / 2}/>
+            }
 
-            {values2D.map((row, rowIndex) =>
+            {!areValuesEmpty &&
+                <Scale values={flatValues}
+                       canvasHeight={height}
+                       canvasWidth={width}
+                       scaleUnit={scaleUnit}
+                       scaleValueOffset={scaleValueOffset}
+                       reverse={reverse}/>
+            }
+
+            {!areValuesEmpty && values2D.map((row, rowIndex) =>
                 row.map((value, colIndex) => (
                     <ChartBar key={`${rowIndex}-${colIndex}`}
                               value={value / maxValue * 100}

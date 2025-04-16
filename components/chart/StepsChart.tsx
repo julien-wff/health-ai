@@ -4,6 +4,7 @@ import { useHealthData } from '@/hooks/useHealthData';
 import { filterCollectionRange } from '@/utils/health';
 import { Dayjs } from 'dayjs';
 import { useMemo } from 'react';
+import dedent from 'dedent';
 
 interface StepsChartProps {
     startDate: Dayjs,
@@ -24,9 +25,15 @@ export default function StepsChart({ startDate, endDate, noMargin }: StepsChartP
         ];
     }), [ stepsRecords, startDate, endDate ]);
 
+    const emptyDataText = useMemo(() => dedent`
+        No steps count found from ${startDate.format('MMMM D')} to ${endDate.format('MMMM D')}.
+        Please check your health data provider.
+    `, [ startDate, endDate ]);
+
     return <BaseChart barColor={colors.green}
                       backgroundColor={colors.greenBackground}
                       values={stepCount}
                       labels={weekLabel}
-                      noMargin={noMargin}/>;
+                      noMargin={noMargin}
+                      emptyDataText={emptyDataText}/>;
 }
