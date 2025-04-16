@@ -115,6 +115,9 @@ export default function Chat() {
     useEffect(() => {
         if (chatAgentMode === undefined && agentMode)
             setChatAgentMode(agentMode);
+
+        if (chatAgentMode !== agentMode)
+            onNewChat();
     }, [ agentMode ]);
 
     useFocusEffect(
