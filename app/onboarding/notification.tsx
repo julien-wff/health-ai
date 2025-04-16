@@ -68,7 +68,24 @@ export default function Notification() {
     }
 
     async function checkPermissionsOnIOS() {
+        const permissionsStatus = await Notifications.requestPermissionsAsync({
+            ios: {
+                allowAlert: true,
+                allowBadge: true,
+                allowSound: true,
+            },
+        });
 
+        if (permissionsStatus.granted || permissionsStatus.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL) {
+            tracking.event('onboarding_notification_permission_granted');
+            setHasNotificationPermissions(true);
+            await finishOnboarding();
+        } else {
+            tracking.event('onboarding_notification_permission_denied');
+            if (!permissionsStatus.canAskAgain) {
+                await Linking.openSettings();
+            }
+        }
     }
 
     /**
