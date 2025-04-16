@@ -11,7 +11,7 @@ export default function AdvancedDebug() {
     const { setRequireNewChat } = useAppState();
 
     function toggleAgentMode() {
-        const newMode = invertAgentMode(agentMode!);
+        const newMode = invertAgentMode(agentMode || 'introvert');
         void overrideFeatureFlag('ai-profile', newMode);
         setRequireNewChat(true);
     }
