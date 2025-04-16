@@ -1,4 +1,5 @@
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { InteractionManager, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef } from 'react';
 
 interface ChatSuggestionsProps {
     suggestions: string[];
@@ -6,7 +7,16 @@ interface ChatSuggestionsProps {
 }
 
 export default function ChatSuggestions({ suggestions, onSuggestionPress }: Readonly<ChatSuggestionsProps>) {
-    return <ScrollView horizontal>
+    // Reset scroll position to the start when suggestions change
+    const scrollViewRef = useRef<ScrollView>(null);
+
+    useEffect(() => {
+        InteractionManager.runAfterInteractions(() => {
+            scrollViewRef.current?.scrollTo({ x: 0, animated: false });
+        });
+    }, [ suggestions ]);
+
+    return <ScrollView horizontal showsHorizontalScrollIndicator={false} ref={scrollViewRef}>
         <View className="mb-1 flex flex-row gap-2 p-2 h-14">
             {suggestions.map((suggestion) =>
                 <TouchableOpacity key={suggestion}

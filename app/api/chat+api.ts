@@ -18,12 +18,14 @@ export async function POST(req: Request) {
     if (agentMode === 'introvert') {
         systemPrompt = getChatPrompt({
             tone: 'neutral and objective',
-            adviceMode: 'only when the user asks for it',
+            advice: 'only when the user asks for it',
+            diplomacy: 'diplomatic and careful, try to convince the user',
         });
     } else {
         systemPrompt = getChatPrompt({
             tone: 'friendly and encouraging',
-            adviceMode: 'even if the user is not asking for it, be proactive in giving advice and suggestions',
+            advice: 'even if the user is not asking for it, be proactive in giving advice and suggestions',
+            diplomacy: 'pushy, almost forcing the user',
         });
     }
 
