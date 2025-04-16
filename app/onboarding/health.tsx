@@ -6,8 +6,6 @@ import { useHealthData } from '@/hooks/useHealthData';
 import { readHealthRecords } from '@/utils/health';
 import { hasAllRequiredPermissions, healthConnect, REQUIRED_PERMISSIONS } from '@/utils/health/android';
 import { initHealthKit } from '@/utils/health/ios';
-import { IS_ONBOARDED } from '@/utils/storageKeys';
-import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { Footprints, Medal, MoonStar } from 'lucide-react-native';
 import { useState } from 'react';
@@ -15,44 +13,43 @@ import { Platform, Text, ToastAndroid, TouchableOpacity, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTracking } from '@/hooks/useTracking';
 
-export default function Onboarding() {
+export default function Health() {
     const colors = useColors();
     const router = useRouter();
     const tracking = useTracking();
 
-    const { setItem: setIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
-    const { hasPermissions, setHasPermissions, setIsOnboarded } = useAppState();
+    const { hasHealthPermissions, setHasHealthPermissions } = useAppState();
     const { setHealthRecords } = useHealthData();
     const [ isLoadingPermissions, setIsLoadingPermissions ] = useState(false);
 
     /**
-     * Ask for permissions (if not already granted), continue to the chat screen and fetch health records
+     * Ask for permissions (if not already granted), continue to the notification onboarding screen and fetch health records
      */
     async function handleContinueClick() {
-        tracking.event('onboarding_start');
+        tracking.event('onboarding_health_start');
         setIsLoadingPermissions(true);
 
-        if (hasPermissions) {
-            tracking.event('onboarding_permission_already_granted');
-            await finishOnboarding();
+        if (hasHealthPermissions) {
+            tracking.event('onboarding_health_permission_already_granted');
+            await finishHealthOnboarding();
             return;
         }
 
         if (Platform.OS === 'ios') {
             await initHealthKit();
-            setHasPermissions(true);
-            await finishOnboarding();
+            setHasHealthPermissions(true);
+            await finishHealthOnboarding();
         }
 
         if (Platform.OS === 'android') {
             ToastAndroid.show('Please allow all...', ToastAndroid.SHORT);
             const permissions = await healthConnect!.requestPermission(REQUIRED_PERMISSIONS);
             if (hasAllRequiredPermissions(permissions)) {
-                tracking.event('onboarding_permission_granted');
-                setHasPermissions(true);
-                await finishOnboarding();
+                tracking.event('onboarding_health_permission_granted');
+                setHasHealthPermissions(true);
+                await finishHealthOnboarding();
             } else {
-                tracking.event('onboarding_permission_denied');
+                tracking.event('onboarding_health_permission_denied');
                 ToastAndroid.show('Missing permissions', ToastAndroid.SHORT);
             }
         }
@@ -61,13 +58,11 @@ export default function Onboarding() {
     }
 
     /**
-     * Set isOnboarded to true, save it in storage, redirect to the chat screen and fetch health records
+     * Go to the next onboarding screen
      */
-    async function finishOnboarding() {
-        tracking.event('onboarding_finish');
-        setIsOnboarded(true);
-        await setIsOnboardedInStorage('1');
-        router.replace('/chat');
+    async function finishHealthOnboarding() {
+        tracking.event('onboarding_health_finish');
+        router.replace('/onboarding/notification');
         const healthRecords = await readHealthRecords();
         setHealthRecords(healthRecords);
     }

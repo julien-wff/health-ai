@@ -41,7 +41,7 @@ export default function ResetAppBtn() {
         await AsyncStorage.multiRemove(keys);
         console.log(`Removed ${keys.length} keys`);
         setChats([]);
-        router.replace('/onboarding');
+        router.replace('/onboarding/health');
     }
 
     return <ProfileBtn onPress={showResetAlert} icon={Trash}>

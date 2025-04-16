@@ -18,6 +18,8 @@ import { PostHog, PostHogProvider } from 'posthog-react-native';
 import { useEffect } from 'react';
 import { AppState, NativeEventSubscription, Platform, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import * as Notifications from 'expo-notifications';
+import { createNotificationChannels } from '@/utils/local-notification';
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
     // Only in native builds, not in Expo Go.
@@ -50,6 +52,14 @@ dayjs.extend(duration);
 dayjs.extend(isBetween);
 void SplashScreen.preventAutoHideAsync();
 
+// Set the handler that will cause the notification to show the alert
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+    }),
+});
 
 export default Sentry.wrap(Layout);
 
@@ -57,7 +67,7 @@ function Layout() {
     const colorScheme = useColorScheme();
     const colors = useColors();
     const { loadStateFromStorage, initHealthAndAsyncLoadState } = useAppInit();
-    const { hasPermissions } = useAppState();
+    const { hasHealthPermissions } = useAppState();
     const { setHealthRecords } = useHealthData();
 
     const ref = useNavigationContainerRef();
@@ -83,7 +93,7 @@ function Layout() {
 
             // Reload health data when the app comes back from background
             subscription = AppState.addEventListener('change', () => {
-                if (!hasPermissions || AppState.currentState !== 'active')
+                if (!hasHealthPermissions || AppState.currentState !== 'active')
                     return;
 
                 Sentry.captureEvent({ event_id: 'layout_state_health_data_update_start', level: 'info' });
@@ -99,6 +109,11 @@ function Layout() {
     useEffect(() => {
         void setBackgroundColorAsync(colors.background);
     }, [ colors.background ]);
+
+    // Initialize notification channels
+    useEffect(() => {
+        createNotificationChannels();
+    }, []);
 
     return <PostHogProvider client={posthogClient}
                             autocapture={{
