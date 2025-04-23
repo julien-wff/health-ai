@@ -43,9 +43,14 @@ export async function saveGoalsToStorage(goals: Goal[]) {
 }
 
 export async function createGoalAndSave(newGoal: CreateGoalsParams, goals: Goal[]): Promise<Goal> {
+    // Find the highest existing ID to avoid duplicates
+    const highestId = goals.length > 0
+        ? Math.max(...goals.map(goal => goal.id))
+        : 0;
+
     const goal: Goal = {
         ...newGoal,
-        id: goals.length + 1,
+        id: highestId + 1,
         createdAt: new Date(),
         updatedAt: new Date(),
         mustBeCompletedBy: newGoal.mustBeCompletedBy ? new Date(newGoal.mustBeCompletedBy) : null,
