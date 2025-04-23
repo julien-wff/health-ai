@@ -1,5 +1,5 @@
 import ProjectIcon from '@/components/content/ProjectIcon';
-import HealthRecord from '@/components/onboarding/HealthRecord';
+import OnboardingWidget from '@/components/onboarding/OnboardingWidget';
 import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
 import { IS_ONBOARDED } from '@/utils/storageKeys';
@@ -34,41 +34,12 @@ export default function Notification() {
             return;
         }
 
-        if (Platform.OS === 'android')
-            await checkPermissionsOnAndroid();
-        else if (Platform.OS === 'ios')
-            await checkPermissionsOnIOS();
-
-        setIsLoadingPermissions(false);
-    }
-
-    async function checkPermissionsOnAndroid() {
-
         const permissionsStatus = await Notifications.requestPermissionsAsync({
             android: {
                 allowAlert: true,
                 allowBadge: true,
                 allowSound: true,
             },
-        });
-
-        if (permissionsStatus.granted) {
-            tracking.event('onboarding_notification_permission_granted');
-            setHasNotificationPermissions(true);
-            await finishOnboarding();
-        } else {
-            tracking.event('onboarding_notification_permission_denied');
-            if (!permissionsStatus.canAskAgain) {
-                ToastAndroid.show('Please allow notifications.', ToastAndroid.SHORT);
-                await Linking.openSettings();
-            }
-        }
-
-
-    }
-
-    async function checkPermissionsOnIOS() {
-        const permissionsStatus = await Notifications.requestPermissionsAsync({
             ios: {
                 allowAlert: true,
                 allowBadge: true,
@@ -83,9 +54,14 @@ export default function Notification() {
         } else {
             tracking.event('onboarding_notification_permission_denied');
             if (!permissionsStatus.canAskAgain) {
+                if (Platform.OS === 'android') {
+                    ToastAndroid.show('Please allow notifications.', ToastAndroid.SHORT);
+                }
                 await Linking.openSettings();
             }
         }
+
+        setIsLoadingPermissions(false);
     }
 
     /**
@@ -113,8 +89,8 @@ export default function Notification() {
             </Text>
 
             <View className="flex flex-row gap-4">
-                <HealthRecord icon={Bell} label="Notifications" color={colors.blue}
-                              background={colors.indigoBackground}/>
+                <OnboardingWidget icon={Bell} label="Notifications" color={colors.blue}
+                                  background={colors.indigoBackground}/>
             </View>
         </View>
 
