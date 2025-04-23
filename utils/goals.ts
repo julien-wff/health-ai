@@ -31,8 +31,7 @@ export interface Goal extends EditGoalsParams {
  */
 export async function getGoalsFromStorage(): Promise<Goal[]> {
     const jsonGoals = await AsyncStorage.getItem(GOALS);
-    const goals = jsonGoals ? superJson.parse<Goal[]>(jsonGoals) : [];
-    return goals.filter(goal => !goal.isDeleted);
+    return jsonGoals ? superJson.parse<Goal[]>(jsonGoals) : [];
 }
 
 /**
@@ -77,26 +76,38 @@ export async function updateGoalAndSave(goalId: number, updatedGoal: Partial<Edi
 }
 
 /**
- * Format a goal to give as context for the AI agent
- * @param goal The goal to format
+ * Format a goal to give as context for the AI agent.
+ * @param goal The goal to format.
+ * @returns A string representation of the goal.
  */
-export const formatGoalForAI = (goal: Goal) => dedent`
-    Goal ID: ${goal.id}
-    Type: ${goal.type}
-    Description: ${goal.description}
-    Created At: ${goal.createdAt.toISOString()}
-    Must be completed by: ${goal.mustBeCompletedBy ? goal.mustBeCompletedBy.toISOString() : 'No deadline'}
-    Completed: ${goal.isCompleted ? 'Yes' : 'No'}
-`;
+export function formatGoalForAI(goal: Goal) {
+    if (goal.isDeleted) {
+        return `Goal ID: ${goal.id} (deleted)`;
+    } else {
+        return dedent`
+            Goal ID: ${goal.id}
+            Type: ${goal.type}
+            Description: ${goal.description}
+            Created At: ${goal.createdAt.toISOString()}
+            Must be completed by: ${goal.mustBeCompletedBy ? goal.mustBeCompletedBy.toISOString() : 'No deadline'}
+            Completed: ${goal.isCompleted ? 'Yes' : 'No'}
+        `;
+    }
+}
 
 /**
- * Format a list of goals to give as context for the AI agent
- * @param goals The list of goals to format
+ * Format a list of goals to give as context for the AI agent.
+ * Ignore deleted goals.
+ * @param goals The list of goals to format.
+ * @returns A string representation of the goals, each one separated by a blank line.
  */
 export const formatGoalsForAI = (goals: Goal[]) => {
     if (goals.length === 0) {
         return 'No goals found.';
     }
 
-    return goals.map(formatGoalForAI).join('\n\n');
+    return goals
+        .filter(goal => !goal.isDeleted)
+        .map(formatGoalForAI)
+        .join('\n\n');
 };
