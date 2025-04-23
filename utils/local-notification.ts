@@ -25,12 +25,6 @@ export async function createNotificationChannels() {
     );
 }
 
-export async function onScheduleNotificationToolCall(title?: string, body?: string, date?: string, chatId?: string) {
-    const result = await scheduleNotification(title, body, date, chatId);
-
-    return result.status;
-}
-
 export async function scheduleNotification(title?: string, body?: string, date?: string, chatId?: string): Promise<ScheduleNotificationResponse> {
     const dayjsDate = dayjs(date);
 

@@ -87,7 +87,7 @@ export default function Chat() {
                     const { title, body, date } = toolCall.args as NotificationParams;
                     return scheduleNotification(title, body, date, chatId)
                         .then((result) => {
-                            tracking.event('chat_schedule_notification', { args: toolCall.args, result: result });
+                            tracking.event('chat_schedule_notification', { status: result.status });
                             return result.status;
                         });
                 }
