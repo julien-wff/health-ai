@@ -1,5 +1,5 @@
 import ProjectIcon from '@/components/content/ProjectIcon';
-import HealthRecord from '@/components/onboarding/HealthRecord';
+import OnboardingWidget from '@/components/onboarding/OnboardingWidget';
 import { useAppState } from '@/hooks/useAppState';
 import { useColors } from '@/hooks/useColors';
 import { useHealthData } from '@/hooks/useHealthData';
@@ -81,9 +81,11 @@ export default function Health() {
             </Text>
 
             <View className="flex flex-row gap-4">
-                <HealthRecord icon={Footprints} label="Steps" color={colors.green} background={colors.greenBackground}/>
-                <HealthRecord icon={MoonStar} label="Sleep" color={colors.indigo} background={colors.indigoBackground}/>
-                <HealthRecord icon={Medal} label="Activity" color={colors.red} background={colors.redBackground}/>
+                <OnboardingWidget icon={Footprints} label="Steps" color={colors.green}
+                                  background={colors.greenBackground}/>
+                <OnboardingWidget icon={MoonStar} label="Sleep" color={colors.indigo}
+                                  background={colors.indigoBackground}/>
+                <OnboardingWidget icon={Medal} label="Activity" color={colors.red} background={colors.redBackground}/>
             </View>
 
             <Text className="mt-4 text-lg text-slate-800 dark:text-slate-200">

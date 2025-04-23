@@ -16,8 +16,8 @@ export default function NotificationSuccessWidget({ title, date }: NotificationW
 
     const formattedDate = useMemo(() => date.format('DD MMM YYYY [at] HH:mm'), [ date ]);
 
-    return <View className={`w-full flex flex-row items-center p-2 my-2`}>
-        <LinearGradient colors={colors.indigoBackground}
+    return <View className="w-full flex flex-row items-center p-2 my-2">
+        <LinearGradient colors={colors.blueBackground}
                         start={vec(0, 0)}
                         end={vec(1, 1)}
                         style={{ borderRadius: 12, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}/>
