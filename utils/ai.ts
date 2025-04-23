@@ -49,6 +49,8 @@ export interface DateRangeParams {
     endDate?: string;
 }
 
+export type ToolParameters<T extends keyof typeof tools> = z.infer<typeof tools[T]['parameters']>;
+
 export const tools = {
     'get-health-data-and-visualize': {
         description: 'Get health data (steps count, exercise, sleep) and optionally show a graph of it on the user\'s chat.',

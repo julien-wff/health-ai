@@ -1,7 +1,7 @@
 import ExerciseChart from '@/components/chart/ExerciseChart';
 import SleepChart from '@/components/chart/SleepChart';
 import StepsChart from '@/components/chart/StepsChart';
-import type { tools } from '@/utils/ai';
+import type { ToolParameters, tools } from '@/utils/ai';
 import { parseRange } from '@/utils/health';
 import { ToolInvocation } from 'ai';
 import { useMemo } from 'react';
@@ -35,9 +35,7 @@ export default function ChatToolWidget({ invocation }: Readonly<ChatToolWidgetPr
 }
 
 
-type ChartVisualizeToolParams = typeof tools['get-health-data-and-visualize']['parameters']['_type'];
-
-function Chart({ dataType, startDate, endDate, display }: Readonly<ChartVisualizeToolParams>) {
+function Chart({ dataType, startDate, endDate, display }: Readonly<ToolParameters<'get-health-data-and-visualize'>>) {
     const [ start, end ] = useMemo(
         () => parseRange(startDate, endDate),
         [ startDate, endDate ],

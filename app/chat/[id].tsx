@@ -9,6 +9,7 @@ import {
     generateConversationSuggestions,
     generateConversationSummary,
     generateConversationTitle,
+    ToolParameters,
     tools,
 } from '@/utils/ai';
 import { type ChatRequestBody, getStorageChat, saveStorageChat } from '@/utils/chat';
@@ -74,7 +75,7 @@ export default function Chat() {
                         display,
                         startDate,
                         endDate,
-                    } = toolCall.args as typeof tools['get-health-data-and-visualize']['parameters']['_type'];
+                    } = toolCall.args as ToolParameters<'get-health-data-and-visualize'>;
                     tracking.event('chat_get_health_data', { dataType, display });
                     const data = filterCollectionRange({ steps, exercise, sleep }[dataType], startDate, endDate);
                     return formatCollection(data, dataType);
@@ -86,7 +87,7 @@ export default function Chat() {
                     return formatGoalForAI(goal);
                 }
                 case 'update-user-goal': {
-                    const args = toolCall.args as typeof tools['update-user-goal']['parameters']['_type'];
+                    const args = toolCall.args as ToolParameters<'update-user-goal'>;
                     const updatedGoals = await updateGoalAndSave(args.id, args, goals);
                     if (!updatedGoals) {
                         return `Goal #${args.id} not found. Max ID: ${goals.length}.`;
@@ -98,7 +99,7 @@ export default function Chat() {
                 }
                 case 'display-user-goal': {
                     tracking.event('chat_display_user_goals');
-                    const goalId = (toolCall.args as typeof tools['display-user-goal']['parameters']['_type']).id;
+                    const goalId = (toolCall.args as ToolParameters<'display-user-goal'>).id;
                     const goal = goals.find(g => g.id === goalId);
                     if (!goal) {
                         return `Goal #${goalId} not found. Max ID: ${goals.length}.`;
