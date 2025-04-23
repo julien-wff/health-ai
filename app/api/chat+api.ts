@@ -20,6 +20,7 @@ export async function POST(req: Request) {
             tone: 'neutral and objective',
             advice: 'only when the user asks for it',
             diplomacy: 'diplomatic and careful, try to convince the user',
+            goalsCreation: 'always ask the user a confirmation, don\'t force him',
             goals,
         });
     } else {
@@ -27,6 +28,7 @@ export async function POST(req: Request) {
             tone: 'friendly and encouraging',
             advice: 'even if the user is not asking for it, be proactive in giving advice and suggestions',
             diplomacy: 'pushy, almost forcing the user',
+            goalsCreation: 'don\'t ask the user for confirmation, make it an ambitious challenge',
             goals,
         });
     }

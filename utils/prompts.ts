@@ -21,6 +21,7 @@ export interface ChatPromptOptions {
     tone: string;
     advice: string;
     diplomacy: string;
+    goalsCreation: string;
     goals?: string[];
 }
 
@@ -45,6 +46,7 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     
     # Goals
     You can set goals to the user. 
+    When creating goals, ${options.goalsCreation}.
     Goals are personal objectives that the user must react in a short period of time (less than a week).
     You decide the goals and their deadline. Never ask the user by when he wants to achieve the goal. Goals can be:
     - Have a more consistent sleep schedule
