@@ -58,6 +58,24 @@ export async function createGoalAndSave(newGoal: CreateGoalsParams, goals: Goal[
     return goal;
 }
 
+export async function updateGoalAndSave(goalId: number, updatedGoal: Partial<EditGoalsParams>, goals: Goal[]): Promise<Goal[] | null> {
+    const goalIndex = goals.findIndex(goal => goal.id === goalId);
+    if (goalIndex === -1) {
+        return null;
+    }
+
+    const updatedGoalData: Goal = {
+        ...goals[goalIndex],
+        ...updatedGoal,
+        mustBeCompletedBy: updatedGoal.mustBeCompletedBy ? new Date(updatedGoal.mustBeCompletedBy) : goals[goalIndex].mustBeCompletedBy,
+        updatedAt: new Date(),
+    };
+
+    const updatedGoals = [ ...goals.slice(0, goalIndex), updatedGoalData, ...goals.slice(goalIndex + 1) ];
+    await saveGoalsToStorage(updatedGoals);
+    return updatedGoals;
+}
+
 /**
  * Format a goal to give as context for the AI agent
  * @param goal The goal to format

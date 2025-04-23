@@ -29,6 +29,7 @@ export default function ChatToolWidget({ invocation }: Readonly<ChatToolWidgetPr
             return <SleepChart startDate={start} endDate={end}/>;
         case 'create-user-goal':
             return <GoalWidget goal={invocation.args}/>;
+        case 'update-user-goal':
         case 'display-user-goal': {
             const goalId = invocation.args.id as number;
             const goal = goals.find(g => g.id === goalId);

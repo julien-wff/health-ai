@@ -100,6 +100,16 @@ export const tools = {
             mustBeCompletedBy: z.string().optional().describe('Expected date of completion of the goal by the user, in the format of a valid javascript date or datetime.'),
         }).describe('Returns the created goal, notably its ID.'),
     },
+    'update-user-goal': {
+        description: 'Update an existing health-related goal for the user. Only specify the fields you want to update.',
+        parameters: z.object({
+            id: z.number().min(0).describe('ID of the goal to update.'),
+            description: z.string().optional().describe('Description of the goal, what the user must achieve.'),
+            mustBeCompletedBy: z.string().optional().describe('Expected date of completion of the goal by the user, in the format of a valid javascript date or datetime.'),
+            completed: z.boolean().optional().describe('Whether you, AI, estimate that the goal is completed or not.'),
+            deleted: z.boolean().optional().describe('True if the goal should be deleted. Cannot be undone.'),
+        }),
+    },
     'display-user-goal': {
         description: 'Display a widget with the goal informations to the chat. Always try to use this tool call when talking about a specific goal.',
         parameters: z.object({

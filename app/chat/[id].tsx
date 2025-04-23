@@ -29,10 +29,10 @@ import HealthDataFoundNotification from '@/components/notification/HealthDataFou
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
-import { createGoalAndSave, CreateGoalsParams, formatGoalForAI } from '@/utils/goals';
+import { createGoalAndSave, CreateGoalsParams, formatGoalForAI, updateGoalAndSave } from '@/utils/goals';
 
 export default function Chat() {
-    const { addOrUpdateChat, requireNewChat, setRequireNewChat, goals, addGoal } = useAppState();
+    const { addOrUpdateChat, requireNewChat, setRequireNewChat, goals, setGoals, addGoal } = useAppState();
     const {
         steps,
         exercise,
@@ -88,6 +88,17 @@ export default function Chat() {
                     addGoal(goal);
                     tracking.event('chat_create_user_goal');
                     return formatGoalForAI(goal);
+                }
+                case 'update-user-goal': {
+                    const args = toolCall.args as typeof tools['update-user-goal']['parameters']['_type'];
+                    const updatedGoal = await updateGoalAndSave(args.id, args, goals);
+                    if (!updatedGoal) {
+                        return `Goal #${args.id} not found. Max ID: ${goals.length}.`;
+                    } else {
+                        setGoals(updatedGoal);
+                        tracking.event('chat_update_user_goal');
+                        return formatGoalForAI(updatedGoal.find(g => g.id === args.id)!);
+                    }
                 }
                 case 'display-user-goal': {
                     tracking.event('chat_display_user_goals');
