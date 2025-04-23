@@ -21,6 +21,7 @@ export interface ChatPromptOptions {
     tone: string;
     advice: string;
     diplomacy: string;
+    goals?: string[];
 }
 
 export const getChatPrompt = (options: ChatPromptOptions) => dedent`
@@ -65,6 +66,11 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
 
     # Context
     For your information, today is ${getCurrentDateFormatted()}.
+    
+    # User goals
+    ${(options.goals ?? []).length === 0
+    ? 'The user hasn\'t set any goals yet.'
+    : 'Here is the list of user\'s goals:\n' + options.goals!.join('\n')}
 `;
 
 

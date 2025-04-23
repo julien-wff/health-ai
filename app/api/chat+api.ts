@@ -12,7 +12,7 @@ interface RequestJson {
 
 export async function POST(req: Request) {
     const { messages, requestBody } = await req.json() as RequestJson;
-    const { agentMode } = requestBody;
+    const { agentMode, goals } = requestBody;
 
     let systemPrompt: string;
     if (agentMode === 'introvert') {
@@ -20,12 +20,14 @@ export async function POST(req: Request) {
             tone: 'neutral and objective',
             advice: 'only when the user asks for it',
             diplomacy: 'diplomatic and careful, try to convince the user',
+            goals,
         });
     } else {
         systemPrompt = getChatPrompt({
             tone: 'friendly and encouraging',
             advice: 'even if the user is not asking for it, be proactive in giving advice and suggestions',
             diplomacy: 'pushy, almost forcing the user',
+            goals,
         });
     }
 

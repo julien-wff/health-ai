@@ -29,7 +29,7 @@ import HealthDataFoundNotification from '@/components/notification/HealthDataFou
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
-import { createGoalAndSave, CreateGoalsParams, formatGoalForAI, formatGoalsForAI } from '@/utils/goals';
+import { createGoalAndSave, CreateGoalsParams, formatGoalForAI } from '@/utils/goals';
 
 export default function Chat() {
     const { addOrUpdateChat, requireNewChat, setRequireNewChat, goals, addGoal } = useAppState();
@@ -58,6 +58,7 @@ export default function Chat() {
         experimental_prepareRequestBody(options) {
             options.requestBody = {
                 agentMode: chatAgentMode ?? 'introvert',
+                goals: goals.map(formatGoalForAI),
             } satisfies ChatRequestBody;
             return options;
         },
@@ -88,9 +89,6 @@ export default function Chat() {
                     tracking.event('chat_create_user_goal');
                     return formatGoalForAI(goal);
                 }
-                case 'list-user-goals':
-                    tracking.event('chat_list_user_goals');
-                    return formatGoalsForAI(goals);
                 case 'display-user-goal': {
                     tracking.event('chat_display_user_goals');
                     const goalId = (toolCall.args as typeof tools['display-user-goal']['parameters']['_type']).id;

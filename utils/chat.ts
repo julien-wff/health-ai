@@ -11,6 +11,7 @@ import dayjs from 'dayjs';
  */
 export interface ChatRequestBody {
     agentMode: AiProfile;
+    goals: string[];
 }
 
 

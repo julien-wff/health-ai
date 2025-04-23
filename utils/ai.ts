@@ -100,10 +100,6 @@ export const tools = {
             mustBeCompletedBy: z.string().optional().describe('Expected date of completion of the goal by the user, in the format of a valid javascript date or datetime.'),
         }).describe('Returns the created goal, notably its ID.'),
     },
-    'list-user-goals': {
-        description: 'List all the goals of the user.',
-        parameters: z.object({}).describe('Returns the list of goals.'),
-    },
     'display-user-goal': {
         description: 'Display a widget with the goal informations to the chat. Always try to use this tool call when talking about a specific goal.',
         parameters: z.object({
