@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { CreateGoalsParams } from '@/utils/goals';
+import { CreateGoalsParams, Goal } from '@/utils/goals';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useColors } from '@/hooks/useColors';
 import { useMemo } from 'react';
@@ -8,12 +8,15 @@ import dayjs from 'dayjs';
 
 
 interface GoalCreatedWidgetProps {
-    goal: CreateGoalsParams;
+    goal: CreateGoalsParams | Goal;
 }
 
 export default function GoalWidget({ goal }: Readonly<GoalCreatedWidgetProps>) {
     const colors = useColors();
     const { description, type, mustBeCompletedBy } = goal;
+    const isCompleted = 'isCompleted' in goal && goal.isCompleted;
+    const isDeleted = 'isDeleted' in goal && goal.isDeleted;
+    const updatedAt = 'updatedAt' in goal ? goal.updatedAt : undefined;
 
     const [ iconColor, bgColor, Icon ] = useMemo(() => {
         switch (type) {
@@ -27,6 +30,15 @@ export default function GoalWidget({ goal }: Readonly<GoalCreatedWidgetProps>) {
                 return [ colors.blue, colors.blueBackground, Trophy ];
         }
     }, [ type ]);
+
+    let subtitle: string | null = null;
+    if (mustBeCompletedBy && !isCompleted && !isDeleted) {
+        subtitle = `Complete by ${dayjs(mustBeCompletedBy).format('MMMM D')} (${dayjs(mustBeCompletedBy).fromNow()})`;
+    } else if (isCompleted && updatedAt && !isDeleted) {
+        subtitle = `Completed on ${dayjs(updatedAt).format('MMMM D')}`;
+    } else if (isDeleted && updatedAt) {
+        subtitle = `Deleted on ${dayjs(updatedAt).format('MMMM D')}`;
+    }
 
     return <View className="flex flex-row items-center justify-center gap-4 p-4 my-2">
         <LinearGradient colors={bgColor}
@@ -42,10 +54,8 @@ export default function GoalWidget({ goal }: Readonly<GoalCreatedWidgetProps>) {
                 Goal: {description}
             </Text>
 
-            {mustBeCompletedBy && <Text className="text-slate-500 dark:text-slate-400">
-                Complete by {dayjs(mustBeCompletedBy).format('MMMM D')}
-                {' '}
-                ({dayjs(mustBeCompletedBy).fromNow()})
+            {subtitle && <Text className="text-slate-500 dark:text-slate-400">
+                {subtitle}
             </Text>}
         </View>
     </View>;
