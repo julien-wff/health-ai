@@ -1,7 +1,7 @@
 import ExerciseChart from '@/components/chart/ExerciseChart';
 import SleepChart from '@/components/chart/SleepChart';
 import StepsChart from '@/components/chart/StepsChart';
-import { tools } from '@/utils/ai';
+import type { tools } from '@/utils/ai';
 import { parseRange } from '@/utils/health';
 import { ToolInvocation } from 'ai';
 import { useMemo } from 'react';
@@ -15,18 +15,9 @@ interface ChatToolWidgetProps {
 export default function ChatToolWidget({ invocation }: Readonly<ChatToolWidgetProps>) {
     const { goals } = useAppState();
 
-    const [ start, end ] = useMemo(
-        () => parseRange(invocation.args.startDate, invocation.args.endDate),
-        [ invocation.args.startDate, invocation.args.endDate ],
-    );
-
     switch (invocation.toolName as keyof typeof tools) {
-        case 'display-steps':
-            return <StepsChart startDate={start} endDate={end}/>;
-        case 'display-exercise':
-            return <ExerciseChart startDate={start} endDate={end}/>;
-        case 'display-sleep':
-            return <SleepChart startDate={start} endDate={end}/>;
+        case 'get-health-data-and-visualize':
+            return <Chart {...invocation.args}/>;
         case 'create-user-goal':
             return <GoalWidget goal={invocation.args}/>;
         case 'update-user-goal':
@@ -41,4 +32,28 @@ export default function ChatToolWidget({ invocation }: Readonly<ChatToolWidgetPr
         default:
             return <></>;
     }
+}
+
+
+type ChartVisualizeToolParams = typeof tools['get-health-data-and-visualize']['parameters']['_type'];
+
+function Chart({ dataType, startDate, endDate, display }: Readonly<ChartVisualizeToolParams>) {
+    const [ start, end ] = useMemo(
+        () => parseRange(startDate, endDate),
+        [ startDate, endDate ],
+    );
+
+    if (!display) {
+        return <></>;
+    }
+
+    switch (dataType) {
+        case 'steps':
+            return <StepsChart startDate={start} endDate={end}/>;
+        case 'exercise':
+            return <ExerciseChart startDate={start} endDate={end}/>;
+        case 'sleep':
+            return <SleepChart startDate={start} endDate={end}/>;
+    }
+
 }

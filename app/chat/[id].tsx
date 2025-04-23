@@ -6,7 +6,6 @@ import PromptInput from '@/components/chat/PromptInput';
 import { useAppState } from '@/hooks/useAppState';
 import { useHealthData } from '@/hooks/useHealthData';
 import {
-    DateRangeParams,
     generateConversationSuggestions,
     generateConversationSummary,
     generateConversationTitle,
@@ -68,21 +67,18 @@ export default function Chat() {
             console.error(error, 'ERROR');
         },
         async onToolCall({ toolCall }) {
-            const { startDate, endDate } = toolCall.args as DateRangeParams;
-
             switch (toolCall.toolName as keyof typeof tools) {
-                case 'get-daily-steps':
-                case 'display-steps':
-                    tracking.event('chat_get_daily_steps', { display: toolCall.toolName.startsWith('display') });
-                    return formatCollection(filterCollectionRange(steps, startDate, endDate), 'steps');
-                case 'get-daily-exercise':
-                case 'display-exercise':
-                    tracking.event('chat_get_daily_exercise', { display: toolCall.toolName.startsWith('display') });
-                    return formatCollection(filterCollectionRange(exercise, startDate, endDate), 'exercise');
-                case 'get-daily-sleep':
-                case 'display-sleep':
-                    tracking.event('chat_get_daily_sleep', { display: toolCall.toolName.startsWith('display') });
-                    return formatCollection(filterCollectionRange(sleep, startDate, endDate), 'sleep');
+                case 'get-health-data-and-visualize': {
+                    const {
+                        dataType,
+                        display,
+                        startDate,
+                        endDate,
+                    } = toolCall.args as typeof tools['get-health-data-and-visualize']['parameters']['_type'];
+                    tracking.event('chat_get_health_data', { dataType, display });
+                    const data = filterCollectionRange({ steps, exercise, sleep }[dataType], startDate, endDate);
+                    return formatCollection(data, dataType);
+                }
                 case 'create-user-goal': {
                     const goal = await createGoalAndSave(toolCall.args as CreateGoalsParams, goals);
                     addGoal(goal);
