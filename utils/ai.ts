@@ -106,8 +106,8 @@ export const tools = {
             id: z.number().min(0).describe('ID of the goal to update.'),
             description: z.string().optional().describe('Description of the goal, what the user must achieve.'),
             mustBeCompletedBy: z.string().optional().describe('Expected date of completion of the goal by the user, in the format of a valid javascript date or datetime.'),
-            completed: z.boolean().optional().describe('Whether you, AI, estimate that the goal is completed or not.'),
-            deleted: z.boolean().optional().describe('True if the goal should be deleted. Cannot be undone.'),
+            isCompleted: z.boolean().optional().describe('Whether you, AI, estimate that the goal is completed or not.'),
+            isDeleted: z.boolean().optional().describe('True if the goal should be deleted. Cannot be undone.'),
         }),
     },
     'display-user-goal': {
