@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import { AndroidImportance } from 'expo-notifications';
 import dayjs from 'dayjs';
+import dedent from 'dedent';
 
 export interface ScheduleNotificationResponse {
     status: 'success' | 'error';
@@ -23,6 +24,17 @@ export async function createNotificationChannels() {
             enableVibrate: true,
         },
     );
+}
+
+export function formatScheduleNotificationResponseForAI(response: ScheduleNotificationResponse) {
+    if (response.status === 'success') {
+        return dedent`
+            ${response.message}
+            Notification id: ${response.notificationId}
+        `;
+    }
+
+    return response.status;
 }
 
 export async function scheduleNotification(title?: string, body?: string, date?: string, chatId?: string): Promise<ScheduleNotificationResponse> {

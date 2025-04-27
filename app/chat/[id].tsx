@@ -30,7 +30,7 @@ import HealthDataFoundNotification from '@/components/notification/HealthDataFou
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
-import { scheduleNotification } from '@/utils/local-notification';
+import { formatScheduleNotificationResponseForAI, scheduleNotification } from '@/utils/local-notification';
 
 export default function Chat() {
     const { addOrUpdateChat, requireNewChat, setRequireNewChat } = useAppState();
@@ -88,7 +88,7 @@ export default function Chat() {
                     return scheduleNotification(title, body, date, chatId)
                         .then((result) => {
                             tracking.event('chat_schedule_notification', { status: result.status });
-                            return result.status;
+                            return formatScheduleNotificationResponseForAI(result);
                         });
                 }
             }
