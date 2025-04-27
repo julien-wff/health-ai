@@ -30,7 +30,12 @@ import HealthDataFoundNotification from '@/components/notification/HealthDataFou
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
-import { formatScheduleNotificationResponseForAI, scheduleNotification } from '@/utils/local-notification';
+import {
+    cancelScheduledNotification,
+    formatScheduleNotificationResponseForAI,
+    getAllScheduledNotificationsForAI, rescheduleNotification,
+    scheduleNotification,
+} from '@/utils/local-notification';
 
 export default function Chat() {
     const { addOrUpdateChat, requireNewChat, setRequireNewChat } = useAppState();
@@ -90,6 +95,23 @@ export default function Chat() {
                             tracking.event('chat_schedule_notification', { status: result.status });
                             return formatScheduleNotificationResponseForAI(result);
                         });
+                }
+                case 'reschedule-notification': {
+                    const { identifier, date } = toolCall.args as { identifier: string, date: string };
+                    return rescheduleNotification(identifier, date)
+                        .then((result) => {
+                            tracking.event('chat_reschedule_notification', { status: result.status });
+                            return formatScheduleNotificationResponseForAI(result);
+                        });
+                }
+                case 'get-notifications':
+                    tracking.event('chat_get_notifications');
+                    return getAllScheduledNotificationsForAI();
+                case 'cancel-notification': {
+                    tracking.event('chat_cancel_notification');
+                    const { identifier } = toolCall.args as { identifier: string };
+                    return cancelScheduledNotification(identifier)
+                        .then((r) => r ? 'success' : 'error');
                 }
             }
         },

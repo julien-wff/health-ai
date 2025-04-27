@@ -105,5 +105,22 @@ export const tools = {
             body: z.string().optional().describe('The notification message to display.'),
         }),
     },
+    'reschedule-notification': {
+        description: 'Reschedule a previous scheduled notification to another date.',
+        parameters: z.object({
+            identifier: z.string().optional().describe('The notification identifier.'),
+            date: z.string().optional().describe('Date and time (hour and minutes), of the format YYYY-MM-DD hh:mm.'),
+        }),
+    },
+    'get-notifications': {
+        description: 'Get information about all scheduled notifications.',
+        parameters: z.object({})
+    },
+    'cancel-notification': {
+        description: 'Cancels a single scheduled notification.',
+        parameters: z.object({
+            identifier: z.string().optional().describe('The notification identifier.'),
+        })
+    }
 
 } satisfies ToolSet;
