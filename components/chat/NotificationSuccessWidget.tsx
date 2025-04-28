@@ -8,13 +8,16 @@ import { vec } from '@shopify/react-native-skia';
 
 interface NotificationWidgetProps {
     title: string,
-    date: Dayjs,
+    dates: Dayjs[],
 }
 
-export default function NotificationSuccessWidget({ title, date }: NotificationWidgetProps) {
+export default function NotificationSuccessWidget({ title, dates }: Readonly<NotificationWidgetProps>) {
     const colors = useColors();
 
-    const formattedDate = useMemo(() => date.format('DD MMM YYYY [at] HH:mm'), [ date ]);
+    const formattedDates = useMemo(
+        () => dates.map(d => d.format('DD MMM YYYY [at] HH:mm')).join(','),
+        [ dates.length ],
+    );
 
     return <View className="w-full flex flex-row items-center p-2 my-2">
         <LinearGradient colors={colors.blueBackground}
@@ -23,7 +26,8 @@ export default function NotificationSuccessWidget({ title, date }: NotificationW
                         style={{ borderRadius: 12, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}/>
         <CircleCheck color={colors.blue} size={24}/>
         <Text className="flex-1 pl-2">
-            Notification <Text className="font-bold">{title}</Text> scheduled for {formattedDate}
+            Notification{dates.length > 1 ? 's' : ''} <Text className="font-bold">{title}</Text> scheduled
+            for {formattedDates}
         </Text>
     </View>;
 }

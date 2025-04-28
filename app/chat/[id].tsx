@@ -88,15 +88,15 @@ export default function Chat() {
                     return formatCollection(data, dataType);
                 }
                 case 'schedule-notification': {
-                    const { title, body, date } = toolCall.args as ToolParameters<'schedule-notification'>;
-                    return scheduleNotification(title, body, date, chatId)
+                    const { title, body, dateList } = toolCall.args as ToolParameters<'schedule-notification'>;
+                    return scheduleNotification(title, body, dateList, chatId)
                         .then((result) => {
                             tracking.event('chat_schedule_notification', { status: result.status });
                             return formatScheduleNotificationResponseForAI(result);
                         });
                 }
                 case 'reschedule-notification': {
-                    const { identifier, date } = toolCall.args as { identifier: string, date: string };
+                    const { identifier, date } = toolCall.args as ToolParameters<'reschedule-notification'>;
                     return rescheduleNotification(identifier, date)
                         .then((result) => {
                             tracking.event('chat_reschedule_notification', { status: result.status });
@@ -108,13 +108,9 @@ export default function Chat() {
                     return getAllScheduledNotificationsForAI();
                 case 'cancel-notification': {
                     tracking.event('chat_cancel_notification');
-                    const { identifier } = toolCall.args as { identifier: string };
+                    const { identifier } = toolCall.args as ToolParameters<'cancel-notification'>;
                     return cancelScheduledNotification(identifier)
                         .then((r) => r ? 'success' : 'error');
-                    const { title, body, date } = toolCall.args as ToolParameters<'schedule-notification'>;
-                    const notificationResponse = await scheduleNotification(title, body, date, chatId);
-                    tracking.event('chat_schedule_notification', { status: notificationResponse.status });
-                    return notificationResponse.status;
                 }
                 case 'create-user-goal': {
                     const goal = await createGoalAndSave(toolCall.args as ToolParameters<'create-user-goal'>);

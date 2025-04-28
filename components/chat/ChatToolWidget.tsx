@@ -22,14 +22,9 @@ export default function ChatToolWidget({ invocation }: Readonly<ChatToolWidgetPr
         [ invocation.toolName ],
     );
 
-    const [ start, end ] = useMemo(
-        () => parseRange(invocation.args.startDate, invocation.args.endDate),
-        [ invocation.args.startDate, invocation.args.endDate ],
-    );
-
-    const [ date, title ] = useMemo(
-        () => [ dayjs(invocation.args.date), invocation.args.title ],
-        [ invocation.args.date, invocation.args.title ],
+    const [ dates, title ] = useMemo(
+        () => [ invocation.args.dateList?.map(dayjs) ?? [], invocation.args.title ],
+        [ invocation.args.dateList?.length, invocation.args.title ],
     );
 
     if (invocation.state === 'result' && invocation.result === 'error') {
@@ -40,7 +35,7 @@ export default function ChatToolWidget({ invocation }: Readonly<ChatToolWidgetPr
         case 'get-health-data-and-visualize':
             return <Chart {...invocation.args}/>;
         case 'schedule-notification':
-            return <NotificationSuccessWidget title={title} date={date}/>;
+            return <NotificationSuccessWidget title={title} dates={dates}/>;
         case 'create-user-goal':
             return <GoalWidget goal={invocation.args}/>;
         case 'update-user-goal':

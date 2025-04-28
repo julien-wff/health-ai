@@ -68,29 +68,29 @@ export const tools = {
         }).describe('Returns the health data.'),
     },
     'schedule-notification': {
-        description: 'Schedule a notification which will be displayed to the user.',
+        description: 'Schedule one or multiple notifications which will be displayed to the user. Try to not schedule more than 7 days.',
         parameters: z.object({
-            date: z.string().optional().describe('Date and time (hour and minutes), of the format YYYY-MM-DD hh:mm.'),
-            title: z.string().optional().describe('The notification title to display.'),
-            body: z.string().optional().describe('The notification message to display.'),
+            title: z.string().describe('The notification title to display.'),
+            body: z.string().describe('The notification message to display.'),
+            dateList: z.string().array().describe('A list of the dates and time when the notification will be triggered, of the format YYYY-MM-DD hh:mm.'),
         }),
     },
     'reschedule-notification': {
         description: 'Reschedule a previous scheduled notification to another date.',
         parameters: z.object({
-            identifier: z.string().optional().describe('The notification identifier.'),
-            date: z.string().optional().describe('Date and time (hour and minutes), of the format YYYY-MM-DD hh:mm.'),
+            identifier: z.string().describe('The notification identifier.'),
+            date: z.string().describe('Date and time (hour and minutes), of the format YYYY-MM-DD hh:mm.'),
         }),
     },
     'get-notifications': {
         description: 'Get information about all scheduled notifications.',
-        parameters: z.object({})
+        parameters: z.object({}),
     },
     'cancel-notification': {
         description: 'Cancels a single scheduled notification.',
         parameters: z.object({
-            identifier: z.string().optional().describe('The notification identifier.'),
-        })
+            identifier: z.string().describe('The notification identifier.'),
+        }),
     },
     'create-user-goal': {
         description: 'Create a new health-related goal for the user to reach.',

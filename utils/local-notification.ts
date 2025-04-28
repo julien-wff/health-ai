@@ -6,7 +6,7 @@ import dedent from 'dedent';
 export interface ScheduleNotificationResponse {
     status: 'success' | 'error';
     message: string;
-    notificationId?: string;
+    notificationIds?: string[];
 }
 
 export enum NotificationChannel {
@@ -30,7 +30,7 @@ export function formatScheduleNotificationResponseForAI(response: ScheduleNotifi
     if (response.status === 'success') {
         return dedent`
             ${response.message}
-            Notification id: ${response.notificationId}
+            Notification ids: ${response.notificationIds?.join(', ')}
         `;
     }
 
@@ -45,7 +45,7 @@ function formatNotificationForAI(notification: NotificationRequest): string {
         Title: ${notification.content.title}
         Body: ${notification.content.body}
         Date: ${dayjs(triggerInput.date).toISOString()}
-    `
+    `;
 }
 
 function formatNotificationsForAI(notifications: NotificationRequest[]): string {
@@ -78,30 +78,14 @@ export async function rescheduleNotification(identifier: string, date: string): 
         return { status: 'error', message: 'No such notification found.' };
     }
 
-    const title = notification.content.title ?? undefined;
-    const body = notification.content.body ?? undefined;
+    const title = notification.content.title ?? '';
+    const body = notification.content.body ?? '';
     const chatId = notification.content.data.chatId;
 
-    return scheduleNotification(title, body, date, chatId, identifier);
+    return scheduleNotification(title, body, [ date ], chatId, identifier);
 }
 
-export async function scheduleNotification(title?: string, body?: string, date?: string, chatId?: string, identifier?: string): Promise<ScheduleNotificationResponse> {
-    const dayjsDate = dayjs(date);
-
-    if (!title || !body || !date) {
-        return { status: 'error', message: 'Missing title, body, or date.' };
-    }
-
-    if (!dayjsDate.isValid()) {
-        return { status: 'error', message: 'Invalid date format.' };
-    }
-
-    if (dayjsDate.isBefore(dayjs())) {
-        return { status: 'error', message: 'Cannot schedule notifications in the past.' };
-    }
-
-    const triggerDate = dayjsDate.toDate();
-
+function buildNoficationRequestInput(title: string, body: string, date: Date, chatId: string, identifier?: string): NotificationRequestInput {
     let notificationRequestInput: NotificationRequestInput = {
         content: {
             title: title,
@@ -113,26 +97,35 @@ export async function scheduleNotification(title?: string, body?: string, date?:
         trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,
             channelId: NotificationChannel.General,
-            date: triggerDate,
+            date: date,
         },
-    }
+    };
 
     if (identifier) {
         notificationRequestInput = {
             ...notificationRequestInput,
             identifier: identifier,
-        }
-    }
-
-    let notificationId = null;
-    try {
-        notificationId = await Notifications.scheduleNotificationAsync(notificationRequestInput);
-    } catch (error) {
-        return {
-            status: 'error',
-            message: `Failed to schedule notification: ${error instanceof Error ? error.message : 'Unknown error'}`,
         };
     }
 
-    return { status: 'success', message: 'Notification scheduled successfully.', notificationId: notificationId };
+    return notificationRequestInput;
+}
+
+export async function scheduleNotification(title: string, body: string, dates: string[], chatId: string, identifier?: string): Promise<ScheduleNotificationResponse> {
+    const dayjsDates = dates.map(dayjs).filter(date => date.isValid() && !date.isBefore(dayjs()));
+
+    // if (dayjsDates?.length != dates?.length) {
+    //     return { status: 'error', message: 'One or more dates were invalid.' };
+    // }
+
+    let notificationIds: string[] = [];
+
+    for (const dayjsDate of dayjsDates) {
+        const notificationRequestInput = buildNoficationRequestInput(title, body, dayjsDate.toDate(), chatId, identifier);
+
+        const notificationId = await Notifications.scheduleNotificationAsync(notificationRequestInput);
+        notificationIds.push(notificationId);
+    }
+
+    return { status: 'success', message: 'Notification scheduled successfully.', notificationIds: notificationIds };
 }
