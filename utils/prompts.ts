@@ -23,6 +23,7 @@ export interface ChatPromptOptions {
     diplomacy: string;
     goalsCreation: string;
     goals?: string[];
+    history: string[];
 }
 
 export const getChatPrompt = (options: ChatPromptOptions) => dedent`
@@ -60,6 +61,7 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     Always respond some text, never tools invocations alone. Interpret and explain the data.
     Don't enumerate data to the user (like saying day by day numbers), prefer to show graphs, summarize and interpret the data.
     Don't show the graph and say "see by yourself", give a text answer to the question.
+    Be aware of the chat history, take that into account when answering to show you know the user and his preferences.
 
     # Formatting Rules
     Don't answer with markdown, only plain text. Don't even use markings like **. For lists, use dashes.
@@ -74,6 +76,9 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     ${(options.goals ?? []).length === 0
     ? 'The user hasn\'t set any goals yet.'
     : 'Here is the list of user\'s goals:\n' + options.goals!.join('\n')}
+    
+    # Old chats history
+    ${options.history.join('\n')}
 `;
 
 
