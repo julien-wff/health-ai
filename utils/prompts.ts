@@ -78,7 +78,9 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     : 'Here is the list of user\'s goals:\n' + options.goals!.join('\n')}
     
     # Old chats history
-    ${options.history.join('\n')}
+    ${options.history.length === 0
+    ? 'The user has no history yet, this is the first chat.'
+    : options.history.join('\n')}
 `;
 
 
