@@ -23,7 +23,7 @@ export default function NotificationSuccessWidget({ title, date }: NotificationW
                         style={{ borderRadius: 12, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}/>
         <CircleCheck color={colors.blue}/>
         <Text className="flex-1 pl-2">
-            Notification <Text className={'font-bold'}>{title}</Text> scheduled for {formattedDate}
+            Notification <Text className="font-bold">{title}</Text> scheduled for {formattedDate}
         </Text>
     </View>;
 
