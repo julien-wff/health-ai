@@ -97,6 +97,6 @@ export const tools = {
         description: 'Display a widget with the goal information to the chat. Always try to use this tool call when talking about a specific goal.',
         parameters: z.object({
             id: z.number().min(0).describe('ID of the goal to display.'),
-        }).describe('Returns the goal.'),
+        }).describe('Returns the goal. Returns null if the goal is not found.'),
     },
 } satisfies ToolSet;

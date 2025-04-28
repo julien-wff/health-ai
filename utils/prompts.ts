@@ -65,6 +65,7 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     Don't answer with markdown, only plain text. Don't even use markings like **. For lists, use dashes.
     Always answer in the same language as the question, no matter what. Default to English.
     Always format properly durations, like 1 hour 30 minutes instead of 90 minutes.
+    Never prompt the user to write exact dates and times, like "2025-01-01 12:00". Make it as convenient as possible for the user, even if you have to decide yourself the exact date or time.
 
     # Context
     For your information, today is ${getCurrentDateFormatted()}.

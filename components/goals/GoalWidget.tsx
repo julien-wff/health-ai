@@ -9,9 +9,11 @@ import dayjs from 'dayjs';
 
 interface GoalCreatedWidgetProps {
     goal: CreateGoalsParams | Goal;
+    showID?: boolean;
+    noMargin?: boolean;
 }
 
-export default function GoalWidget({ goal }: Readonly<GoalCreatedWidgetProps>) {
+export default function GoalWidget({ goal, showID, noMargin }: Readonly<GoalCreatedWidgetProps>) {
     const colors = useColors();
     const { description, type, mustBeCompletedBy } = goal;
     const isCompleted = 'isCompleted' in goal && goal.isCompleted;
@@ -40,7 +42,7 @@ export default function GoalWidget({ goal }: Readonly<GoalCreatedWidgetProps>) {
         subtitle = `Deleted on ${dayjs(updatedAt).format('MMMM D')}`;
     }
 
-    return <View className="flex flex-row items-center justify-center gap-4 p-4 my-2">
+    return <View className={`flex flex-row items-center justify-center gap-4 p-4 ${noMargin ? '' : 'my-2'}`}>
         <LinearGradient colors={bgColor}
             // Tailwind doesn't seem to work, especially on iOS
                         style={{ borderRadius: 8, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
@@ -51,6 +53,7 @@ export default function GoalWidget({ goal }: Readonly<GoalCreatedWidgetProps>) {
 
         <View className="flex flex-1 justify-center">
             <Text className="text-slate-800 dark:text-slate-200">
+                {showID && 'id' in goal ? `#${goal.id} ` : ''}
                 Goal: {description}
             </Text>
 

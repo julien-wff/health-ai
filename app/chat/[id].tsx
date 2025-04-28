@@ -91,14 +91,14 @@ export default function Chat() {
                         });
                 }
                 case 'create-user-goal': {
-                    const goal = await createGoalAndSave(toolCall.args as CreateGoalsParams, goals);
+                    const goal = await createGoalAndSave(toolCall.args as CreateGoalsParams);
                     addGoal(goal);
                     tracking.event('chat_create_user_goal');
                     return formatGoalForAI(goal);
                 }
                 case 'update-user-goal': {
                     const args = toolCall.args as ToolParameters<'update-user-goal'>;
-                    const updatedGoals = await updateGoalAndSave(args.id, args, goals);
+                    const updatedGoals = await updateGoalAndSave(args.id, args);
                     if (!updatedGoals) {
                         return `Goal #${args.id} not found. Max ID: ${goals.length}.`;
                     } else {

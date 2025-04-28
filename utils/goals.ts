@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GOALS } from '@/utils/storageKeys';
 import dedent from 'dedent';
 import superJson from 'superjson';
+import { useAppState } from '@/hooks/useAppState';
 
 
 export const POSSIBLE_GOAL_TYPES = [ 'sleep', 'steps', 'exercise', 'other' ] as const;
@@ -42,7 +43,9 @@ export async function saveGoalsToStorage(goals: Goal[]) {
     await AsyncStorage.setItem(GOALS, superJson.stringify(goals));
 }
 
-export async function createGoalAndSave(newGoal: CreateGoalsParams, goals: Goal[]): Promise<Goal> {
+export async function createGoalAndSave(newGoal: CreateGoalsParams): Promise<Goal> {
+    const goals = useAppState.getState().goals;
+
     // Find the highest existing ID to avoid duplicates
     const highestId = goals.length > 0
         ? Math.max(...goals.map(goal => goal.id))
@@ -62,7 +65,9 @@ export async function createGoalAndSave(newGoal: CreateGoalsParams, goals: Goal[
     return goal;
 }
 
-export async function updateGoalAndSave(goalId: number, updatedGoal: Partial<EditGoalsParams>, goals: Goal[]): Promise<Goal[] | null> {
+export async function updateGoalAndSave(goalId: number, updatedGoal: Partial<EditGoalsParams>): Promise<Goal[] | null> {
+    const goals = useAppState.getState().goals;
+
     const goalIndex = goals.findIndex(goal => goal.id === goalId);
     if (goalIndex === -1) {
         return null;
