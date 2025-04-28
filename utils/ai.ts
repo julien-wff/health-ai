@@ -49,6 +49,12 @@ export interface DateRangeParams {
     endDate?: string;
 }
 
+export interface NotificationParams {
+    title?: string;
+    body?: string;
+    date?: string;
+}
+
 export type ToolParameters<T extends keyof typeof tools> = z.infer<typeof tools[T]['parameters']>;
 
 export const tools = {
@@ -60,6 +66,14 @@ export const tools = {
             startDate: z.string().describe('Start date of the range to query, of the format yyyy-mm-dd. Exclusive'),
             endDate: z.string().describe('End date of the range to query, of the format yyyy-mm-dd. Inclusive'),
         }).describe('Returns the health data.'),
+    },
+    'schedule-notification': {
+        description: 'Schedule a notification which will be displayed to the user.',
+        parameters: z.object({
+            date: z.string().optional().describe('Date and time (hour and minutes), of the format YYYY-MM-DD hh:mm.'),
+            title: z.string().optional().describe('The notification title to display.'),
+            body: z.string().optional().describe('The notification message to display.'),
+        }),
     },
     'create-user-goal': {
         description: 'Create a new health-related goal for the user to reach.',

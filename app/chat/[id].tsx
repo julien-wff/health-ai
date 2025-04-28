@@ -9,6 +9,7 @@ import {
     generateConversationSuggestions,
     generateConversationSummary,
     generateConversationTitle,
+    NotificationParams,
     ToolParameters,
     tools,
 } from '@/utils/ai';
@@ -29,6 +30,7 @@ import HealthDataFoundNotification from '@/components/notification/HealthDataFou
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
+import { scheduleNotification } from '@/utils/local-notification';
 import { createGoalAndSave, CreateGoalsParams, formatGoalForAI, updateGoalAndSave } from '@/utils/goals';
 
 export default function Chat() {
@@ -79,6 +81,14 @@ export default function Chat() {
                     tracking.event('chat_get_health_data', { dataType, display });
                     const data = filterCollectionRange({ steps, exercise, sleep }[dataType], startDate, endDate);
                     return formatCollection(data, dataType);
+                }
+                case 'schedule-notification': {
+                    const { title, body, date } = toolCall.args as NotificationParams;
+                    return scheduleNotification(title, body, date, chatId)
+                        .then((result) => {
+                            tracking.event('chat_schedule_notification', { status: result.status });
+                            return result.status;
+                        });
                 }
                 case 'create-user-goal': {
                     const goal = await createGoalAndSave(toolCall.args as CreateGoalsParams, goals);

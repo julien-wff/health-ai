@@ -10,7 +10,7 @@ interface HealthRecordProps {
     background: [ string, string ];
 }
 
-export default function HealthRecord({ icon: Icon, label, color, background }: HealthRecordProps) {
+export default function OnboardingWidget({ icon: Icon, label, color, background }: HealthRecordProps) {
     return <View className="flex flex-1 items-center gap-2 px-2 py-4">
         <LinearGradient colors={background}
             // Tailwind doesn't seem to work, especially on iOS

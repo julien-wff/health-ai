@@ -7,8 +7,10 @@ interface AppState {
     setIsOnboarded: (isOnboarded: boolean) => void;
     hasDebugAccess: boolean;
     setHasDebugAccess: (hasDebugAccess: boolean) => void;
-    hasPermissions: boolean;
-    setHasPermissions: (hasPermissions: boolean) => void;
+    hasHealthPermissions: boolean;
+    setHasHealthPermissions: (hasHealthPermissions: boolean) => void;
+    hasNotificationPermissions: boolean;
+    setHasNotificationPermissions: (hasNotificationPermissions: boolean) => void;
     requireNewChat: boolean;
     setRequireNewChat: (requireNewChat: boolean) => void;
     chats: StorageChat[];
@@ -25,13 +27,15 @@ interface AppState {
 export const useAppState = create<AppState>((set) => ({
     isOnboarded: false,
     hasDebugAccess: false,
-    hasPermissions: false,
+    hasHealthPermissions: false,
+    hasNotificationPermissions: false,
     requireNewChat: false,
     chats: [],
     goals: [],
     setIsOnboarded: (isOnboarded: boolean) => set({ isOnboarded }),
     setHasDebugAccess: (hasDebugAccess: boolean) => set({ hasDebugAccess }),
-    setHasPermissions: (hasPermissions: boolean) => set({ hasPermissions }),
+    setHasHealthPermissions: (hasHealthPermissions: boolean) => set({ hasHealthPermissions }),
+    setHasNotificationPermissions: (hasNotificationPermissions: boolean) => set({ hasNotificationPermissions }),
     setRequireNewChat: (requireNewChat: boolean) => set({ requireNewChat }),
     setChats: (chats: StorageChat[]) => set({
         chats: chats.sort((a, b) => b.lastUpdated.getTime() - a.lastUpdated.getTime()),

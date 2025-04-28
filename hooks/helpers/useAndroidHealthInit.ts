@@ -8,7 +8,7 @@ import { SplashScreen, useRouter } from 'expo-router';
  * @returns Functions to run pre-checks, initialize health, and load health records
  */
 export function useAndroidHealthInit() {
-    const { setHasPermissions } = useAppState();
+    const { setHasHealthPermissions } = useAppState();
     const router = useRouter();
 
     const runPreChecks = async () => {
@@ -34,7 +34,7 @@ export function useAndroidHealthInit() {
         // Check for permissions
         const grantedPermissions = await healthConnect!.getGrantedPermissions();
         const hasPermissions = hasAllRequiredPermissions(grantedPermissions);
-        setHasPermissions(hasPermissions);
+        setHasHealthPermissions(hasPermissions);
 
         return true;
     };
