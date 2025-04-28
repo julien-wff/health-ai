@@ -31,9 +31,10 @@ import EmptyHealthNotification from '@/components/notification/EmptyHealthNotifi
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { scheduleNotification } from '@/utils/local-notification';
+import { createGoalAndSave, CreateGoalsParams, formatGoalForAI, updateGoalAndSave } from '@/utils/goals';
 
 export default function Chat() {
-    const { addOrUpdateChat, requireNewChat, setRequireNewChat } = useAppState();
+    const { addOrUpdateChat, requireNewChat, setRequireNewChat, goals, setGoals, addGoal } = useAppState();
     const {
         steps,
         exercise,
@@ -59,6 +60,7 @@ export default function Chat() {
         experimental_prepareRequestBody(options) {
             options.requestBody = {
                 agentMode: chatAgentMode ?? 'introvert',
+                goals: goals.map(formatGoalForAI),
             } satisfies ChatRequestBody;
             return options;
         },
@@ -67,7 +69,7 @@ export default function Chat() {
             Sentry.captureException(error);
             console.error(error, 'ERROR');
         },
-        onToolCall({ toolCall }) {
+        async onToolCall({ toolCall }) {
             const { startDate, endDate } = toolCall.args as DateRangeParams;
 
             switch (toolCall.toolName as keyof typeof tools) {
@@ -90,6 +92,33 @@ export default function Chat() {
                             tracking.event('chat_schedule_notification', { status: result.status });
                             return result.status;
                         });
+                }
+                case 'create-user-goal': {
+                    const goal = await createGoalAndSave(toolCall.args as CreateGoalsParams);
+                    addGoal(goal);
+                    tracking.event('chat_create_user_goal');
+                    return formatGoalForAI(goal);
+                }
+                case 'update-user-goal': {
+                    const args = toolCall.args as typeof tools['update-user-goal']['parameters']['_type'];
+                    const updatedGoals = await updateGoalAndSave(args.id, args);
+                    if (!updatedGoals) {
+                        return `Goal #${args.id} not found. Max ID: ${goals.length}.`;
+                    } else {
+                        setGoals(updatedGoals);
+                        tracking.event('chat_update_user_goal');
+                        return formatGoalForAI(updatedGoals.find(g => g.id === args.id)!);
+                    }
+                }
+                case 'display-user-goal': {
+                    tracking.event('chat_display_user_goals');
+                    const goalId = (toolCall.args as typeof tools['display-user-goal']['parameters']['_type']).id;
+                    const goal = goals.find(g => g.id === goalId);
+                    if (!goal) {
+                        return `Goal #${goalId} not found. Max ID: ${goals.length}.`;
+                    } else {
+                        return formatGoalForAI(goal);
+                    }
                 }
             }
         },

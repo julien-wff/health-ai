@@ -2,6 +2,7 @@ import { ToolSet, UIMessage } from 'ai';
 import { fetch as expoFetch } from 'expo/fetch';
 import { z } from 'zod';
 import { generateAPIUrl } from '@/utils/endpoints';
+import { POSSIBLE_GOAL_TYPES } from '@/utils/goals';
 
 
 async function callGenerationAPIWithChats(url: string, messages: UIMessage[], errorMessage?: string) {
@@ -105,5 +106,28 @@ export const tools = {
             body: z.string().optional().describe('The notification message to display.'),
         }),
     },
-
+    'create-user-goal': {
+        description: 'Create a new health-related goal for the user to reach.',
+        parameters: z.object({
+            description: z.string().describe('Description of the goal, what the user must achieve.'),
+            type: z.enum(POSSIBLE_GOAL_TYPES).describe('Type of the goal.'),
+            mustBeCompletedBy: z.string().optional().describe('Expected date of completion of the goal by the user, in the format of a valid javascript date or datetime.'),
+        }).describe('Returns the created goal, notably its ID.'),
+    },
+    'update-user-goal': {
+        description: 'Update an existing health-related goal for the user. Only specify the fields you want to update.',
+        parameters: z.object({
+            id: z.number().min(0).describe('ID of the goal to update.'),
+            description: z.string().optional().describe('Description of the goal, what the user must achieve.'),
+            mustBeCompletedBy: z.string().optional().describe('Expected date of completion of the goal by the user, in the format of a valid javascript date or datetime.'),
+            isCompleted: z.boolean().optional().describe('Whether you, AI, estimate that the goal is completed or not.'),
+            isDeleted: z.boolean().optional().describe('True if the goal should be deleted. Cannot be undone.'),
+        }),
+    },
+    'display-user-goal': {
+        description: 'Display a widget with the goal information to the chat. Always try to use this tool call when talking about a specific goal.',
+        parameters: z.object({
+            id: z.number().min(0).describe('ID of the goal to display.'),
+        }).describe('Returns the goal. Returns null if the goal is not found.'),
+    },
 } satisfies ToolSet;

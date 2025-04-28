@@ -10,7 +10,7 @@ export default function ResetAppBtn() {
     const router = useRouter();
     const tracking = useTracking();
     const colorScheme = useColorScheme();
-    const { setChats } = useAppState();
+    const { setChats, setGoals } = useAppState();
 
     function showResetAlert() {
         tracking.event('profile_reset_app_prompt');
@@ -41,6 +41,7 @@ export default function ResetAppBtn() {
         await AsyncStorage.multiRemove(keys);
         console.log(`Removed ${keys.length} keys`);
         setChats([]);
+        setGoals([]);
         router.replace('/onboarding/health');
     }
 

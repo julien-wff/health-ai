@@ -21,6 +21,8 @@ export interface ChatPromptOptions {
     tone: string;
     advice: string;
     diplomacy: string;
+    goalsCreation: string;
+    goals?: string[];
 }
 
 export const getChatPrompt = (options: ChatPromptOptions) => dedent`
@@ -41,6 +43,18 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     Always display periods between 4 and 14 days on the graphs, include the subset of relevant periods in that range.
     If you have already called a tool once, don't call it again with the same parameters, use the result from the first call.
     You can chain tools together. For instance, get steps count and then display it to the user.
+    
+    # Goals
+    You can set goals to the user. 
+    When creating goals, ${options.goalsCreation}.
+    Goals are personal objectives that the user must react in a short period of time (less than a week).
+    You decide the goals and their deadline. Never ask the user by when he wants to achieve the goal. Goals can be:
+    - Have a more consistent sleep schedule
+    - Sleep x hours a night
+    - Exercise x hours each days
+    And so on. Don't create a goal if it already exists. Only create goals on data that you can see.
+    It's your job to evaluate if the user reach the goal or not.
+    When creating a goal, it is then automatically shown to the user, no need to call a tool to show it.
 
     # Response Guidelines
     Always respond some text, never tools invocations alone. Interpret and explain the data.
@@ -51,9 +65,15 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     Don't answer with markdown, only plain text. Don't even use markings like **. For lists, use dashes.
     Always answer in the same language as the question, no matter what. Default to English.
     Always format properly durations, like 1 hour 30 minutes instead of 90 minutes.
+    Never prompt the user to write exact dates and times, like "2025-01-01 12:00". Make it as convenient as possible for the user, even if you have to decide yourself the exact date or time.
 
     # Context
     For your information, today is ${getCurrentDateFormatted()}.
+    
+    # User goals
+    ${(options.goals ?? []).length === 0
+    ? 'The user hasn\'t set any goals yet.'
+    : 'Here is the list of user\'s goals:\n' + options.goals!.join('\n')}
 `;
 
 
@@ -69,6 +89,7 @@ export const getSuggestionPrompt = () => dedent`
     - Add follow-up question options when appropriate
     
     If the assistant made statements or gave advice:
+    - Include the option to create an in-app goal from the advice
     - Include options to ask for clarification or details
     - Suggest ways to request specific health advice (sleep, exercise, steps, etc.)
     - Add options to share personal experiences related to the topic
