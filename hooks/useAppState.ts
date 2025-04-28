@@ -1,5 +1,6 @@
 import { StorageChat } from '@/utils/chat';
 import { create } from 'zustand';
+import { Goal } from '@/utils/goals';
 
 interface AppState {
     isOnboarded: boolean;
@@ -15,6 +16,9 @@ interface AppState {
     chats: StorageChat[];
     setChats: (chats: StorageChat[]) => void;
     addOrUpdateChat: (chat: Omit<StorageChat, 'lastUpdated'>) => void;
+    goals: Goal[];
+    setGoals: (goals: Goal[]) => void;
+    addGoal: (goal: Goal) => void;
 }
 
 /**
@@ -27,6 +31,7 @@ export const useAppState = create<AppState>((set) => ({
     hasNotificationPermissions: false,
     requireNewChat: false,
     chats: [],
+    goals: [],
     setIsOnboarded: (isOnboarded: boolean) => set({ isOnboarded }),
     setHasDebugAccess: (hasDebugAccess: boolean) => set({ hasDebugAccess }),
     setHasHealthPermissions: (hasHealthPermissions: boolean) => set({ hasHealthPermissions }),
@@ -40,5 +45,11 @@ export const useAppState = create<AppState>((set) => ({
             { ...chat, lastUpdated: new Date() },
             ...state.chats.filter((c) => c.id !== chat.id),
         ],
+    })),
+    setGoals: (goals: Goal[]) => set({
+        goals: [ ...goals ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
+    }),
+    addGoal: (goal: Goal) => set((state) => ({
+        goals: [ ...state.goals, goal ],
     })),
 }) satisfies AppState);

@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { Dumbbell, Footprints, HeartHandshake, Medal, Moon } from 'lucide-react-native';
+import { Dumbbell, Footprints, HeartHandshake, Medal, Moon, Trophy } from 'lucide-react-native';
 import ConversationStarter, { ConversationStarterProps } from '@/components/chat/ConversationStarter';
 import { useMemo } from 'react';
 
@@ -34,6 +34,12 @@ const CONVERSATION_STARTERS: ConversationStarterProps[] = [
         prompt: 'Have I improved lately?',
         icon: Medal,
         iconColor: '#e879f9',
+    },
+    {
+        title: 'See my goals',
+        prompt: 'What are my goals, and their progress?',
+        icon: Trophy,
+        iconColor: '#60a5fa',
     },
 ];
 

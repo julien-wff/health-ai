@@ -57,13 +57,13 @@ const DEFAULT_END_DATE = () => dayjs();
  * @param start Start date of the range, default is 7 days ago, exclusive
  * @param end End date of the range, default is today, inclusive
  */
-export function filterCollectionRange<T extends HealthRecord>(
-    collection: Map<Dayjs, T>,
+export function filterCollectionRange<T extends Map<Dayjs, unknown>>(
+    collection: T,
     start: Dayjs | Date | string = DEFAULT_START_DATE(),
     end: Dayjs | Date | string = DEFAULT_END_DATE()) {
-    return new Map<Dayjs, T>([ ...collection ].filter(
+    return new Map([ ...collection ].filter(
         ([ key ]) => key.isBetween(start, end, 'day', '(]'),
-    ));
+    )) as T;
 }
 
 export const parseRange = (start: Dayjs | Date | string, end: Dayjs | Date | string) => [
@@ -111,9 +111,6 @@ function formatSleepCollection(collection: SleepCollection) {
  * @param type Type of health records to format ('steps', 'exercise', 'sleep')
  * @returns Array of formatted strings
  */
-export function formatCollection(collection: StepsCollection, type: 'steps'): string[];
-export function formatCollection(collection: ExerciseCollection, type: 'exercise'): string[];
-export function formatCollection(collection: SleepCollection, type: 'sleep'): string[]
 export function formatCollection(collection: HealthRecordsCollection, type: 'steps' | 'exercise' | 'sleep') {
     switch (type) {
         case 'steps':

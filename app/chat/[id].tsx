@@ -6,11 +6,10 @@ import PromptInput from '@/components/chat/PromptInput';
 import { useAppState } from '@/hooks/useAppState';
 import { useHealthData } from '@/hooks/useHealthData';
 import {
-    DateRangeParams,
     generateConversationSuggestions,
     generateConversationSummary,
     generateConversationTitle,
-    NotificationParams,
+    ToolParameters,
     tools,
 } from '@/utils/ai';
 import { type ChatRequestBody, getStorageChat, saveStorageChat } from '@/utils/chat';
@@ -30,15 +29,17 @@ import HealthDataFoundNotification from '@/components/notification/HealthDataFou
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
+import { createGoalAndSave, formatGoalForAI, updateGoalAndSave } from '@/utils/goals';
 import {
     cancelScheduledNotification,
     formatScheduleNotificationResponseForAI,
-    getAllScheduledNotificationsForAI, rescheduleNotification,
+    getAllScheduledNotificationsForAI,
+    rescheduleNotification,
     scheduleNotification,
 } from '@/utils/local-notification';
 
 export default function Chat() {
-    const { addOrUpdateChat, requireNewChat, setRequireNewChat } = useAppState();
+    const { addOrUpdateChat, requireNewChat, setRequireNewChat, goals, setGoals, addGoal } = useAppState();
     const {
         steps,
         exercise,
@@ -64,6 +65,7 @@ export default function Chat() {
         experimental_prepareRequestBody(options) {
             options.requestBody = {
                 agentMode: chatAgentMode ?? 'introvert',
+                goals: goals.map(formatGoalForAI),
             } satisfies ChatRequestBody;
             return options;
         },
@@ -72,24 +74,21 @@ export default function Chat() {
             Sentry.captureException(error);
             console.error(error, 'ERROR');
         },
-        onToolCall({ toolCall }) {
-            const { startDate, endDate } = toolCall.args as DateRangeParams;
-
+        async onToolCall({ toolCall }) {
             switch (toolCall.toolName as keyof typeof tools) {
-                case 'get-daily-steps':
-                case 'display-steps':
-                    tracking.event('chat_get_daily_steps', { display: toolCall.toolName.startsWith('display') });
-                    return formatCollection(filterCollectionRange(steps, startDate, endDate), 'steps');
-                case 'get-daily-exercise':
-                case 'display-exercise':
-                    tracking.event('chat_get_daily_exercise', { display: toolCall.toolName.startsWith('display') });
-                    return formatCollection(filterCollectionRange(exercise, startDate, endDate), 'exercise');
-                case 'get-daily-sleep':
-                case 'display-sleep':
-                    tracking.event('chat_get_daily_sleep', { display: toolCall.toolName.startsWith('display') });
-                    return formatCollection(filterCollectionRange(sleep, startDate, endDate), 'sleep');
+                case 'get-health-data-and-visualize': {
+                    const {
+                        dataType,
+                        display,
+                        startDate,
+                        endDate,
+                    } = toolCall.args as ToolParameters<'get-health-data-and-visualize'>;
+                    tracking.event('chat_get_health_data', { dataType, display });
+                    const data = filterCollectionRange({ steps, exercise, sleep }[dataType], startDate, endDate);
+                    return formatCollection(data, dataType);
+                }
                 case 'schedule-notification': {
-                    const { title, body, date } = toolCall.args as NotificationParams;
+                    const { title, body, date } = toolCall.args as ToolParameters<'schedule-notification'>;
                     return scheduleNotification(title, body, date, chatId)
                         .then((result) => {
                             tracking.event('chat_schedule_notification', { status: result.status });
@@ -112,6 +111,37 @@ export default function Chat() {
                     const { identifier } = toolCall.args as { identifier: string };
                     return cancelScheduledNotification(identifier)
                         .then((r) => r ? 'success' : 'error');
+                    const { title, body, date } = toolCall.args as ToolParameters<'schedule-notification'>;
+                    const notificationResponse = await scheduleNotification(title, body, date, chatId);
+                    tracking.event('chat_schedule_notification', { status: notificationResponse.status });
+                    return notificationResponse.status;
+                }
+                case 'create-user-goal': {
+                    const goal = await createGoalAndSave(toolCall.args as ToolParameters<'create-user-goal'>);
+                    addGoal(goal);
+                    tracking.event('chat_create_user_goal');
+                    return formatGoalForAI(goal);
+                }
+                case 'update-user-goal': {
+                    const args = toolCall.args as ToolParameters<'update-user-goal'>;
+                    const updatedGoals = await updateGoalAndSave(args.id, args);
+                    if (!updatedGoals) {
+                        return `Goal #${args.id} not found. Max ID: ${goals.length}.`;
+                    } else {
+                        setGoals(updatedGoals);
+                        tracking.event('chat_update_user_goal');
+                        return formatGoalForAI(updatedGoals.find(g => g.id === args.id)!);
+                    }
+                }
+                case 'display-user-goal': {
+                    tracking.event('chat_display_user_goals');
+                    const goalId = (toolCall.args as ToolParameters<'display-user-goal'>).id;
+                    const goal = goals.find(g => g.id === goalId);
+                    if (!goal) {
+                        return `Goal #${goalId} not found. Max ID: ${goals.length}.`;
+                    } else {
+                        return formatGoalForAI(goal);
+                    }
                 }
             }
         },
