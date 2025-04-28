@@ -6,11 +6,10 @@ import PromptInput from '@/components/chat/PromptInput';
 import { useAppState } from '@/hooks/useAppState';
 import { useHealthData } from '@/hooks/useHealthData';
 import {
-    DateRangeParams,
     generateConversationSuggestions,
     generateConversationSummary,
     generateConversationTitle,
-    NotificationParams,
+    ToolParameters,
     tools,
 } from '@/utils/ai';
 import { type ChatRequestBody, getStorageChat, saveStorageChat } from '@/utils/chat';
@@ -31,7 +30,7 @@ import EmptyHealthNotification from '@/components/notification/EmptyHealthNotifi
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { scheduleNotification } from '@/utils/local-notification';
-import { createGoalAndSave, CreateGoalsParams, formatGoalForAI, updateGoalAndSave } from '@/utils/goals';
+import { createGoalAndSave, formatGoalForAI, updateGoalAndSave } from '@/utils/goals';
 
 export default function Chat() {
     const { addOrUpdateChat, requireNewChat, setRequireNewChat, goals, setGoals, addGoal } = useAppState();
@@ -70,37 +69,32 @@ export default function Chat() {
             console.error(error, 'ERROR');
         },
         async onToolCall({ toolCall }) {
-            const { startDate, endDate } = toolCall.args as DateRangeParams;
-
             switch (toolCall.toolName as keyof typeof tools) {
-                case 'get-daily-steps':
-                case 'display-steps':
-                    tracking.event('chat_get_daily_steps', { display: toolCall.toolName.startsWith('display') });
-                    return formatCollection(filterCollectionRange(steps, startDate, endDate), 'steps');
-                case 'get-daily-exercise':
-                case 'display-exercise':
-                    tracking.event('chat_get_daily_exercise', { display: toolCall.toolName.startsWith('display') });
-                    return formatCollection(filterCollectionRange(exercise, startDate, endDate), 'exercise');
-                case 'get-daily-sleep':
-                case 'display-sleep':
-                    tracking.event('chat_get_daily_sleep', { display: toolCall.toolName.startsWith('display') });
-                    return formatCollection(filterCollectionRange(sleep, startDate, endDate), 'sleep');
+                case 'get-health-data-and-visualize': {
+                    const {
+                        dataType,
+                        display,
+                        startDate,
+                        endDate,
+                    } = toolCall.args as ToolParameters<'get-health-data-and-visualize'>;
+                    tracking.event('chat_get_health_data', { dataType, display });
+                    const data = filterCollectionRange({ steps, exercise, sleep }[dataType], startDate, endDate);
+                    return formatCollection(data, dataType);
+                }
                 case 'schedule-notification': {
-                    const { title, body, date } = toolCall.args as NotificationParams;
-                    return scheduleNotification(title, body, date, chatId)
-                        .then((result) => {
-                            tracking.event('chat_schedule_notification', { status: result.status });
-                            return result.status;
-                        });
+                    const { title, body, date } = toolCall.args as ToolParameters<'schedule-notification'>;
+                    const notificationResponse = await scheduleNotification(title, body, date, chatId);
+                    tracking.event('chat_schedule_notification', { status: notificationResponse.status });
+                    return notificationResponse.status;
                 }
                 case 'create-user-goal': {
-                    const goal = await createGoalAndSave(toolCall.args as CreateGoalsParams);
+                    const goal = await createGoalAndSave(toolCall.args as ToolParameters<'create-user-goal'>);
                     addGoal(goal);
                     tracking.event('chat_create_user_goal');
                     return formatGoalForAI(goal);
                 }
                 case 'update-user-goal': {
-                    const args = toolCall.args as typeof tools['update-user-goal']['parameters']['_type'];
+                    const args = toolCall.args as ToolParameters<'update-user-goal'>;
                     const updatedGoals = await updateGoalAndSave(args.id, args);
                     if (!updatedGoals) {
                         return `Goal #${args.id} not found. Max ID: ${goals.length}.`;
@@ -112,7 +106,7 @@ export default function Chat() {
                 }
                 case 'display-user-goal': {
                     tracking.event('chat_display_user_goals');
-                    const goalId = (toolCall.args as typeof tools['display-user-goal']['parameters']['_type']).id;
+                    const goalId = (toolCall.args as ToolParameters<'display-user-goal'>).id;
                     const goal = goals.find(g => g.id === goalId);
                     if (!goal) {
                         return `Goal #${goalId} not found. Max ID: ${goals.length}.`;

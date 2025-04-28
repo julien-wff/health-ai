@@ -1,7 +1,7 @@
 import ExerciseChart from '@/components/chart/ExerciseChart';
 import SleepChart from '@/components/chart/SleepChart';
 import StepsChart from '@/components/chart/StepsChart';
-import { tools } from '@/utils/ai';
+import type { ToolParameters, tools } from '@/utils/ai';
 import { parseRange } from '@/utils/health';
 import { ToolInvocation } from 'ai';
 import { useMemo } from 'react';
@@ -37,12 +37,8 @@ export default function ChatToolWidget({ invocation }: Readonly<ChatToolWidgetPr
     }
 
     switch (toolName) {
-        case 'display-steps':
-            return <StepsChart startDate={start} endDate={end}/>;
-        case 'display-exercise':
-            return <ExerciseChart startDate={start} endDate={end}/>;
-        case 'display-sleep':
-            return <SleepChart startDate={start} endDate={end}/>;
+        case 'get-health-data-and-visualize':
+            return <Chart {...invocation.args}/>;
         case 'schedule-notification':
             return <NotificationSuccessWidget title={title} date={date}/>;
         case 'create-user-goal':
@@ -59,4 +55,26 @@ export default function ChatToolWidget({ invocation }: Readonly<ChatToolWidgetPr
         default:
             return <></>;
     }
+}
+
+
+function Chart({ dataType, startDate, endDate, display }: Readonly<ToolParameters<'get-health-data-and-visualize'>>) {
+    const [ start, end ] = useMemo(
+        () => parseRange(startDate, endDate),
+        [ startDate, endDate ],
+    );
+
+    if (!display) {
+        return <></>;
+    }
+
+    switch (dataType) {
+        case 'steps':
+            return <StepsChart startDate={start} endDate={end}/>;
+        case 'exercise':
+            return <ExerciseChart startDate={start} endDate={end}/>;
+        case 'sleep':
+            return <SleepChart startDate={start} endDate={end}/>;
+    }
+
 }
