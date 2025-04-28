@@ -18,7 +18,7 @@ import { getGoalsFromStorage } from '@/utils/goals';
 export function useAppInit() {
     const { getItem: getIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
     const { getItem: getHasDebugAccessInStorage } = useAsyncStorage(HAS_DEBUG_ACCESS);
-    const { setIsOnboarded, setChats, setHasPermissions, setHasDebugAccess, setGoals } = useAppState();
+    const { setIsOnboarded, setChats, setHasHealthPermissions, setHasDebugAccess, setGoals } = useAppState();
     const androidHealth = useAndroidHealthInit();
     const router = useRouter();
     const { setHealthRecords } = useHealthData();
@@ -64,12 +64,12 @@ export function useAppInit() {
                 break;
             case 'ios':
                 // Only necessary during onboarding
-                setHasPermissions(useAppState.getState().isOnboarded);
+                setHasHealthPermissions(useAppState.getState().isOnboarded);
                 healthInitSuccess = true;
                 break;
             default:
                 console.warn(`Health init not supported on ${Platform.OS}`);
-                setHasPermissions(true);
+                setHasHealthPermissions(true);
                 healthInitSuccess = true;
                 break;
         }
@@ -81,10 +81,10 @@ export function useAppInit() {
         }
 
         // Redirect to the appropriate screen
-        if (useAppState.getState().isOnboarded && useAppState.getState().hasPermissions)
+        if (useAppState.getState().isOnboarded && useAppState.getState().hasHealthPermissions)
             router.replace('/chat');
         else
-            router.replace('/onboarding');
+            router.replace('/onboarding/health');
 
         // Hide the splash screen
         await SplashScreen.hideAsync();
@@ -99,7 +99,7 @@ export function useAppInit() {
 
         // Load health records
         Sentry.captureEvent({ event_id: 'init_load_health_data_start', level: 'info' });
-        if (useAppState.getState().hasPermissions) {
+        if (useAppState.getState().hasHealthPermissions) {
             const healthRecords = await readHealthRecords();
             setHealthRecords(healthRecords);
         }

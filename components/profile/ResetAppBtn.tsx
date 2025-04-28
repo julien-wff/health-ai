@@ -42,7 +42,7 @@ export default function ResetAppBtn() {
         console.log(`Removed ${keys.length} keys`);
         setChats([]);
         setGoals([]);
-        router.replace('/onboarding');
+        router.replace('/onboarding/health');
     }
 
     return <ProfileBtn onPress={showResetAlert} icon={Trash}>
