@@ -80,7 +80,7 @@ export const tools = {
         parameters: z.object({
             description: z.string().describe('Description of the goal, what the user must achieve.'),
             type: z.enum(POSSIBLE_GOAL_TYPES).describe('Type of the goal.'),
-            mustBeCompletedBy: z.string().optional().describe('Expected date of completion of the goal by the user, in the format of a valid javascript date or datetime.'),
+            mustBeCompletedBy: z.string().describe('Expected date of completion of the goal by the user, in the format of a valid javascript date or datetime.'),
         }).describe('Returns the created goal, notably its ID.'),
     },
     'update-user-goal': {
