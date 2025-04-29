@@ -33,7 +33,17 @@ import { scheduleNotification } from '@/utils/local-notification';
 import { createGoalAndSave, formatGoalForAI, updateGoalAndSave } from '@/utils/goals';
 
 export default function Chat() {
-    const { addOrUpdateChat, requireNewChat, chats, setRequireNewChat, goals, setGoals, addGoal } = useAppState();
+    const {
+        chats,
+        addOrUpdateChat,
+        requireNewChat,
+        setRequireNewChat,
+        goals,
+        setGoals,
+        addGoal,
+        notificationClickPrompt,
+        setNotificationClickPrompt,
+    } = useAppState();
     const {
         steps,
         exercise,
@@ -83,8 +93,8 @@ export default function Chat() {
                     return formatCollection(data, dataType);
                 }
                 case 'schedule-notification': {
-                    const { title, body, date } = toolCall.args as ToolParameters<'schedule-notification'>;
-                    const notificationResponse = await scheduleNotification(title, body, date, chatId);
+                    const { title, body, date, userPrompt } = toolCall.args as ToolParameters<'schedule-notification'>;
+                    const notificationResponse = await scheduleNotification(title, body, date, chatId, userPrompt);
                     tracking.event('chat_schedule_notification', { status: notificationResponse.status });
                     return notificationResponse.status;
                 }
@@ -153,7 +163,14 @@ export default function Chat() {
             const chat = await getStorageChat(chatId);
             if (!chat) {
                 if (chatAgentMode === 'extrovert')
-                    setInput(getExtrovertFirstMessagePrompt());
+                    setInput(getExtrovertFirstMessagePrompt(notificationClickPrompt));
+                else
+                    setInput(notificationClickPrompt ?? '');
+
+                if (notificationClickPrompt) {
+                    tracking.event('notification_click');
+                    setNotificationClickPrompt(null);
+                }
 
                 return;
             }

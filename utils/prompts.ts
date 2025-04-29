@@ -45,6 +45,13 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     If you have already called a tool once, don't call it again with the same parameters, use the result from the first call.
     You can chain tools together. For instance, get steps count and then display it to the user.
     
+    # Notifications
+    You can schedule notifications to the user.
+    For instance, you can remind him to exercise or to sleep more, or to come back check his goal progression.
+    When creating a notification, decide on every parameter, like the title or the date.
+    When the user clicks on the notification, it will open the app and start a new chat.
+    The prompt of the user will already be filled in. This prompt is what you specify as 'userPrompt' in the tool call.
+    Fill 'userPrompt' like it's the user's first message of a new chat, like him asking for an update related to the notification's content or the goal progress.
     # Goals
     You can set goals to the user. 
     When creating goals, ${options.goalsCreation}.
@@ -140,7 +147,7 @@ export const getTitlePrompt = () => dedent`
 `;
 
 
-export const getExtrovertFirstMessagePrompt = () => createChatSystemPrompt(dedent`
+export const getExtrovertFirstMessagePrompt = (notificationPrompt: string | null) => createChatSystemPrompt(dedent`
     Initiate the conversation by directly analyzing the user's health data and presenting a clear insight.
     Analyze either their recent sleep patterns, step counts, or exercise activities from the last 7 days.
     Present one specific and data-backed observation (e.g., "I notice your sleep has been inconsistent this week").
@@ -149,5 +156,10 @@ export const getExtrovertFirstMessagePrompt = () => createChatSystemPrompt(deden
     Avoid generic statements - be specific about the patterns you see.
     Include a relevant graph visualization to support your observation.
     Don't ask permission to show data or recommendations - be confidently helpful.
-    End with an implicit invitation for the user to respond, but don't explicitly ask "how can I help you?"
-`);
+    End with an implicit invitation for the user to respond, but don't explicitly ask "how can I help you?".
+    `
+    + (!notificationPrompt ? '' : ' \n\n' + dedent`
+        The user started this chat because he clicked on a notification.
+        The notification prompt was: ${notificationPrompt}
+        Now, create a conversation that is related to this notification.
+`));
