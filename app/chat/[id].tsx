@@ -35,7 +35,7 @@ import {
     formatScheduleNotificationResponseForAI,
     getAllScheduledNotificationsForAI,
     rescheduleNotification,
-    scheduleNotification,
+    scheduleNotifications,
 } from '@/utils/local-notification';
 
 export default function Chat() {
@@ -89,28 +89,21 @@ export default function Chat() {
                 }
                 case 'schedule-notification': {
                     const { title, body, dateList } = toolCall.args as ToolParameters<'schedule-notification'>;
-                    return scheduleNotification(title, body, dateList, chatId)
-                        .then((result) => {
-                            tracking.event('chat_schedule_notification', { status: result.status });
-                            return formatScheduleNotificationResponseForAI(result);
-                        });
+                    tracking.event('chat_schedule_notification');
+                    return scheduleNotifications(title, body, dateList, chatId).then(formatScheduleNotificationResponseForAI);
                 }
                 case 'reschedule-notification': {
                     const { identifier, date } = toolCall.args as ToolParameters<'reschedule-notification'>;
-                    return rescheduleNotification(identifier, date)
-                        .then((result) => {
-                            tracking.event('chat_reschedule_notification', { status: result.status });
-                            return formatScheduleNotificationResponseForAI(result);
-                        });
+                    tracking.event('chat_reschedule_notification');
+                    return rescheduleNotification(identifier, date).then(formatScheduleNotificationResponseForAI);
                 }
                 case 'get-notifications':
                     tracking.event('chat_get_notifications');
                     return getAllScheduledNotificationsForAI();
                 case 'cancel-notification': {
-                    tracking.event('chat_cancel_notification');
                     const { identifier } = toolCall.args as ToolParameters<'cancel-notification'>;
-                    return cancelScheduledNotification(identifier)
-                        .then((r) => r ? 'success' : 'error');
+                    tracking.event('chat_cancel_notification');
+                    return cancelScheduledNotification(identifier).then((r) => r ? 'success' : 'error');
                 }
                 case 'create-user-goal': {
                     const goal = await createGoalAndSave(toolCall.args as ToolParameters<'create-user-goal'>);

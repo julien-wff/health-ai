@@ -52,6 +52,9 @@ function formatNotificationsForAI(notifications: NotificationRequest[]): string 
     return notifications.map(formatNotificationForAI).join('\n\n');
 }
 
+/**
+ * Get all active scheduled notifications details concatenated for the AI agent.
+ */
 export async function getAllScheduledNotificationsForAI(): Promise<string> {
     const notifications = await Notifications.getAllScheduledNotificationsAsync();
 
@@ -62,6 +65,10 @@ export async function getAllScheduledNotificationsForAI(): Promise<string> {
     return formatNotificationsForAI(await Notifications.getAllScheduledNotificationsAsync());
 }
 
+/**
+ * Cancel a scheduled notification.
+ * @param identifier The notification identifier (id).
+ */
 export async function cancelScheduledNotification(identifier: string): Promise<boolean> {
     await Notifications.cancelScheduledNotificationAsync(identifier);
 
@@ -69,6 +76,11 @@ export async function cancelScheduledNotification(identifier: string): Promise<b
     return notifications.filter(n => n.identifier === identifier).length === 0;
 }
 
+/**
+ * Reschedule one local notification for a different time in the future.
+ * @param identifier The notification identifier (id).
+ * @param date The notification's new delivery date
+ */
 export async function rescheduleNotification(identifier: string, date: string): Promise<ScheduleNotificationResponse> {
     const notifications = await Notifications.getAllScheduledNotificationsAsync();
 
@@ -81,11 +93,21 @@ export async function rescheduleNotification(identifier: string, date: string): 
     const title = notification.content.title ?? '';
     const body = notification.content.body ?? '';
     const chatId = notification.content.data.chatId;
+    const parsedDate = dayjs(date).toDate();
 
-    return scheduleNotification(title, body, [ date ], chatId, identifier);
+    const id = await scheduleNotification(title, body, parsedDate, chatId, identifier);
+    return { status: 'success', message: 'Notification scheduled successfully.', notificationIds: [ id ] };
 }
 
-function buildNoficationRequestInput(title: string, body: string, date: Date, chatId: string, identifier?: string): NotificationRequestInput {
+/**
+ * Schedule one local notification.
+ * @param title Notification title.
+ * @param body Notification body.
+ * @param date The date when the notification will be triggered.
+ * @param chatId The id of the chat that will be stored in the notification.
+ * @param identifier Optional identifier (id).
+ */
+async function scheduleNotification(title: string, body: string, date: Date, chatId: string, identifier?: string): Promise<string> {
     let notificationRequestInput: NotificationRequestInput = {
         content: {
             title: title,
@@ -108,22 +130,29 @@ function buildNoficationRequestInput(title: string, body: string, date: Date, ch
         };
     }
 
-    return notificationRequestInput;
+    return await Notifications.scheduleNotificationAsync(notificationRequestInput);
 }
 
-export async function scheduleNotification(title: string, body: string, dates: string[], chatId: string, identifier?: string): Promise<ScheduleNotificationResponse> {
-    const dayjsDates = dates.map(dayjs).filter(date => date.isValid() && !date.isBefore(dayjs()));
+/**
+ * Schedule one or more local notifications with the same title and body but at different dates.
+ * @param title Notification title.
+ * @param body Notification body.
+ * @param dates An array of the dates when the notification will be triggered.
+ * @param chatId The id of the chat that will be stored in the notification.
+ */
+export async function scheduleNotifications(title: string, body: string, dates: string[], chatId: string): Promise<ScheduleNotificationResponse> {
+    const parsedDates = dates
+        .map(dayjs)
+        .filter(date => date.isValid() && !date.isBefore(dayjs()))
+        .map(date => date.toDate());
 
-    // if (dayjsDates?.length != dates?.length) {
-    //     return { status: 'error', message: 'One or more dates were invalid.' };
-    // }
+    if (parsedDates.length !== dates.length) {
+        return { status: 'error', message: 'One or more dates are invalid.' };
+    }
 
     let notificationIds: string[] = [];
-
-    for (const dayjsDate of dayjsDates) {
-        const notificationRequestInput = buildNoficationRequestInput(title, body, dayjsDate.toDate(), chatId, identifier);
-
-        const notificationId = await Notifications.scheduleNotificationAsync(notificationRequestInput);
+    for (const date of parsedDates) {
+        const notificationId = await scheduleNotification(title, body, date, chatId);
         notificationIds.push(notificationId);
     }
 
