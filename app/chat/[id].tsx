@@ -33,7 +33,16 @@ import { scheduleNotification } from '@/utils/local-notification';
 import { createGoalAndSave, formatGoalForAI, updateGoalAndSave } from '@/utils/goals';
 
 export default function Chat() {
-    const { addOrUpdateChat, requireNewChat, setRequireNewChat, goals, setGoals, addGoal } = useAppState();
+    const {
+        addOrUpdateChat,
+        requireNewChat,
+        setRequireNewChat,
+        goals,
+        setGoals,
+        addGoal,
+        notificationClickPrompt,
+        setNotificationClickPrompt,
+    } = useAppState();
     const {
         steps,
         exercise,
@@ -152,8 +161,11 @@ export default function Chat() {
             const chat = await getStorageChat(chatId);
             if (!chat) {
                 if (chatAgentMode === 'extrovert')
-                    setInput(getExtrovertFirstMessagePrompt());
+                    setInput(getExtrovertFirstMessagePrompt(notificationClickPrompt));
+                else
+                    setInput(notificationClickPrompt ?? '');
 
+                setNotificationClickPrompt(null);
                 return;
             }
 

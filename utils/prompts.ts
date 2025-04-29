@@ -141,7 +141,7 @@ export const getTitlePrompt = () => dedent`
 `;
 
 
-export const getExtrovertFirstMessagePrompt = () => createChatSystemPrompt(dedent`
+export const getExtrovertFirstMessagePrompt = (notificationPrompt: string | null) => createChatSystemPrompt(dedent`
     Initiate the conversation by directly analyzing the user's health data and presenting a clear insight.
     Analyze either their recent sleep patterns, step counts, or exercise activities from the last 7 days.
     Present one specific and data-backed observation (e.g., "I notice your sleep has been inconsistent this week").
@@ -150,5 +150,9 @@ export const getExtrovertFirstMessagePrompt = () => createChatSystemPrompt(deden
     Avoid generic statements - be specific about the patterns you see.
     Include a relevant graph visualization to support your observation.
     Don't ask permission to show data or recommendations - be confidently helpful.
-    End with an implicit invitation for the user to respond, but don't explicitly ask "how can I help you?"
+    End with an implicit invitation for the user to respond, but don't explicitly ask "how can I help you?".
+    ` + !notificationPrompt ? '' : ' \n' + dedent`
+    The user started this chat because he clicked on a notification.
+    The notification prompt was: ${notificationPrompt}
+    Create a conversation that is related to this notification.
 `);
