@@ -165,7 +165,11 @@ export default function Chat() {
                 else
                     setInput(notificationClickPrompt ?? '');
 
-                setNotificationClickPrompt(null);
+                if (notificationClickPrompt) {
+                    tracking.event('notification_click');
+                    setNotificationClickPrompt(null);
+                }
+
                 return;
             }
 
