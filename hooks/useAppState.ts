@@ -19,6 +19,8 @@ interface AppState {
     goals: Goal[];
     setGoals: (goals: Goal[]) => void;
     addGoal: (goal: Goal) => void;
+    notificationClickPrompt: string | null;
+    setNotificationClickPrompt: (notificationPrompt: string | null) => void;
 }
 
 /**
@@ -32,6 +34,7 @@ export const useAppState = create<AppState>((set) => ({
     requireNewChat: false,
     chats: [],
     goals: [],
+    notificationClickPrompt: null,
     setIsOnboarded: (isOnboarded: boolean) => set({ isOnboarded }),
     setHasDebugAccess: (hasDebugAccess: boolean) => set({ hasDebugAccess }),
     setHasHealthPermissions: (hasHealthPermissions: boolean) => set({ hasHealthPermissions }),
@@ -52,4 +55,5 @@ export const useAppState = create<AppState>((set) => ({
     addGoal: (goal: Goal) => set((state) => ({
         goals: [ ...state.goals, goal ],
     })),
+    setNotificationClickPrompt: (notificationPrompt: string | null) => set({ notificationClickPrompt: notificationPrompt }),
 }) satisfies AppState);

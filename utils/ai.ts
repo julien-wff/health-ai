@@ -73,6 +73,7 @@ export const tools = {
             title: z.string().describe('The notification title to display.'),
             body: z.string().describe('The notification message to display.'),
             dateList: z.string().array().describe('A list of the dates and time when the notification will be triggered, of the format YYYY-MM-DD hh:mm.'),
+            userPrompt: z.string().optional().describe('The user\'s prompt to kickstart the conversation.'),
         }),
     },
     'reschedule-notification': {

@@ -92,10 +92,10 @@ export async function rescheduleNotification(identifier: string, date: string): 
 
     const title = notification.content.title ?? '';
     const body = notification.content.body ?? '';
-    const chatId = notification.content.data.chatId;
+    const { chatId, userPrompt } = notification.content.data;
     const parsedDate = dayjs(date).toDate();
 
-    const id = await scheduleNotification(title, body, parsedDate, chatId, identifier);
+    const id = await scheduleNotification(title, body, parsedDate, chatId, userPrompt, identifier);
     return { status: 'success', message: 'Notification scheduled successfully.', notificationIds: [ id ] };
 }
 
@@ -105,15 +105,17 @@ export async function rescheduleNotification(identifier: string, date: string): 
  * @param body Notification body.
  * @param date The date when the notification will be triggered.
  * @param chatId The id of the chat that will be stored in the notification.
- * @param identifier Optional identifier (id).
+ * @param userPrompt Optional user prompt to use when starting a chat from the notification.
+ * @param identifier Optional identifier (id) to edit an existing notification.
  */
-async function scheduleNotification(title: string, body: string, date: Date, chatId: string, identifier?: string): Promise<string> {
+async function scheduleNotification(title: string, body: string, date: Date, chatId: string, userPrompt?: string, identifier?: string): Promise<string> {
     let notificationRequestInput: NotificationRequestInput = {
         content: {
             title: title,
             body: body,
             data: {
-                chatId: chatId,
+                chatId,
+                userPrompt,
             },
         },
         trigger: {
@@ -139,8 +141,9 @@ async function scheduleNotification(title: string, body: string, date: Date, cha
  * @param body Notification body.
  * @param dates An array of the dates when the notification will be triggered.
  * @param chatId The id of the chat that will be stored in the notification.
+ * @param userPrompt Optional user prompt to use when starting a chat from the notification.
  */
-export async function scheduleNotifications(title: string, body: string, dates: string[], chatId: string): Promise<ScheduleNotificationResponse> {
+export async function scheduleNotifications(title: string, body: string, dates: string[], chatId: string, userPrompt?: string): Promise<ScheduleNotificationResponse> {
     const parsedDates = dates
         .map(dayjs)
         .filter(date => date.isValid() && !date.isBefore(dayjs()))
@@ -152,7 +155,7 @@ export async function scheduleNotifications(title: string, body: string, dates: 
 
     let notificationIds: string[] = [];
     for (const date of parsedDates) {
-        const notificationId = await scheduleNotification(title, body, date, chatId);
+        const notificationId = await scheduleNotification(title, body, date, chatId, userPrompt);
         notificationIds.push(notificationId);
     }
 

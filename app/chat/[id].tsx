@@ -39,7 +39,16 @@ import {
 } from '@/utils/local-notification';
 
 export default function Chat() {
-    const { addOrUpdateChat, requireNewChat, setRequireNewChat, goals, setGoals, addGoal } = useAppState();
+    const {
+        addOrUpdateChat,
+        requireNewChat,
+        setRequireNewChat,
+        goals,
+        setGoals,
+        addGoal,
+        notificationClickPrompt,
+        setNotificationClickPrompt,
+    } = useAppState();
     const {
         steps,
         exercise,
@@ -88,9 +97,15 @@ export default function Chat() {
                     return formatCollection(data, dataType);
                 }
                 case 'schedule-notification': {
-                    const { title, body, dateList } = toolCall.args as ToolParameters<'schedule-notification'>;
+                    const {
+                        title,
+                        body,
+                        dateList,
+                        userPrompt,
+                    } = toolCall.args as ToolParameters<'schedule-notification'>;
                     tracking.event('chat_schedule_notification');
-                    return scheduleNotifications(title, body, dateList, chatId).then(formatScheduleNotificationResponseForAI);
+                    return scheduleNotifications(title, body, dateList, chatId, userPrompt)
+                        .then(formatScheduleNotificationResponseForAI);
                 }
                 case 'reschedule-notification': {
                     const { identifier, date } = toolCall.args as ToolParameters<'reschedule-notification'>;
@@ -170,7 +185,14 @@ export default function Chat() {
             const chat = await getStorageChat(chatId);
             if (!chat) {
                 if (chatAgentMode === 'extrovert')
-                    setInput(getExtrovertFirstMessagePrompt());
+                    setInput(getExtrovertFirstMessagePrompt(notificationClickPrompt));
+                else
+                    setInput(notificationClickPrompt ?? '');
+
+                if (notificationClickPrompt) {
+                    tracking.event('notification_click');
+                    setNotificationClickPrompt(null);
+                }
 
                 return;
             }
