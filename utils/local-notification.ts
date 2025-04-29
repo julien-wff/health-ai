@@ -25,7 +25,7 @@ export async function createNotificationChannels() {
     );
 }
 
-export async function scheduleNotification(title?: string, body?: string, date?: string, chatId?: string): Promise<ScheduleNotificationResponse> {
+export async function scheduleNotification(title?: string, body?: string, date?: string, chatId?: string, userPrompt?: string): Promise<ScheduleNotificationResponse> {
     const dayjsDate = dayjs(date);
 
     if (!title || !body || !date) {
@@ -49,7 +49,8 @@ export async function scheduleNotification(title?: string, body?: string, date?:
                 title: title,
                 body: body,
                 data: {
-                    chatId: chatId,
+                    chatId,
+                    userPrompt,
                 },
             },
             trigger: {

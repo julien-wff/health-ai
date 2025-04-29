@@ -44,6 +44,14 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     If you have already called a tool once, don't call it again with the same parameters, use the result from the first call.
     You can chain tools together. For instance, get steps count and then display it to the user.
     
+    # Notifications
+    You can schedule notifications to the user.
+    For instance, you can remind him to exercise or to sleep more, or to come back check his goal progression.
+    When creating a notification, decide of every parameter, like the title or the date.
+    When the user clicks on the notification, it will open the app and start a new chat.
+    The prompt of the user will already filled in. This prompt is what you specify as 'userPrompt' in the tool call.
+    Fill 'userPrompt' like it's the user's first message of a new chat, like him asking for an update related to the notification's content or the goal progress.
+    
     # Goals
     You can set goals to the user. 
     When creating goals, ${options.goalsCreation}.

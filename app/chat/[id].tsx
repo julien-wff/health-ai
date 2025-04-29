@@ -82,8 +82,8 @@ export default function Chat() {
                     return formatCollection(data, dataType);
                 }
                 case 'schedule-notification': {
-                    const { title, body, date } = toolCall.args as ToolParameters<'schedule-notification'>;
-                    const notificationResponse = await scheduleNotification(title, body, date, chatId);
+                    const { title, body, date, userPrompt } = toolCall.args as ToolParameters<'schedule-notification'>;
+                    const notificationResponse = await scheduleNotification(title, body, date, chatId, userPrompt);
                     tracking.event('chat_schedule_notification', { status: notificationResponse.status });
                     return notificationResponse.status;
                 }

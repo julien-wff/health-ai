@@ -73,6 +73,7 @@ export const tools = {
             date: z.string().optional().describe('Date and time (hour and minutes), of the format YYYY-MM-DD hh:mm.'),
             title: z.string().optional().describe('The notification title to display.'),
             body: z.string().optional().describe('The notification message to display.'),
+            userPrompt: z.string().optional().describe('The user\'s prompt to kickstart the conversation.'),
         }),
     },
     'create-user-goal': {
