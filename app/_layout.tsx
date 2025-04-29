@@ -11,12 +11,12 @@ import duration from 'dayjs/plugin/duration';
 import isBetween from 'dayjs/plugin/isBetween';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
-import { Stack, useNavigationContainerRef } from 'expo-router';
+import { Stack, useNavigationContainerRef, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import { PostHog, PostHogProvider } from 'posthog-react-native';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { AppState, NativeEventSubscription, Platform, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Notifications from 'expo-notifications';
@@ -69,8 +69,9 @@ function Layout() {
     const colorScheme = useColorScheme();
     const colors = useColors();
     const { loadStateFromStorage, initHealthAndAsyncLoadState } = useAppInit();
-    const { hasHealthPermissions } = useAppState();
+    const { hasHealthPermissions, setNotificationClickPrompt } = useAppState();
     const { setHealthRecords } = useHealthData();
+    const router = useRouter();
 
     const ref = useNavigationContainerRef();
 
@@ -79,6 +80,21 @@ function Layout() {
             navigationIntegration.registerNavigationContainer(ref);
         }
     }, [ ref ]);
+
+    const notificationResponseListener = useRef<Notifications.EventSubscription>();
+    useEffect(() => {
+        notificationResponseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+            const { data } = response.notification.request.content;
+            setNotificationClickPrompt(data.userPrompt ?? null);
+            router.replace('/chat');
+        });
+
+        return () => {
+            if (notificationResponseListener.current) {
+                Notifications.removeNotificationSubscription(notificationResponseListener.current);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         if (posthogClient)

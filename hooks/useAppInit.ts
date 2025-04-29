@@ -10,6 +10,7 @@ import { SplashScreen, useRouter } from 'expo-router';
 import { Platform } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { getGoalsFromStorage } from '@/utils/goals';
+import * as Notifications from 'expo-notifications';
 
 /**
  * Platform-agnostic hook to initialize the app
@@ -18,7 +19,14 @@ import { getGoalsFromStorage } from '@/utils/goals';
 export function useAppInit() {
     const { getItem: getIsOnboardedInStorage } = useAsyncStorage(IS_ONBOARDED);
     const { getItem: getHasDebugAccessInStorage } = useAsyncStorage(HAS_DEBUG_ACCESS);
-    const { setIsOnboarded, setChats, setHasHealthPermissions, setHasDebugAccess, setGoals } = useAppState();
+    const {
+        setIsOnboarded,
+        setChats,
+        setHasHealthPermissions,
+        setHasDebugAccess,
+        setGoals,
+        setNotificationClickPrompt,
+    } = useAppState();
     const androidHealth = useAndroidHealthInit();
     const router = useRouter();
     const { setHealthRecords } = useHealthData();
@@ -40,6 +48,16 @@ export function useAppInit() {
      * This function can be called multiple times, after a pre-check has been done.
      */
     const initHealthAndAsyncLoadState = async () => {
+        // Load last clicked notification data
+        const notificationResponse = await Notifications.getLastNotificationResponseAsync();
+        if (notificationResponse) {
+            const { notification, actionIdentifier } = notificationResponse;
+            const { data } = notification.request.content;
+            if (actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER) {
+                setNotificationClickPrompt(data.userPrompt ?? null);
+            }
+        }
+
         // Pre-checks
         Sentry.captureEvent({ event_id: 'init_health_precheck_start', level: 'info' });
         let preCheckSuccess: boolean;
