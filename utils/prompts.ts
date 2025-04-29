@@ -151,8 +151,9 @@ export const getExtrovertFirstMessagePrompt = (notificationPrompt: string | null
     Include a relevant graph visualization to support your observation.
     Don't ask permission to show data or recommendations - be confidently helpful.
     End with an implicit invitation for the user to respond, but don't explicitly ask "how can I help you?".
-    ` + !notificationPrompt ? '' : ' \n' + dedent`
-    The user started this chat because he clicked on a notification.
-    The notification prompt was: ${notificationPrompt}
-    Create a conversation that is related to this notification.
-`);
+    `
+    + (!notificationPrompt ? '' : ' \n\n' + dedent`
+        The user started this chat because he clicked on a notification.
+        The notification prompt was: ${notificationPrompt}
+        Now, create a conversation that is related to this notification.
+`));
