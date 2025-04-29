@@ -48,7 +48,7 @@ export function useAppInit() {
      * This function can be called multiple times, after a pre-check has been done.
      */
     const initHealthAndAsyncLoadState = async () => {
-        // Load last clicked notification data
+        // Load notification data when the app is opened from clicking a notification
         const notificationResponse = await Notifications.getLastNotificationResponseAsync();
         if (notificationResponse) {
             const { notification, actionIdentifier } = notificationResponse;

@@ -81,6 +81,7 @@ function Layout() {
         }
     }, [ ref ]);
 
+    // Handle the click of a notification if the app is already open
     const notificationResponseListener = useRef<Notifications.EventSubscription>();
     useEffect(() => {
         notificationResponseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
