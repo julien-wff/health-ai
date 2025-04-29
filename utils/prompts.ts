@@ -101,6 +101,7 @@ export const getSuggestionPrompt = () => dedent`
     - Suggest ways to request specific health advice (sleep, exercise, steps, etc.)
     - Add options to share personal experiences related to the topic
     - Include options to challenge or question the advice respectfully
+    - If not already done, suggest to create a goal based on the advice given or create a reminder notification.
     
     All suggestions should sound like something a real person would say in conversation.
     Never include explanations or anything outside the actual suggestions.
@@ -143,6 +144,7 @@ export const getTitlePrompt = () => dedent`
 export const getExtrovertFirstMessagePrompt = () => createChatSystemPrompt(dedent`
     Initiate the conversation by directly analyzing the user's health data and presenting a clear insight.
     Analyze either their recent sleep patterns, step counts, or exercise activities from the last 7 days.
+    You can also review user's goals and talk about the user's progress.
     Present one specific and data-backed observation (e.g., "I notice your sleep has been inconsistent this week").
     Follow with a personalized, actionable recommendation tied directly to the data.
     Use a friendly but authoritative tone - be the expert who cares.
@@ -150,4 +152,5 @@ export const getExtrovertFirstMessagePrompt = () => createChatSystemPrompt(deden
     Include a relevant graph visualization to support your observation.
     Don't ask permission to show data or recommendations - be confidently helpful.
     End with an implicit invitation for the user to respond, but don't explicitly ask "how can I help you?"
+    Try to not make the same statement as another chat from the same day (according to the chat history).
 `);
