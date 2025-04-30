@@ -5,7 +5,7 @@ import type { ToolParameters, tools } from '@/utils/ai';
 import { parseRange } from '@/utils/health';
 import { ToolInvocation } from 'ai';
 import { useMemo } from 'react';
-import NotificationSuccessWidget from '@/components/chat/NotificationSuccessWidget';
+import NotificationWidget from '@/components/chat/widgets/NotificationWidget';
 import dayjs from 'dayjs';
 import GoalWidget from '@/components/goals/GoalWidget';
 import { useAppState } from '@/hooks/useAppState';
@@ -24,7 +24,12 @@ export default function ChatToolWidget({ invocation }: Readonly<ChatToolWidgetPr
 
     const [ dates, title ] = useMemo(
         () => [ invocation.args.dateList?.map(dayjs) ?? [], invocation.args.title ],
-        [ invocation.args.dateList?.length, invocation.args.title ],
+        [ invocation.args.dateList, invocation.args.title ],
+    );
+
+    const date = useMemo(
+        () => dayjs(invocation.args.date),
+        [ invocation.args.date ],
     );
 
     if (invocation.state === 'result' && invocation.result === 'error') {
@@ -35,7 +40,11 @@ export default function ChatToolWidget({ invocation }: Readonly<ChatToolWidgetPr
         case 'get-health-data-and-visualize':
             return <Chart {...invocation.args}/>;
         case 'schedule-notification':
-            return <NotificationSuccessWidget title={title} dates={dates}/>;
+            return <NotificationWidget title={title} dates={dates} type="schedule"/>;
+        case 'reschedule-notification':
+            return <NotificationWidget title="" dates={[ date ]} type="reschedule"/>;
+        case 'cancel-notification':
+            return <NotificationWidget title="" dates={[]} type="cancel"/>;
         case 'create-user-goal':
             return <GoalWidget goal={invocation.args}/>;
         case 'update-user-goal':
