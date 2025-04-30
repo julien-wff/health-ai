@@ -74,7 +74,7 @@ export default function Chat() {
             } satisfies ChatRequestBody;
             return options;
         },
-        maxSteps: 5,
+        maxSteps: 8,
         onError: error => {
             Sentry.captureException(error);
             console.error(error, 'ERROR');
