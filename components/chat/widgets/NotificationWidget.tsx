@@ -17,7 +17,7 @@ export default function NotificationWidget({ title, dates, type }: Readonly<Noti
 
     const formattedDates = useMemo(
         () => dates.map(d => d.format('MMM DD [at] HH:mm')).join(', '),
-        [ dates.length ],
+        [ dates ],
     );
 
     const description: string = useMemo(
@@ -31,7 +31,7 @@ export default function NotificationWidget({ title, dates, type }: Readonly<Noti
                     return `Notification rescheduled to ${formattedDates}.`;
             }
         },
-        [ type ],
+        [ type, title, formattedDates, dates.length ],
     );
 
     return <View className="w-full flex flex-row items-center p-2 my-2">
