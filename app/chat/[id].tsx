@@ -12,7 +12,7 @@ import {
     ToolParameters,
     tools,
 } from '@/utils/ai';
-import { type ChatRequestBody, getStorageChat, saveStorageChat } from '@/utils/chat';
+import { type ChatRequestBody, getChatsHistoryFormatted, getStorageChat, saveStorageChat } from '@/utils/chat';
 import { getExtrovertFirstMessagePrompt, isChatSystemPrompt } from '@/utils/prompts';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterCollectionRange, formatCollection } from '@/utils/health';
@@ -34,6 +34,7 @@ import { createGoalAndSave, formatGoalForAI, updateGoalAndSave } from '@/utils/g
 
 export default function Chat() {
     const {
+        chats,
         addOrUpdateChat,
         requireNewChat,
         setRequireNewChat,
@@ -69,6 +70,7 @@ export default function Chat() {
             options.requestBody = {
                 agentMode: chatAgentMode ?? 'introvert',
                 goals: goals.map(formatGoalForAI),
+                history: getChatsHistoryFormatted(chatId, agentMode, chats),
             } satisfies ChatRequestBody;
             return options;
         },

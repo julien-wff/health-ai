@@ -4,6 +4,7 @@ import { UIMessage } from 'ai';
 import superJson from 'superjson';
 import type { AiProfile } from '@/hooks/useFeatureFlags';
 import dayjs from 'dayjs';
+import dedent from 'dedent';
 
 
 /**
@@ -12,6 +13,7 @@ import dayjs from 'dayjs';
 export interface ChatRequestBody {
     agentMode: AiProfile;
     goals: string[];
+    history: string[];
 }
 
 
@@ -71,3 +73,11 @@ export const filterChatsByDaysRange = (chats: StorageChat[], startDay: number, e
         const lastUpdated = dayjs(chat.lastUpdated);
         return lastUpdated.isBetween(dayjs().subtract(startDay, 'day'), dayjs().subtract(endDay || 1, 'day'), 'day', '[)');
     });
+
+
+export const getChatsHistoryFormatted = (currentChatId: string, agentMode: AiProfile | undefined, chats: StorageChat[]) =>
+    chats
+        .filter(c => c.id !== currentChatId && (!agentMode || c.agentMode === agentMode))
+        .map((chat) => dedent`
+            [${dayjs(chat.lastUpdated).format('DD/MM/YYYY HH:mm')}, ${chat.title}] ${chat.summary}
+        `);
