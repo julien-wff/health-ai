@@ -13,7 +13,7 @@ import {
     tools,
 } from '@/utils/ai';
 import { type ChatRequestBody, getChatsHistoryFormatted, getStorageChat, saveStorageChat } from '@/utils/chat';
-import { getExtrovertFirstMessagePrompt, isChatSystemPrompt } from '@/utils/prompts';
+import { getExtrovertFirstMessagePrompt, isChatSystemPrompt, retryAfterErrorPrompt } from '@/utils/prompts';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterCollectionRange, formatCollection } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
@@ -62,7 +62,7 @@ export default function Chat() {
     const [ chatAgentMode, setChatAgentMode ] = useState(agentMode);
     const [ suggestions, setSuggestions ] = useState<string[]>([]);
 
-    const { messages, setInput, input, handleSubmit, setMessages, stop, status } = useChat({
+    const { messages, setInput, input, handleSubmit, setMessages, stop, status, error } = useChat({
         id: chatId,
         fetch: expoFetch as unknown as typeof globalThis.fetch,
         api: generateAPIUrl(`/api/chat`),
@@ -240,6 +240,10 @@ export default function Chat() {
             tracking.event('chat_drawer_close');
     }, [ drawerOpened ]);
 
+    function retryAfterError() {
+        setInput(retryAfterErrorPrompt());
+    }
+
     /**
      * Stop current message streaming (if any) and navigate to new chat screen
      */
@@ -262,7 +266,7 @@ export default function Chat() {
 
                     {messages.length === 0
                         ? <ChatEmptyMessages onPromptClick={p => setInput(p)}/>
-                        : <ChatMessages messages={messages}/>
+                        : <ChatMessages messages={messages} error={error ?? null} retryAfterError={retryAfterError}/>
                     }
 
                     <PromptInput input={input}

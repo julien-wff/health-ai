@@ -160,8 +160,14 @@ export const getExtrovertFirstMessagePrompt = (notificationPrompt: string | null
     Don't ask permission to show data or recommendations - be confidently helpful.
     End with an implicit invitation for the user to respond, but don't explicitly ask "how can I help you?".
     Try to not make the same statement as another chat from the same day (according to the chat history).
-`+ (!notificationPrompt ? '' : ' \n\n' + dedent`
+` + (!notificationPrompt ? '' : ' \n\n' + dedent`
         The user started this chat because he clicked on a notification.
         The notification prompt was: ${notificationPrompt}
         Now, create a conversation that is related to this notification.
 `));
+
+
+export const retryAfterErrorPrompt = () => createChatSystemPrompt(dedent`
+    An error occurred during the previous generation.
+    Please resume the conversation from where it left off.
+`);
