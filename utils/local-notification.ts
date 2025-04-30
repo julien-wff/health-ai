@@ -66,14 +66,13 @@ export async function getAllScheduledNotificationsForAI(): Promise<string> {
 }
 
 /**
- * Cancel a scheduled notification.
- * @param identifier The notification identifier (id).
+ * Cancel one or more scheduled notifications.
+ * @param identifiers An array of notifications identifiers.
  */
-export async function cancelScheduledNotification(identifier: string): Promise<boolean> {
-    await Notifications.cancelScheduledNotificationAsync(identifier);
-
-    const notifications = await Notifications.getAllScheduledNotificationsAsync();
-    return notifications.filter(n => n.identifier === identifier).length === 0;
+export async function cancelScheduledNotifications(identifiers: string[]): Promise<void> {
+    for (const identifier of identifiers) {
+        await Notifications.cancelScheduledNotificationAsync(identifier);
+    }
 }
 
 /**

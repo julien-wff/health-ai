@@ -88,9 +88,9 @@ export const tools = {
         parameters: z.object({}),
     },
     'cancel-notification': {
-        description: 'Cancels a single scheduled notification.',
+        description: 'Cancels one or multiple scheduled notification.',
         parameters: z.object({
-            identifier: z.string().describe('The notification identifier.'),
+            identifiers: z.string().array().nonempty().describe('The notification identifiers.'),
         }),
     },
     'create-user-goal': {

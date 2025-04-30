@@ -31,7 +31,7 @@ import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { createGoalAndSave, formatGoalForAI, updateGoalAndSave } from '@/utils/goals';
 import {
-    cancelScheduledNotification,
+    cancelScheduledNotifications,
     formatScheduleNotificationResponseForAI,
     getAllScheduledNotificationsForAI,
     rescheduleNotification,
@@ -116,9 +116,10 @@ export default function Chat() {
                     tracking.event('chat_get_notifications');
                     return getAllScheduledNotificationsForAI();
                 case 'cancel-notification': {
-                    const { identifier } = toolCall.args as ToolParameters<'cancel-notification'>;
+                    const { identifiers } = toolCall.args as ToolParameters<'cancel-notification'>;
                     tracking.event('chat_cancel_notification');
-                    return cancelScheduledNotification(identifier).then((r) => r ? 'success' : 'error');
+                    await cancelScheduledNotifications(identifiers);
+                    return 'success';
                 }
                 case 'create-user-goal': {
                     const goal = await createGoalAndSave(toolCall.args as ToolParameters<'create-user-goal'>);
