@@ -11,9 +11,10 @@ import ChatErrorWidget from '@/components/chat/widgets/ChatErrorWidget';
 interface ChatMessagesProps {
     messages: UIMessage[];
     error: Error | null;
+    retryAfterError?: () => void;
 }
 
-export default function ChatMessages({ messages, error }: Readonly<ChatMessagesProps>) {
+export default function ChatMessages({ messages, error, retryAfterError }: Readonly<ChatMessagesProps>) {
     const scrollView = useRef<ScrollView>(null);
 
     useEffect(() => {
@@ -51,7 +52,7 @@ export default function ChatMessages({ messages, error }: Readonly<ChatMessagesP
                 </View>
             ))}
 
-            {error && <ChatErrorWidget error={error}/>}
+            {error && <ChatErrorWidget error={error} onRetry={retryAfterError}/>}
         </ScrollView>
     );
 }
