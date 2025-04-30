@@ -30,7 +30,7 @@ export function formatScheduleNotificationResponseForAI(response: ScheduleNotifi
     if (response.status === 'success') {
         return dedent`
             ${response.message}
-            Notification ids: ${response.notificationIds?.join(', ')}
+            Notification ids: ${response.notificationIds?.length ? response.notificationIds.join(', ') : ''}
         `;
     }
 
@@ -44,7 +44,7 @@ function formatNotificationForAI(notification: NotificationRequest): string {
         Notification ID: ${notification.identifier}
         Title: ${notification.content.title}
         Body: ${notification.content.body}
-        Date: ${dayjs(triggerInput.date).toISOString()}
+        Date: ${dayjs(triggerInput.date).format('YYYY-MM-DD HH:mm')}
     `;
 }
 
@@ -62,7 +62,7 @@ export async function getAllScheduledNotificationsForAI(): Promise<string> {
         return 'There are no scheduled notifications yet.';
     }
 
-    return formatNotificationsForAI(await Notifications.getAllScheduledNotificationsAsync());
+    return formatNotificationsForAI(notifications);
 }
 
 /**
@@ -94,8 +94,8 @@ export async function rescheduleNotification(identifier: string, date: string): 
     const { chatId, userPrompt } = notification.content.data;
     const parsedDate = dayjs(date).toDate();
 
-    const id = await scheduleNotification(title, body, parsedDate, chatId, userPrompt, identifier);
-    return { status: 'success', message: 'Notification scheduled successfully.', notificationIds: [ id ] };
+    await scheduleNotification(title, body, parsedDate, chatId, userPrompt, identifier);
+    return { status: 'success', message: 'Notification scheduled successfully.', notificationIds: [ identifier ] };
 }
 
 /**
@@ -106,6 +106,7 @@ export async function rescheduleNotification(identifier: string, date: string): 
  * @param chatId The id of the chat that will be stored in the notification.
  * @param userPrompt Optional user prompt to use when starting a chat from the notification.
  * @param identifier Optional identifier (id) to edit an existing notification.
+ * @return Notification identifier.
  */
 async function scheduleNotification(title: string, body: string, date: Date, chatId: string, userPrompt?: string, identifier?: string): Promise<string> {
     let notificationRequestInput: NotificationRequestInput = {
@@ -141,6 +142,7 @@ async function scheduleNotification(title: string, body: string, date: Date, cha
  * @param dates An array of the dates when the notification will be triggered.
  * @param chatId The id of the chat that will be stored in the notification.
  * @param userPrompt Optional user prompt to use when starting a chat from the notification.
+ * @return An object containing details about the success of the notification scheduling.
  */
 export async function scheduleNotifications(title: string, body: string, dates: string[], chatId: string, userPrompt?: string): Promise<ScheduleNotificationResponse> {
     const parsedDates = dates
@@ -152,7 +154,7 @@ export async function scheduleNotifications(title: string, body: string, dates: 
         return { status: 'error', message: 'One or more dates are invalid.' };
     }
 
-    let notificationIds: string[] = [];
+    const notificationIds: string[] = [];
     for (const date of parsedDates) {
         const notificationId = await scheduleNotification(title, body, date, chatId, userPrompt);
         notificationIds.push(notificationId);
