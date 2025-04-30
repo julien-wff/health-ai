@@ -72,7 +72,7 @@ export const tools = {
         parameters: z.object({
             title: z.string().describe('The notification title to display.'),
             body: z.string().describe('The notification message to display.'),
-            dateList: z.string().array().nonempty().describe('A list of the dates and time when the notification will be triggered, of the format YYYY-MM-DD hh:mm.'),
+            dateList: z.string().array().nonempty().describe('A list of the dates and time when the notification will be triggered, of the format YYYY-MM-DD hh:mm. The dates should be in the future.'),
             userPrompt: z.string().optional().describe('The user\'s prompt to kickstart the conversation.'),
         }),
     },
@@ -80,7 +80,7 @@ export const tools = {
         description: 'Reschedule a previous scheduled notification to another date.',
         parameters: z.object({
             identifier: z.string().describe('The notification identifier.'),
-            date: z.string().describe('Date and time (hour and minutes), of the format YYYY-MM-DD hh:mm.'),
+            date: z.string().describe('Date and time (hour and minutes), of the format YYYY-MM-DD hh:mm. The date should be in the future.'),
         }),
     },
     'get-notifications': {
@@ -88,7 +88,7 @@ export const tools = {
         parameters: z.object({}),
     },
     'cancel-notification': {
-        description: 'Cancels one or multiple scheduled notification.',
+        description: 'Cancels one or multiple scheduled notifications.',
         parameters: z.object({
             identifiers: z.string().array().nonempty().describe('The notification identifiers.'),
         }),
