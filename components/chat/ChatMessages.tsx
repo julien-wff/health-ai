@@ -6,12 +6,14 @@ import { HeartPulse, User } from 'lucide-react-native';
 import { useEffect, useRef } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { isChatSystemPrompt } from '@/utils/prompts';
+import ChatErrorWidget from '@/components/chat/widgets/ChatErrorWidget';
 
 interface ChatMessagesProps {
     messages: UIMessage[];
+    error: Error | null;
 }
 
-export default function ChatMessages({ messages }: ChatMessagesProps) {
+export default function ChatMessages({ messages, error }: Readonly<ChatMessagesProps>) {
     const scrollView = useRef<ScrollView>(null);
 
     useEffect(() => {
@@ -48,6 +50,8 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
                         })}
                 </View>
             ))}
+
+            {error && <ChatErrorWidget error={error}/>}
         </ScrollView>
     );
 }

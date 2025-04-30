@@ -62,7 +62,7 @@ export default function Chat() {
     const [ chatAgentMode, setChatAgentMode ] = useState(agentMode);
     const [ suggestions, setSuggestions ] = useState<string[]>([]);
 
-    const { messages, setInput, input, handleSubmit, setMessages, stop, status } = useChat({
+    const { messages, setInput, input, handleSubmit, setMessages, stop, status, error } = useChat({
         id: chatId,
         fetch: expoFetch as unknown as typeof globalThis.fetch,
         api: generateAPIUrl(`/api/chat`),
@@ -262,7 +262,7 @@ export default function Chat() {
 
                     {messages.length === 0
                         ? <ChatEmptyMessages onPromptClick={p => setInput(p)}/>
-                        : <ChatMessages messages={messages}/>
+                        : <ChatMessages messages={messages} error={error ?? null}/>
                     }
 
                     <PromptInput input={input}
