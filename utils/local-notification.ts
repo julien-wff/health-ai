@@ -70,9 +70,7 @@ export async function getAllScheduledNotificationsForAI(): Promise<string> {
  * @param identifiers An array of notifications identifiers.
  */
 export async function cancelScheduledNotifications(identifiers: string[]): Promise<void> {
-    for (const identifier of identifiers) {
-        await Notifications.cancelScheduledNotificationAsync(identifier);
-    }
+    await Promise.all(identifiers.map(Notifications.cancelScheduledNotificationAsync));
 }
 
 /**
@@ -89,10 +87,15 @@ export async function rescheduleNotification(identifier: string, date: string): 
         return { status: 'error', message: 'No such notification found.' };
     }
 
+    const dayjsDate = dayjs(date);
+    if(!dayjsDate.isAfter(dayjsDate) || dayjsDate.isBefore(dayjs())) {
+        return { status: 'error', message: 'The provided date is invalid or in the past.' };
+    }
+
+    const parsedDate = dayjsDate.toDate();
     const title = notification.content.title ?? '';
     const body = notification.content.body ?? '';
     const { chatId, userPrompt } = notification.content.data;
-    const parsedDate = dayjs(date).toDate();
 
     await scheduleNotification(title, body, parsedDate, chatId, userPrompt, identifier);
     return { status: 'success', message: 'Notification scheduled successfully.', notificationIds: [ identifier ] };
@@ -151,7 +154,7 @@ export async function scheduleNotifications(title: string, body: string, dates: 
         .map(date => date.toDate());
 
     if (parsedDates.length !== dates.length) {
-        return { status: 'error', message: 'One or more dates are invalid.' };
+        return { status: 'error', message: 'One or more dates are invalid or in the past.' };
     }
 
     const notificationIds: string[] = [];
