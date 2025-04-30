@@ -88,7 +88,7 @@ export async function rescheduleNotification(identifier: string, date: string): 
     }
 
     const dayjsDate = dayjs(date);
-    if(!dayjsDate.isAfter(dayjsDate) || dayjsDate.isBefore(dayjs())) {
+    if(!dayjsDate.isValid() || dayjsDate.isBefore(dayjs())) {
         return { status: 'error', message: 'The provided date is invalid or in the past.' };
     }
 

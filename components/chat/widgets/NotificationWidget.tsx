@@ -24,7 +24,7 @@ export default function NotificationWidget({ title, dates, type }: Readonly<Noti
         () => {
             switch (type) {
                 case 'schedule':
-                    return `Notification${dates.length > 1 ? 's' : ''} ${title} scheduled to ${formattedDates}`;
+                    return `Notification${dates.length > 1 ? 's' : ''} '${title}' scheduled to ${formattedDates}`;
                 case 'cancel':
                     return `Notifications cancelled.`;
                 case 'reschedule':
