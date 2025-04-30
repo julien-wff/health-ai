@@ -20,7 +20,7 @@ export default function ChatErrorWidget({ error, onRetry }: Readonly<ChatErrorWi
                         start={[ 0, 0 ]}
                         end={[ 1, 1 ]}/>
 
-        <ShieldX size={32} className="w-6 h-6" color={colors.red}/>
+        <ShieldX size={32} className="w-8 h-8" color={colors.red}/>
 
         <View className="flex flex-1 justify-center">
             <Text className="text-slate-800 dark:text-slate-200">
