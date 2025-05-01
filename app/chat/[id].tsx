@@ -29,8 +29,14 @@ import HealthDataFoundNotification from '@/components/notification/HealthDataFou
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
-import { scheduleNotification } from '@/utils/local-notification';
 import { createGoalAndSave, formatGoalForAI, updateGoalAndSave } from '@/utils/goals';
+import {
+    cancelScheduledNotifications,
+    formatScheduleNotificationResponseForAI,
+    getAllScheduledNotificationsForAI,
+    rescheduleNotification,
+    scheduleNotifications,
+} from '@/utils/local-notification';
 
 export default function Chat() {
     const {
@@ -93,10 +99,29 @@ export default function Chat() {
                     return formatCollection(data, dataType);
                 }
                 case 'schedule-notification': {
-                    const { title, body, date, userPrompt } = toolCall.args as ToolParameters<'schedule-notification'>;
-                    const notificationResponse = await scheduleNotification(title, body, date, chatId, userPrompt);
-                    tracking.event('chat_schedule_notification', { status: notificationResponse.status });
-                    return notificationResponse.status;
+                    const {
+                        title,
+                        body,
+                        dateList,
+                        userPrompt,
+                    } = toolCall.args as ToolParameters<'schedule-notification'>;
+                    tracking.event('chat_schedule_notification');
+                    return scheduleNotifications(title, body, dateList, chatId, userPrompt)
+                        .then(formatScheduleNotificationResponseForAI);
+                }
+                case 'reschedule-notification': {
+                    const { identifier, date } = toolCall.args as ToolParameters<'reschedule-notification'>;
+                    tracking.event('chat_reschedule_notification');
+                    return rescheduleNotification(identifier, date).then(formatScheduleNotificationResponseForAI);
+                }
+                case 'get-notifications':
+                    tracking.event('chat_get_notifications');
+                    return getAllScheduledNotificationsForAI();
+                case 'cancel-notification': {
+                    const { identifiers } = toolCall.args as ToolParameters<'cancel-notification'>;
+                    tracking.event('chat_cancel_notification');
+                    await cancelScheduledNotifications(identifiers);
+                    return 'success';
                 }
                 case 'create-user-goal': {
                     const goal = await createGoalAndSave(toolCall.args as ToolParameters<'create-user-goal'>);
