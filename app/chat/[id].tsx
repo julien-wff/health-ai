@@ -12,8 +12,8 @@ import {
     ToolParameters,
     tools,
 } from '@/utils/ai';
-import { type ChatRequestBody, getStorageChat, saveStorageChat } from '@/utils/chat';
-import { getExtrovertFirstMessagePrompt, isChatSystemPrompt } from '@/utils/prompts';
+import { type ChatRequestBody, getChatsHistoryFormatted, getStorageChat, saveStorageChat } from '@/utils/chat';
+import { getExtrovertFirstMessagePrompt, isChatSystemPrompt, retryAfterErrorPrompt } from '@/utils/prompts';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterCollectionRange, formatCollection } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
@@ -40,6 +40,7 @@ import {
 
 export default function Chat() {
     const {
+        chats,
         addOrUpdateChat,
         requireNewChat,
         setRequireNewChat,
@@ -67,7 +68,7 @@ export default function Chat() {
     const [ chatAgentMode, setChatAgentMode ] = useState(agentMode);
     const [ suggestions, setSuggestions ] = useState<string[]>([]);
 
-    const { messages, setInput, input, handleSubmit, setMessages, stop, status } = useChat({
+    const { messages, setInput, input, handleSubmit, setMessages, stop, status, error } = useChat({
         id: chatId,
         fetch: expoFetch as unknown as typeof globalThis.fetch,
         api: generateAPIUrl(`/api/chat`),
@@ -75,10 +76,11 @@ export default function Chat() {
             options.requestBody = {
                 agentMode: chatAgentMode ?? 'introvert',
                 goals: goals.map(formatGoalForAI),
+                history: getChatsHistoryFormatted(chatId, agentMode, chats),
             } satisfies ChatRequestBody;
             return options;
         },
-        maxSteps: 5,
+        maxSteps: 8,
         onError: error => {
             Sentry.captureException(error);
             console.error(error, 'ERROR');
@@ -263,6 +265,10 @@ export default function Chat() {
             tracking.event('chat_drawer_close');
     }, [ drawerOpened ]);
 
+    function retryAfterError() {
+        setInput(retryAfterErrorPrompt());
+    }
+
     /**
      * Stop current message streaming (if any) and navigate to new chat screen
      */
@@ -285,7 +291,7 @@ export default function Chat() {
 
                     {messages.length === 0
                         ? <ChatEmptyMessages onPromptClick={p => setInput(p)}/>
-                        : <ChatMessages messages={messages}/>
+                        : <ChatMessages messages={messages} error={error ?? null} retryAfterError={retryAfterError}/>
                     }
 
                     <PromptInput input={input}

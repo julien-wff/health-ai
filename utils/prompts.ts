@@ -23,6 +23,7 @@ export interface ChatPromptOptions {
     diplomacy: string;
     goalsCreation: string;
     goals?: string[];
+    history: string[];
 }
 
 export const getChatPrompt = (options: ChatPromptOptions) => dedent`
@@ -67,6 +68,7 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     Always respond some text, never tools invocations alone. Interpret and explain the data.
     Don't enumerate data to the user (like saying day by day numbers), prefer to show graphs, summarize and interpret the data.
     Don't show the graph and say "see by yourself", give a text answer to the question.
+    Be aware of the chat history, take that into account when answering to show you know the user and his preferences.
 
     # Formatting Rules
     Don't answer with markdown, only plain text. Don't even use markings like **. For lists, use dashes.
@@ -81,6 +83,11 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     ${(options.goals ?? []).length === 0
     ? 'The user hasn\'t set any goals yet.'
     : 'Here is the list of user\'s goals:\n' + options.goals!.join('\n')}
+    
+    # Old chats history
+    ${options.history.length === 0
+    ? 'The user has no history yet, this is the first chat.'
+    : options.history.join('\n')}
 `;
 
 
@@ -101,6 +108,7 @@ export const getSuggestionPrompt = () => dedent`
     - Suggest ways to request specific health advice (sleep, exercise, steps, etc.)
     - Add options to share personal experiences related to the topic
     - Include options to challenge or question the advice respectfully
+    - If not already done, suggest to create a goal based on the advice given or create a reminder notification.
     
     All suggestions should sound like something a real person would say in conversation.
     Never include explanations or anything outside the actual suggestions.
@@ -143,6 +151,7 @@ export const getTitlePrompt = () => dedent`
 export const getExtrovertFirstMessagePrompt = (notificationPrompt: string | null) => createChatSystemPrompt(dedent`
     Initiate the conversation by directly analyzing the user's health data and presenting a clear insight.
     Analyze either their recent sleep patterns, step counts, or exercise activities from the last 7 days.
+    You can also review user's goals and talk about the user's progress.
     Present one specific and data-backed observation (e.g., "I notice your sleep has been inconsistent this week").
     Follow with a personalized, actionable recommendation tied directly to the data.
     Use a friendly but authoritative tone - be the expert who cares.
@@ -150,9 +159,15 @@ export const getExtrovertFirstMessagePrompt = (notificationPrompt: string | null
     Include a relevant graph visualization to support your observation.
     Don't ask permission to show data or recommendations - be confidently helpful.
     End with an implicit invitation for the user to respond, but don't explicitly ask "how can I help you?".
-    `
-    + (!notificationPrompt ? '' : ' \n\n' + dedent`
+    Try to not make the same statement as another chat from the same day (according to the chat history).
+` + (!notificationPrompt ? '' : ' \n\n' + dedent`
         The user started this chat because he clicked on a notification.
         The notification prompt was: ${notificationPrompt}
         Now, create a conversation that is related to this notification.
 `));
+
+
+export const retryAfterErrorPrompt = () => createChatSystemPrompt(dedent`
+    An error occurred during the previous generation.
+    Please resume the conversation from where it left off.
+`);
