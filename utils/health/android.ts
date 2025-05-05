@@ -62,7 +62,7 @@ function aggregateStepsByDay(stepsRecords: ReadRecordsResult<'Steps'>['records']
     const dailySteps = new Map<string, number>();
 
     // Create entries for the last 30 days with 0 steps
-    for (let i = 0; i < 30; i++) {
+    for (let i = 30; i > 0; i--) {
         const date = dayjs().subtract(i, 'days');
         const dateStr = date.format('YYYY-MM-DD');
         dailySteps.set(dateStr, 0);
