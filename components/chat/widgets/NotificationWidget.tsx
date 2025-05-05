@@ -40,7 +40,7 @@ export default function NotificationWidget({ title, dates, type }: Readonly<Noti
                         end={vec(1, 1)}
                         style={{ borderRadius: 12, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}/>
         <CircleCheck color={colors.blue} size={24}/>
-        <Text className="flex-1 pl-2">
+        <Text className="flex-1 pl-2 text-slate-800 dark:text-slate-200">
             {description}
         </Text>
     </View>;
