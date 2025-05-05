@@ -54,6 +54,37 @@ export async function isHealthConnectInstalled() {
 
 
 /**
+ * Aggregates steps data by day
+ * @param stepsRecords Array of step records from Health Connect
+ * @returns Map with dates as keys and aggregated step counts as values
+ */
+function aggregateStepsByDay(stepsRecords: ReadRecordsResult<'Steps'>['records']): Map<Dayjs, StepsData> {
+    const dailySteps = new Map<string, number>();
+
+    // Create entries for the last 30 days with 0 steps
+    for (let i = 0; i < 30; i++) {
+        const date = dayjs().subtract(i, 'days');
+        const dateStr = date.format('YYYY-MM-DD');
+        dailySteps.set(dateStr, 0);
+    }
+
+    // Group and sum steps by date string
+    stepsRecords.forEach(record => {
+        const dateStr = dayjs(record.startTime).format('YYYY-MM-DD');
+        dailySteps.set(dateStr, (dailySteps.get(dateStr) ?? 0) + record.count);
+    });
+
+    // Convert to the required Map<Dayjs, StepsData> format
+    const result = new Map<Dayjs, StepsData>();
+    dailySteps.forEach((steps, dateStr) => {
+        result.set(dayjs(dateStr), { steps });
+    });
+
+    return result;
+}
+
+
+/**
  * Read health records for the last month.
  * Records are read in parallel for performance, but this method still takes a few hundred milliseconds.
  * @returns Health records for the last month
@@ -73,12 +104,7 @@ export async function readAndroidHealthRecords(): Promise<HealthRecords> {
     ]) as [ ReadRecordsResult<'Steps'>, ReadRecordsResult<'SleepSession'>, ReadRecordsResult<'ExerciseSession'> ];
 
     return {
-        steps: new Map<Dayjs, StepsData>(steps.records.map(r => [
-            dayjs(r.startTime),
-            {
-                steps: r.count,
-            },
-        ])),
+        steps: aggregateStepsByDay(steps.records),
         sleep: new Map<Dayjs, SleepData>(sleep.records.map(r => [
             dayjs(r.startTime),
             {
