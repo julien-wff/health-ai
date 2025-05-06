@@ -9,14 +9,7 @@ bun run build:web
 
 echo -e "${light_blue}\nPublishing web on EAS...\n${reset}"
 
-bun x eas-cli deploy
-
-echo -e "${light_blue}\nPlease enter the deployment URL:${reset}"
-read url
-
-echo -e "${light_blue}\nUpdating the environment variable...\n${reset}"
-
-bun x eas-cli env:update --environment=development --environment=preview --variable-name=EXPO_PUBLIC_API_BASE_URL --non-interactive --scope=project --value "$url"
+bun x eas-cli deploy --prod
 
 echo -e "${light_blue}\nBuilding application on EAS...!\n${reset}"
 
