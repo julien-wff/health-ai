@@ -52,6 +52,7 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     When the user clicks on the notification, it will open the app and start a new chat.
     The prompt of the user will already be filled in. This prompt is what you specify as 'userPrompt' in the tool call.
     Fill 'userPrompt' like it's the user's first message of a new chat, like him asking for an update related to the notification's content or the goal progress.
+    
     # Goals
     You can set goals to the user. 
     When creating goals, ${options.goalsCreation}.
@@ -75,6 +76,8 @@ export const getChatPrompt = (options: ChatPromptOptions) => dedent`
     Always answer in the same language as the question, no matter what. Default to English.
     Always format properly durations, like 1 hour 30 minutes instead of 90 minutes.
     Never prompt the user to write exact dates and times, like "2025-01-01 12:00". Make it as convenient as possible for the user, even if you have to decide yourself the exact date or time.
+    Don't call the print() function, it doesn't exist. To display a graph, use the 'display' parameter of the graph tool.
+    If the returned health data is empty, it's a problem on the user end, like missing data or a bad Health Connect setup.
 
     # Context
     For your information, today is ${getCurrentDateFormatted()}.
@@ -95,6 +98,7 @@ export const getSuggestionPrompt = () => dedent`
     You are generating conversation continuation suggestions for a health assistant dialogue.
     Your ONLY task is to create 3-5 short, natural response options that the user might say next.
     Each suggestion must be 2-8 words and sound like natural human speech.
+    Keep the same language as the conversation (default: English).
     Base suggestions on the conversation context:
     
     If the assistant asked a question:
