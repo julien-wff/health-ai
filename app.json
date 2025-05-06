@@ -1,89 +1,99 @@
 {
-    "expo": {
-        "name": "Health AI",
-        "slug": "health-ai",
-        "scheme": "health-ai",
-        "version": "1.3.2",
-        "orientation": "portrait",
-        "userInterfaceStyle": "automatic",
-        "newArchEnabled": true,
-        "icon": "./assets/icons/icon.png",
-        "android": {
-            "package": "com.julienwff.healthai",
-            "adaptiveIcon": {
-                "foregroundImage": "./assets/icons/adaptive-icon.png",
-                "backgroundColor": "#FFFFFF"
-            },
-            "permissions": [
-                "android.permission.health.READ_STEPS",
-                "android.permission.health.READ_SLEEP",
-                "android.permission.health.READ_EXERCISE",
-                "android.permission.SCHEDULE_EXACT_ALARM"
-            ]
-        },
-        "ios": {
-            "bundleIdentifier": "com.julienwff.healthai"
-        },
-        "web": {
-            "bundler": "metro",
-            "output": "server"
-        },
-        "plugins": [
-            "expo-router",
-            "expo-health-connect",
-            [
-                "expo-splash-screen",
-                {
-                    "backgroundColor": "#f8fafc",
-                    "image": "./assets/icons/splash-icon.png",
-                    "resizeMode": "contain",
-                    "dark": {
-                        "image": "./assets/icons/splash-icon-dark.png",
-                        "backgroundColor": "#0f172a"
-                    },
-                    "imageWidth": 200
-                }
-            ],
-            [
-                "expo-build-properties",
-                {
-                    "android": {
-                        "compileSdkVersion": 35,
-                        "targetSdkVersion": 35,
-                        "minSdkVersion": 26
-                    }
-                }
-            ],
-            [
-                "@sentry/react-native/expo",
-                {
-                    "url": "https://sentry.io/",
-                    "project": "health-ai",
-                    "organization": "julien-wff"
-                }
-            ],
-            [
-                "expo-check-installed-apps",
-                {
-                    "android": [
-                        "com.google.android.apps.healthdata"
-                    ]
-                }
-            ],
-            "expo-localization",
-            "react-native-health"
-        ],
-        "experiments": {
-            "typedRoutes": true
-        },
-        "extra": {
-            "router": {
-                "origin": false
-            },
-            "eas": {
-                "projectId": "ee4962d3-730a-49a4-9980-9d6a698c390a"
-            }
-        },
-        "owner": "julien-wff-org"
+  "expo": {
+    "name": "Health AI",
+    "slug": "health-ai",
+    "scheme": "health-ai",
+    "version": "1.3.2",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "icon": "./assets/icons/icon.png",
+    "android": {
+      "package": "com.julienwff.healthai",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icons/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "permissions": [
+        "android.permission.health.READ_STEPS",
+        "android.permission.health.READ_SLEEP",
+        "android.permission.health.READ_EXERCISE",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.health.READ_STEPS",
+        "android.permission.health.READ_SLEEP",
+        "android.permission.health.READ_EXERCISE",
+        "android.permission.SCHEDULE_EXACT_ALARM"
+      ]
+    },
+    "ios": {
+      "bundleIdentifier": "com.julienwff.healthai"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "server"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-health-connect",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#f8fafc",
+          "image": "./assets/icons/splash-icon.png",
+          "resizeMode": "contain",
+          "dark": {
+            "image": "./assets/icons/splash-icon-dark.png",
+            "backgroundColor": "#0f172a"
+          },
+          "imageWidth": 200
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "minSdkVersion": 26
+          }
+        }
+      ],
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "health-ai",
+          "organization": "julien-wff"
+        }
+      ],
+      [
+        "expo-check-installed-apps",
+        {
+          "android": [
+            "com.google.android.apps.healthdata"
+          ]
+        }
+      ],
+      "expo-localization",
+      "react-native-health"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ee4962d3-730a-49a4-9980-9d6a698c390a"
+      }
+    },
+    "owner": "julien-wff-org",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/ee4962d3-730a-49a4-9980-9d6a698c390a"
     }
+  }
 }
