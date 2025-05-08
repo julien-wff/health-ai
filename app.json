@@ -3,7 +3,7 @@
     "name": "Health AI",
     "slug": "health-ai",
     "scheme": "health-ai",
-    "version": "1.3.2",
+    "version": "1.3.3",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -89,7 +89,7 @@
       }
     },
     "owner": "julien-wff-org",
-    "runtimeVersion": "1.3.2-1",
+    "runtimeVersion": "1.3.3-0",
     "updates": {
       "url": "https://u.expo.dev/ee4962d3-730a-49a4-9980-9d6a698c390a"
     }
