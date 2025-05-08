@@ -1,5 +1,6 @@
-import { Linking, Platform, ScrollView, Text, View } from 'react-native';
-import { SquareArrowOutUpRight } from 'lucide-react-native';
+import { Linking, Platform, ScrollView, Text, ToastAndroid, View } from 'react-native';
+import { RefreshCw, SquareArrowOutUpRight } from 'lucide-react-native';
+import * as Update from 'expo-updates';
 import { useColors } from '@/hooks/useColors';
 import ResetAppBtn from '@/components/profile/ResetAppBtn';
 import DebugInfoBtn from '@/components/profile/DebugInfoBtn';
@@ -33,6 +34,19 @@ export default function Profile() {
         }
     }
 
+    async function handleCheckForUpdate() {
+        tracking.event('profile_check_for_update');
+        const res = await Update.checkForUpdateAsync();
+        if (res.isAvailable) {
+            tracking.event('profile_update_available');
+            ToastAndroid.show('Update available, downloading and reloading app...', ToastAndroid.SHORT);
+            await Update.fetchUpdateAsync();
+            await Update.reloadAsync();
+        } else {
+            ToastAndroid.show('No update available', ToastAndroid.SHORT);
+        }
+    }
+
     return <SafeAreaView className="flex h-full gap-4 bg-slate-50 p-4 dark:bg-slate-950">
         <ViewHeaderWithBack>Settings</ViewHeaderWithBack>
 
@@ -62,6 +76,9 @@ export default function Profile() {
 
                 <Text className="mt-4 ml-4 text-slate-800 dark:text-slate-200">Debug</Text>
                 <View className="rounded-lg bg-white dark:bg-slate-900">
+                    <ProfileBtn icon={RefreshCw} separator onPress={handleCheckForUpdate}>
+                        Check for update
+                    </ProfileBtn>
                     <CopyStorageBtn/>
                     {hasDebugAccess && <AdvancedDebugBtn/>}
                     <DebugInfoBtn/>
