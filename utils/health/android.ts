@@ -95,6 +95,7 @@ export async function readAndroidHealthRecords(): Promise<HealthRecords> {
             startTime: dayjs().subtract(1, 'month').toISOString(),
             operator: 'after',
         },
+        pageSize: 200000,
     } satisfies ReadRecordsOptions;
 
     const [ steps, sleep, exercise ] = await Promise.all([
