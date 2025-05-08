@@ -12,8 +12,8 @@ import {
     ToolParameters,
     tools,
 } from '@/utils/ai';
-import { type ChatRequestBody, getStorageChat, saveStorageChat } from '@/utils/chat';
-import { getExtrovertFirstMessagePrompt, isChatSystemPrompt } from '@/utils/prompts';
+import { type ChatRequestBody, getChatsHistoryFormatted, getStorageChat, saveStorageChat } from '@/utils/chat';
+import { getExtrovertFirstMessagePrompt, isChatSystemPrompt, retryAfterErrorPrompt } from '@/utils/prompts';
 import { generateAPIUrl } from '@/utils/endpoints';
 import { filterCollectionRange, formatCollection } from '@/utils/health';
 import { useChat } from '@ai-sdk/react';
@@ -29,11 +29,18 @@ import HealthDataFoundNotification from '@/components/notification/HealthDataFou
 import EmptyHealthNotification from '@/components/notification/EmptyHealthNotification';
 import { useTracking } from '@/hooks/useTracking';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
-import { scheduleNotification } from '@/utils/local-notification';
 import { createGoalAndSave, formatGoalForAI, updateGoalAndSave } from '@/utils/goals';
+import {
+    cancelScheduledNotifications,
+    formatScheduleNotificationResponseForAI,
+    getAllScheduledNotificationsForAI,
+    rescheduleNotification,
+    scheduleNotifications,
+} from '@/utils/local-notification';
 
 export default function Chat() {
     const {
+        chats,
         addOrUpdateChat,
         requireNewChat,
         setRequireNewChat,
@@ -61,7 +68,7 @@ export default function Chat() {
     const [ chatAgentMode, setChatAgentMode ] = useState(agentMode);
     const [ suggestions, setSuggestions ] = useState<string[]>([]);
 
-    const { messages, setInput, input, handleSubmit, setMessages, stop, status } = useChat({
+    const { messages, setInput, input, handleSubmit, setMessages, stop, status, error } = useChat({
         id: chatId,
         fetch: expoFetch as unknown as typeof globalThis.fetch,
         api: generateAPIUrl(`/api/chat`),
@@ -69,10 +76,11 @@ export default function Chat() {
             options.requestBody = {
                 agentMode: chatAgentMode ?? 'introvert',
                 goals: goals.map(formatGoalForAI),
+                history: getChatsHistoryFormatted(chatId, agentMode, chats),
             } satisfies ChatRequestBody;
             return options;
         },
-        maxSteps: 5,
+        maxSteps: 8,
         onError: error => {
             Sentry.captureException(error);
             console.error(error, 'ERROR');
@@ -91,10 +99,29 @@ export default function Chat() {
                     return formatCollection(data, dataType);
                 }
                 case 'schedule-notification': {
-                    const { title, body, date, userPrompt } = toolCall.args as ToolParameters<'schedule-notification'>;
-                    const notificationResponse = await scheduleNotification(title, body, date, chatId, userPrompt);
-                    tracking.event('chat_schedule_notification', { status: notificationResponse.status });
-                    return notificationResponse.status;
+                    const {
+                        title,
+                        body,
+                        dateList,
+                        userPrompt,
+                    } = toolCall.args as ToolParameters<'schedule-notification'>;
+                    tracking.event('chat_schedule_notification');
+                    return scheduleNotifications(title, body, dateList, chatId, userPrompt)
+                        .then(formatScheduleNotificationResponseForAI);
+                }
+                case 'reschedule-notification': {
+                    const { identifier, date } = toolCall.args as ToolParameters<'reschedule-notification'>;
+                    tracking.event('chat_reschedule_notification');
+                    return rescheduleNotification(identifier, date).then(formatScheduleNotificationResponseForAI);
+                }
+                case 'get-notifications':
+                    tracking.event('chat_get_notifications');
+                    return getAllScheduledNotificationsForAI();
+                case 'cancel-notification': {
+                    const { identifiers } = toolCall.args as ToolParameters<'cancel-notification'>;
+                    tracking.event('chat_cancel_notification');
+                    await cancelScheduledNotifications(identifiers);
+                    return 'success';
                 }
                 case 'create-user-goal': {
                     const goal = await createGoalAndSave(toolCall.args as ToolParameters<'create-user-goal'>);
@@ -238,6 +265,10 @@ export default function Chat() {
             tracking.event('chat_drawer_close');
     }, [ drawerOpened ]);
 
+    function retryAfterError() {
+        setInput(retryAfterErrorPrompt());
+    }
+
     /**
      * Stop current message streaming (if any) and navigate to new chat screen
      */
@@ -260,7 +291,7 @@ export default function Chat() {
 
                     {messages.length === 0
                         ? <ChatEmptyMessages onPromptClick={p => setInput(p)}/>
-                        : <ChatMessages messages={messages}/>
+                        : <ChatMessages messages={messages} error={error ?? null} retryAfterError={retryAfterError}/>
                     }
 
                     <PromptInput input={input}

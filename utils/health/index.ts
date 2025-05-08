@@ -77,6 +77,10 @@ export const parseRange = (start: Dayjs | Date | string, end: Dayjs | Date | str
  * @returns Array of formatted strings
  */
 function formatStepsCollection(collection: StepsCollection) {
+    if (Array.from(collection.values()).every(v => v.steps === 0)) {
+        return [ 'No data available for the selected period. This is likely an error on the user end. Tell him.' ];
+    }
+
     return Array.from(collection.entries()).map(([ key, value ]) =>
         `${key.format('YYYY-MM-DD')}: ${value.steps} steps`,
     );
@@ -88,6 +92,10 @@ function formatStepsCollection(collection: StepsCollection) {
  * @returns Array of formatted strings
  */
 function formatExerciseCollection(collection: ExerciseCollection) {
+    if (Array.from(collection.values()).every(v => v.duration.asMinutes() === 0)) {
+        return [ 'No data available for the selected period. This is likely an error on the user end. Tell him.' ];
+    }
+
     return Array.from(collection.entries()).map(([ key, value ]) =>
         `${key.format('YYYY-MM-DD')}: ${value.duration.format('H[h] mm[min]')} of ${value.type}`,
     );
@@ -99,6 +107,10 @@ function formatExerciseCollection(collection: ExerciseCollection) {
  * @returns Array of formatted strings
  */
 function formatSleepCollection(collection: SleepCollection) {
+    if (Array.from(collection.values()).every(v => v.duration.asMinutes() === 0)) {
+        return [ 'No data available for the selected period. This is likely an error on the user end. Tell him.' ];
+    }
+
     return Array.from(collection.entries()).map(([ key, value ]) =>
         `${key.format('YYYY-MM-DD')}: ${value.duration.format('H[h] mm[min]')} of sleep, `
         + `from ${key.format('HH:mm')} to ${value.endTime.format('HH:mm')}`,
@@ -112,6 +124,10 @@ function formatSleepCollection(collection: SleepCollection) {
  * @returns Array of formatted strings
  */
 export function formatCollection(collection: HealthRecordsCollection, type: 'steps' | 'exercise' | 'sleep') {
+    if (collection.size === 0) {
+        return [ 'No data available for the selected period. This is likely an error on the user end. Tell him.' ];
+    }
+
     switch (type) {
         case 'steps':
             return formatStepsCollection(collection as StepsCollection);

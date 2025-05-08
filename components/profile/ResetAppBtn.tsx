@@ -5,6 +5,7 @@ import { Trash } from 'lucide-react-native';
 import { Alert, useColorScheme } from 'react-native';
 import ProfileBtn from '@/components/profile/ProfileBtn';
 import { useTracking } from '@/hooks/useTracking';
+import * as Notifications from 'expo-notifications';
 
 export default function ResetAppBtn() {
     const router = useRouter();
@@ -42,6 +43,7 @@ export default function ResetAppBtn() {
         console.log(`Removed ${keys.length} keys`);
         setChats([]);
         setGoals([]);
+        await Notifications.cancelAllScheduledNotificationsAsync();
         router.replace('/onboarding/health');
     }
 

@@ -8,11 +8,5 @@ export const generateAPIUrl = (relativePath: string) => {
         return origin.concat(path);
     }
 
-    if (!process.env.EXPO_PUBLIC_API_BASE_URL) {
-        throw new Error(
-            'EXPO_PUBLIC_API_BASE_URL environment variable is not defined',
-        );
-    }
-
-    return process.env.EXPO_PUBLIC_API_BASE_URL.concat(path);
+    return (process?.env?.EXPO_PUBLIC_API_BASE_URL ?? 'https://aau-25-health-ai.expo.app').concat(path);
 };
