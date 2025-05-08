@@ -163,7 +163,7 @@ export const getExtrovertFirstMessagePrompt = (notificationPrompt: string | null
     Include a relevant graph visualization to support your observation.
     Don't ask permission to show data or recommendations - be confidently helpful.
     End with an implicit invitation for the user to respond, but don't explicitly ask "how can I help you?".
-    Try to not make the same statement as another chat from the same day (according to the chat history).
+    Avoid repeating health topics (sleep, steps, exercise) from today's chat history. Choose a fresh topic or discuss goals.
 ` + (!notificationPrompt ? '' : ' \n\n' + dedent`
         The user started this chat because he clicked on a notification.
         The notification prompt was: ${notificationPrompt}
