@@ -15,7 +15,8 @@ export default function DebugInfoBtn() {
 
     const env = process.env.APP_VARIANT || process.env.NODE_ENV;
     const debugInfo = dedent`
-        ${Constants.expoConfig?.name} v${Constants.expoConfig?.version}-${env} (runtime v${Updates.runtimeVersion})
+        ${Constants.expoConfig?.name} v${Constants.expoConfig?.version}-${env} 
+        Runtime v${Updates.runtimeVersion} (${Updates.channel})
         UID: ${posthog.getAnonymousId()}
     `;
 
