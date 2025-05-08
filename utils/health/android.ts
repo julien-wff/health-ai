@@ -2,7 +2,13 @@ import { numberToExerciseType } from '@/utils/health/androidExerciseType';
 import { ExerciseData, HealthRecords, SleepData, StepsData } from '@/utils/health/index';
 import dayjs, { Dayjs } from 'dayjs';
 import { checkInstalledApps } from 'expo-check-installed-apps';
-import type { Permission, ReadRecordsOptions, ReadRecordsResult } from 'react-native-health-connect';
+import type {
+    Permission,
+    ReadRecordsOptions,
+    ReadRecordsResult,
+    RecordResult,
+    RecordType,
+} from 'react-native-health-connect';
 import { Platform } from 'react-native';
 
 
@@ -83,6 +89,36 @@ function aggregateStepsByDay(stepsRecords: ReadRecordsResult<'Steps'>['records']
     return result;
 }
 
+const RECORDS_READ_OPTIONS = {
+    timeRangeFilter: {
+        startTime: dayjs().subtract(1, 'month').toISOString(),
+        operator: 'after',
+    },
+    pageSize: 4000,
+} satisfies ReadRecordsOptions;
+
+
+/**
+ * Read health records from Health Connect accounting for pagination
+ * @param record The type of record to read
+ * @returns All records from the last month
+ */
+async function readHealthRecords<T extends RecordType>(record: T): Promise<RecordResult<T>[]> {
+    let records: RecordResult<T>[] = [];
+    let pageToken: string | undefined = undefined;
+
+    do {
+        const result: ReadRecordsResult<T> = await healthConnect!.readRecords(record, {
+            ...RECORDS_READ_OPTIONS,
+            pageToken,
+        });
+        records = records.concat(result.records);
+        pageToken = result.pageToken;
+    } while (pageToken);
+
+    return records;
+}
+
 
 /**
  * Read health records for the last month.
@@ -90,30 +126,23 @@ function aggregateStepsByDay(stepsRecords: ReadRecordsResult<'Steps'>['records']
  * @returns Health records for the last month
  */
 export async function readAndroidHealthRecords(): Promise<HealthRecords> {
-    const readOptions = {
-        timeRangeFilter: {
-            startTime: dayjs().subtract(1, 'month').toISOString(),
-            operator: 'after',
-        },
-        pageSize: 200000,
-    } satisfies ReadRecordsOptions;
 
     const [ steps, sleep, exercise ] = await Promise.all([
-        healthConnect!.readRecords('Steps', readOptions),
-        healthConnect!.readRecords('SleepSession', readOptions),
-        healthConnect!.readRecords('ExerciseSession', readOptions),
-    ]) as [ ReadRecordsResult<'Steps'>, ReadRecordsResult<'SleepSession'>, ReadRecordsResult<'ExerciseSession'> ];
+        readHealthRecords('Steps'),
+        readHealthRecords('SleepSession'),
+        readHealthRecords('ExerciseSession'),
+    ]);
 
     return {
-        steps: aggregateStepsByDay(steps.records),
-        sleep: new Map<Dayjs, SleepData>(sleep.records.map(r => [
+        steps: aggregateStepsByDay(steps),
+        sleep: new Map<Dayjs, SleepData>(sleep.map(r => [
             dayjs(r.startTime),
             {
                 endTime: dayjs(r.endTime),
                 duration: dayjs.duration(dayjs(r.endTime).diff(dayjs(r.startTime))),
             },
         ])),
-        exercise: new Map<Dayjs, ExerciseData>(exercise.records.map(r => [
+        exercise: new Map<Dayjs, ExerciseData>(exercise.map(r => [
             dayjs(r.startTime),
             {
                 endTime: dayjs(r.endTime),
