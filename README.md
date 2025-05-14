@@ -40,3 +40,20 @@ More specifically, there are two versions of the chatbot:
 
 At the beginning of the two-week study, each participant is assigned one of the two versions of the chatbot. Then, after
 one week and an interview, the participants switch version for the remaining week.
+
+## Screenshots
+
+<table>
+  <tr>
+    <td valign="top">
+      <p align="center"><strong>Demo Video</strong></p>
+      <video controls width="300" src="https://github.com/user-attachments/assets/18b93f18-821c-4c60-a1c8-7d67e6586582">
+          Your browser does not support the video tag.
+      </video>
+    </td>
+    <td valign="top">
+      <p align="center"><strong>Health AI Chat (Dark Mode)</strong></p>
+      <img src="https://github.com/user-attachments/assets/4077b14f-4d63-4d5a-ab9b-17ab08e3d428" alt="health-ai-chat-dark" width="300">
+    </td>
+  </tr>
+</table>
